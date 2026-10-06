@@ -16,15 +16,23 @@ const HEAD: Record<RouteKey, { title: string; sub: string }> = {
   },
   insights: {
     title: "Insights",
-    sub: "Where your money goes, how it compares with common guidelines, and what stands out.",
+    sub: "A quick health check of your budget, what to do next, and the numbers behind it.",
   },
   monthly: {
     title: "Month by month",
-    sub: "Every month laid out in a table, with short and long term recommendations.",
+    sub: "What you save each month, where it comes from, and how your balance builds.",
   },
   goals: {
     title: "Goals",
     sub: "Plan the big purchases you are saving for.",
+  },
+  millionaire: {
+    title: "Road to millionaire",
+    sub: "When your savings reach your target if you invest them, and what gets you there sooner.",
+  },
+  pension: {
+    title: "Pension",
+    sub: "How much you will have when you retire at 65 on July 2, 2062, and where it comes from.",
   },
   knowledge: { title: "Knowledge", sub: "" },
 };

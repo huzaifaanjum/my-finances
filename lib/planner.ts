@@ -98,7 +98,36 @@ function daily(n){
 }
 
 /* rendering helpers */
-const kpi=(k,v,n,c="")=>`<div class="kpi ${c}"><div class="k">${k}</div><div class="v">${v}</div><div class="n">${n}</div></div>`;
+/* plain-language explanations for stat cards, matched by the start of the card label */
+const KTIPS=[
+  ["Saved by","Your projected savings at the end of the period you picked: what you have now, plus your monthly surplus, plus any bonuses."],
+  ["Savings rate","The share of your take-home pay left after all expenses. Saving 20% or more is a common target."],
+  ["Emergency fund","When your savings cover one month of expenses, and then three. This cushion protects you from a job loss or a surprise bill."],
+  ["Next milestone","The next savings level you will reach, and the month you are expected to get there."],
+  ["Bonuses and one-time money","Signing payments, the yearly incentive and other one-off money in this period, and how much of your savings they make up."],
+  ["Lowest balance","The lowest your bank account gets, usually just before payday. Below $0 means you would be overdrawn."],
+  ["Balance by","Your savings at the end of the period, after every month's deposit."],
+  ["Typical month","The average you save in a month. The first month is left out so this reflects a normal month."],
+  ["Best month","The month you save the most, usually because a bonus arrives then."],
+  ["Bonuses and one-time","All bonus and one-off money in the period, and its share of everything you save. Do not count on it for bills."],
+  ["You reach","The month your invested savings reach your target, if returns match the rate you chose."],
+  ["Invest each month","What goes into your investments each month: your surplus plus any extra you add. It grows each year by the increase you set."],
+  ["You put in","The total of your own money invested by the time you reach the target."],
+  ["Growth from returns","Money your investments earn on their own. Over long periods it can overtake what you put in."],
+  ["In today's dollars","What the target would buy in today's money once prices rise 2% a year. A million in the future buys less than a million today."],
+  ["Total pension at 65","The projected value of your Air Canada pension account when you turn 65: your contributions, Air Canada's match and the growth on both."],
+  ["Your contributions","The 6% of your salary taken from every paycheque and paid into the pension, added up until you turn 65."],
+  ["Air Canada adds","Air Canada matches your 6% with 6% of its own. It is extra pay that goes straight into your pension."],
+  ["Investment growth","What the pension fund earns by investing the contributions. Money that goes in early has the longest time to grow."],
+  ["Monthly income at 65","What you could spend each month in retirement, in today's money, from your pension, your own investments, QPP and OAS."],
+  ["Monthly payment","Your car loan payment each month. Try to keep it under 10 to 15% of take-home pay."],
+  ["Extra you pay in interest","What the loan costs on top of the car's price. A shorter loan or a lower rate cuts it."],
+  ["Total cost of the car","The price, plus sales tax, plus all the interest you pay over the life of the loan."],
+  ["You borrow","The loan amount: the price with tax, minus your down payment."],
+  ["Paid off by","The month you make your last car payment."],
+  ["Left over after the payment","Your monthly surplus after the car payment. This is what you can still save."]];
+const ktip=k=>{const t=KTIPS.filter(t=>k.startsWith(t[0])).sort((a,b)=>b[0].length-a[0].length)[0];return t?t[1]:"";};
+const kpi=(k,v,n,c="",tip="")=>{const t=tip||ktip(k);return `<div class="kpi ${c}"><div class="k">${k}${t?`<button type="button" class="ktip" aria-label="What this means" data-tip="${t.replace(/"/g,"&quot;")}">i</button>`:""}</div><div class="v">${v}</div><div class="n">${n}</div></div>`;};
 const bar=(w,col,mark)=>`<div class="bar"><i style="width:${Math.max(0,Math.min(100,w*100))}%;background:${col}"></i>${mark!==undefined?`<s style="left:${mark*100}%"></s>`:""}</div>`;
 
 function run(){
@@ -120,7 +149,6 @@ function run(){
   const hs=$("health");
   hs.className="badge "+(left<0?"neg":rate>=.2?"pos":"warn");
   hs.innerHTML="<i></i>"+(left<0?"Over budget":rate>=.2?"On track":rate>=.1?"Tight":"Low savings");
-  $("chips").innerHTML=[["Start","Oct 2026"],["Horizon",hl],["Take-home",f(V.net)+"/mo"],["Saving",pc(Math.max(0,rate))]].map(c=>`<span class="chip">${c[0]} <b>${c[1]}</b></span>`).join("");
 
   /* milestones */
   const T=[["1 month of expenses",V.exp],["3 months of expenses",V.exp*3],["$10,000",10000],["$25,000",25000],["$50,000",50000],["$100,000",100000]].filter(t=>t[1]>0).sort((a,b)=>a[1]-b[1]);
@@ -147,10 +175,19 @@ function run(){
   const top=[...V.cats].sort((a,b)=>b.m-a.m).slice(0,5),mx=top[0]?top[0].m||1:1;
   $("cats").innerHTML='<div class="lrow" style="margin-top:16px"><span><em>Biggest categories</em></span><span></span></div>'+top.map(c=>`<div class="lrow" style="margin:8px 0 4px"><span>${c.n}</span><span>${f(c.m)}</span></div>${bar(c.m/mx,GC[c.g])}`).join("");
 
-  /* needs / wants / savings */
+  /* needs / wants / savings: waffle of take-home */
   const needs=V.cats.filter(c=>c.need).reduce((t,c)=>t+c.m,0),wants=V.exp-needs,sv=Math.max(0,left),nt=V.net||1;
-  $("rule").innerHTML=[["Needs","rent, bills, groceries, transit, health",needs,.5,"var(--scotia)"],["Wants","subscriptions, eating out, shopping, other",wants,.3,"var(--promo)"],["Savings","what is left over",sv,.2,"var(--std)"]].map(r=>
-    `<div class="lrow" style="margin:0 0 5px"><span>${r[0]} <em>· ${r[1]}</em></span><span>${f(r[2])} · ${pc(r[2]/nt)}</span></div>${bar(r[2]/nt,r[4],r[3])}<div style="height:14px"></div>`).join("");
+  {
+    const over=left<0,base=over?V.exp:nt,parts=[["Needs",needs,"var(--scotia)",.5,"rent, bills, groceries, transit, health"],["Wants",wants,"var(--promo)",.3,"subscriptions, eating out, shopping, other"],["Savings",sv,"var(--std)",.2,"what is left over"]];
+    const raw=parts.map(p=>p[1]/base*100),cnt=raw.map(Math.floor);let rem=100-cnt.reduce((t,c)=>t+c,0);
+    raw.map((r,i)=>[r-Math.floor(r),i]).sort((x,y)=>y[0]-x[0]).forEach(([,i])=>{if(rem>0){cnt[i]++;rem--;}});
+    $("waf").innerHTML=parts.map((p,i)=>`<i style="background:${p[2]}"></i>`.repeat(cnt[i])).join("");
+    $("waf").setAttribute("aria-label",parts.map((p,i)=>p[0]+" "+cnt[i]+"%").join(", "));
+    $("wafd").textContent=over?"You spend more than you earn, so each square here is 1% of your spending.":"Each square is 1% of your "+f(V.net)+" take-home, about "+f(V.net/100)+". The 50/30/20 guideline is 50 needs, 30 wants, 20 savings.";
+    $("rule").innerHTML=parts.map(p=>{const pct=p[1]/nt,d=Math.round((pct-p[3])*100),good=p[0]==="Savings"?d>=0:d<=0;
+      return `<div class="wl"><div class="wlh"><span><i style="background:${p[2]}"></i>${p[0]}</span><b>${pc(pct)}</b></div><div class="wls">${f(p[1])} · ${p[4]}</div>`+
+        `<div class="wlv ${good?"ok":"bad"}">${d===0?"Right on the "+pc(p[3])+" guideline":(Math.abs(d)+" points "+(d>0?"above":"below")+" the "+pc(p[3])+" guideline")}</div></div>`;}).join("");
+  }
 
   /* tax-sheltered room */
   const tf=Math.max(0,+$("tfsa").value||0),fh=Math.max(0,+$("fhsa").value||0);
@@ -160,17 +197,140 @@ function run(){
   $("fhsab").style.width=Math.min(100,fh?Math.max(0,dec)/fh*100:0)+"%";
   $("fhsat").innerHTML=fh?"By Dec 31 your savings would be about <b>"+f(Math.max(0,dec))+"</b>. Contributing that to an FHSA by Dec 31 could add roughly <b>"+f(est)+"</b> to your 2026 refund (estimate). Cover your 1-month fund first.":"Enter your FHSA room.";
 
-  /* insights */
-  const ins=[];
-  if(lo.bal<0)ins.push("<b>Warning:</b> your cash balance dips below zero around "+MN[lod.getMonth()]+" "+lod.getDate()+". Lower expenses or move a bonus earlier.");
-  ins.push(left<0?"Your expenses are <b>"+f(-left)+"</b> a month more than your take-home, so savings shrink.":"You save <b>"+pc(rate)+"</b> of take-home. A common target is 20%"+(rate>=.2?", so you are ahead of it.":", so there is room to improve."));
-  const rent=V.cats.find(c=>c.n==="Rent");
-  if(rent&&V.net)ins.push("Rent is <b>"+pc(rent.m/V.net)+"</b> of take-home. A common guideline is about 30%.");
-  ins.push("Needs take <b>"+pc(needs/nt)+"</b> of your pay (guideline 50%) and wants <b>"+pc(wants/nt)+"</b> (guideline 30%).");
-  if(extra>0)ins.push("Bonuses and one-time money are <b>"+f(extra)+"</b> of your savings by "+last.lab+". They depend on you staying employed, so do not count on them for bills.");
-  const big=top[0];if(big&&big.n!=="Rent")ins.push("Your biggest category is <b>"+big.n+"</b> at "+f(big.m)+" a month.");
-  ins.push("Every <b>$100</b> a month you trim adds <b>$1,200</b> a year to savings.");
-  $("ins").innerHTML=ins.map(t=>"<li>"+t+"</li>").join("");
+  /* health check */
+  const rent=V.cats.find(c=>c.n==="Rent"),rm=rent?rent.m:0,addTot=Math.max(0,last.a-(V.start+V.lump));
+  const mo3=far.findIndex(r=>r.a>=V.exp*3),rel=addTot>0?extra/addTot:0;
+  const IC={ok:["Good","M3.5 8.5l3 3 6-7"],watch:["Watch","M8 4v5M8 12v.5"],act:["Act","M5 5l6 6M11 5l-6 6"]};
+  const tile=(t,lv,v,g,ex)=>`<div class="hct ${lv}"><div class="hctt"><span>${t}</span><span class="pill"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="${IC[lv][1]}"/></svg>${IC[lv][0]}</span></div><div class="hcv">${v}</div><div class="hcg">${g}</div><p>${ex}</p></div>`;
+  const hcs=[
+    tile("Savings rate",left<0?"act":rate>=.2?"ok":rate>=.1?"watch":"act",pc(rate),"Target 20% or more",
+      left<0?"You spend more than you earn.":rate>=.2?"You keep more than a fifth of your pay.":"Saving "+f(.2*V.net-left)+" more a month reaches 20%."),
+    tile("Rent",!rm?"ok":rm/nt<=.3?"ok":rm/nt<=.4?"watch":"act",pc(rm/nt),"Guideline about 30% of take-home",
+      !rm?"No rent entered.":rm/nt<=.3?"Housing is within the guideline.":"About "+f(rm-.3*V.net)+" a month above 30%. Your biggest single cost."),
+    tile("Needs",needs/nt<=.5?"ok":needs/nt<=.6?"watch":"act",pc(needs/nt),"Guideline 50% of take-home",
+      needs/nt<=.5?"Essentials leave room for the rest.":"Essentials crowd out wants and savings. Rent is most of it."),
+    tile("Safety net",mo3<0?"act":mo3<=12?"ok":mo3<=24?"watch":"act",mo3<0?"Not reached":mo3===0?"Reached":far[mo3].lab,f(V.exp*3)+" covers 3 months of costs",
+      mo3<0?"Raise your savings to build a cushion.":mo3===0?"You already have it.":"That is "+mo3+" months away. 1 month arrives "+e1+"."),
+    tile("Lowest cash",lo.bal<0?"act":lo.bal<V.fx?"watch":"ok",f(lo.bal),"on "+MN[lod.getMonth()]+" "+lod.getDate(),
+      lo.bal<0?"Your account would go negative. Keep "+f(-lo.bal)+" extra in chequing.":lo.bal<V.fx?"Thin cushion before payday. Avoid big purchases late in the month.":"Comfortable cushion all month."),
+    tile("Bonus reliance",rel<=.25?"ok":rel<=.5?"watch":"act",pc(rel),"of what you add by "+last.lab,
+      !extra?"None in this period. Your plan runs on pay alone.":rel<=.25?"Most of your savings come from steady pay.":"A big share depends on bonuses you might not get.")];
+  $("hc").innerHTML=hcs.join("");
+
+  /* guidelines vs you */
+  {
+    const cm=n=>V.cats.filter(c=>n.includes(c.n)).reduce((t,c)=>t+c.m,0);
+    const P=v=>v/nt,mo=v=>V.exp?v/V.exp:0,pf=v=>Math.abs(v)<.1&&v!==0?(v*100).toFixed(1)+"%":pc(v),mf=v=>v.toFixed(1)+" mo";
+    /* [group, name, what it covers, guideline text, value, fmt, good, ok, higherIsBetter, bar max] */
+    const G=[
+      ["Big picture","Savings rate","left over after all costs","20% or more",P(left),pf,.2,.15,1,.4],
+      ["Big picture","Needs","rent, bills, groceries, transit, health","50% or less",P(needs),pf,.5,.55,0,1],
+      ["Big picture","Wants","subscriptions, eating out, shopping, fun","30% or less",P(wants),pf,.3,.35,0,.6],
+      ["Spending","Rent","","30% or less",P(rm),pf,.3,.35,0,.6],
+      ["Spending","Bills","electricity, phone, Wi-Fi","10% or less",P(cm(["Electricity (bill every 2 months)","Phone","Wi-Fi"])),pf,.1,.12,0,.2],
+      ["Spending","Transit","Opus Metro pass","10% or less",P(cm(["Opus Metro pass"])),pf,.1,.15,0,.3],
+      ["Spending","Groceries","","15% or less",P(cm(["Groceries"])),pf,.15,.18,0,.3],
+      ["Spending","Eating out","","5% or less",P(cm(["Eating out"])),pf,.05,.08,0,.15],
+      ["Spending","Shopping and fun","shopping, entertainment, other","10% or less",P(cm(["Shopping","Entertainment & misc","Other"])),pf,.1,.15,0,.3],
+      ["Spending","Subscriptions","","2% or less",P(V.grp[1]),pf,.02,.03,0,.06],
+      ["Safety","Emergency fund today","savings you hold now","3 to 6 months of costs",mo(start0),mf,3,1,1,6],
+      ["Safety","Emergency fund by "+last.lab,"projected","3 to 6 months of costs",mo(last.a),mf,3,1,1,6],
+      ["Safety","Lowest cash balance","on "+MN[lod.getMonth()]+" "+lod.getDate(),"never below $0",lo.bal,f,V.fx,0,1,Math.max(V.fx*2,lo.bal,1)],
+      ["Safety","Bonus reliance","share of what you add","25% or less",rel,pf,.25,.5,0,1],
+      ["Safety","Pension","employer matches up to 6%","take the full match",1,()=>"6%",1,1,1,1]];
+    const ST={good:["Good","M3.5 8.5l3 3 6-7"],ok:["OK","M4 8h8"],bad:["Off track","M5 5l6 6M11 5l-6 6"]};
+    let cnt={good:0,ok:0,bad:0},grp="";
+    const rowsH=G.map(g=>{
+      const [gr,nm,sub,gl,v,fm,gd,ok,hi,mx]=g;
+      const st=hi?(v>=gd?"good":v>=ok?"ok":"bad"):(v<=gd?"good":v<=ok?"ok":"bad");cnt[st]++;
+      const w=Math.max(0,Math.min(1,v/mx)),mk=Math.max(0,Math.min(1,(hi&&ok===0?ok:gd)/mx));
+      const head=gr!==grp?`<div class="gvg">${gr}</div>`:"";grp=gr;
+      return head+`<div class="gvr ${st}" role="row"><div class="gvn" role="cell"><b>${nm}</b>${sub?`<span>${sub}</span>`:""}</div>`+
+        `<div class="gvgl" role="cell"><span class="gvk">Guideline</span>${gl}</div>`+
+        `<div class="gvy" role="cell"><span class="gvk">You</span><b>${fm(v)}</b></div>`+
+        `<div class="gvb" role="cell" aria-hidden="true"><i style="width:${w*100}%"></i><s style="left:${mk*100}%"></s></div>`+
+        `<div class="gvs" role="cell"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="${ST[st][1]}"/></svg>${ST[st][0]}</div></div>`;
+    }).join("");
+    $("gv").innerHTML=`<div class="gvr gvh" role="row"><div role="columnheader">Check</div><div role="columnheader">Guideline</div><div role="columnheader">You</div><div role="columnheader"><span class="vh">Bar</span></div><div role="columnheader">Status</div></div>`+rowsH;
+    $("gvd").textContent="Common rules of thumb for your take-home pay, next to your numbers. The white tick on each bar is the guideline.";
+    $("gvl").innerHTML=`<span class="good"><b>${cnt.good}</b> good</span><span class="ok"><b>${cnt.ok}</b> OK, close to the line</span><span class="bad"><b>${cnt.bad}</b> off track</span>`;
+  }
+
+  /* income target */
+  {
+    const NR=4680.90/7917,need=[["For rent to be 30% of take-home",rm/.3],["For needs to be 50% of take-home",needs/.5],["To save 20% at today's spending",V.exp/.8]];
+    const tgt=Math.ceil(Math.max(...need.map(x=>x[1]))/50)*50,gap=Math.max(0,tgt-V.net),bind=need.reduce((a,b)=>b[1]>a[1]?b:a);
+    const SAL=95000,KEEP=.5,gross=v=>v<=V.net?SAL*v/(V.net||1):SAL+(v-V.net)*12/KEEP,gy=v=>f(Math.round(gross(v)/1000)*1000);
+    $("itd").textContent="The highest of three checks sets the target. Gross pay assumes each extra dollar of salary adds about 50¢ to take-home (41 to 47.5% tax at this level plus 6% to your pension).";
+    $("itgt").innerHTML=`<div class="itn"><span>Target take-home</span><b>${f(tgt)}</b><em>a month · about ${gy(tgt)} a year before tax</em></div>`+
+      `<div class="itc"><div><span>You now</span><b>${f(V.net)}</b><em>about ${gy(V.net)} gross</em></div><div class="${gap?"bad":"good"}"><span>${gap?"Gap":"Above target by"}</span><b>${f(gap||V.net-tgt)}</b><em>${gap?"+"+pc(gap/V.net)+" a month":"you are there"}</em></div></div>`+
+      need.map(x=>`<div class="itr${x===bind?" on":""}"><div class="lrow" style="margin:0 0 5px"><span>${x[0]}${x===bind?' <em class="tag">sets the target</em>':""}</span><span>${f(x[1])}</span></div>${bar(x[1]/Math.max(tgt,V.net),x===bind?"var(--text)":"#52525b",V.net/Math.max(tgt,V.net))}</div>`).join("")+
+      `<p class="note" style="margin-top:12px">The tick on each bar is your take-home today.</p>`;
+    {
+      const r25=v=>Math.round(v/25)*25,autoT=Math.max(0,last.a)*.03/12+Math.max(0,V.exp-rm)*.015+1400/12;
+      const mix=[["rs_raise",225],["rs_room",Math.min(1500,Math.round(rm/2/50)*50)],["rs_free",400],["rs_side",225]];
+      const left2=gap-autoT-mix.reduce((t,m)=>t+m[1],0);if(left2>0)mix.push(["rs_dig",Math.min(2000,Math.ceil(left2/25)*25)]);
+      const nm=Object.fromEntries(RS.map(r=>[r[0],r[1]]));
+      $("itplan").innerHTML=gap?`<div class="grp"><span>An example plan</span><span>${f(mix.reduce((t,m)=>t+m[1],0)+autoT)}</span></div>`+
+        mix.map(m=>`<div class="kv"><span>${nm[m[0]]}</span><span>${f(m[1])}</span></div>`).join("")+
+        `<div class="kv"><span><em>Interest, cashback and tax refund</em></span><span>${f(autoT)}</span></div>`+
+        `<div class="itb"><button type="button" class="add" data-mix='${JSON.stringify(mix)}'>Try this plan</button><button type="button" class="add" data-mix='${JSON.stringify(RS.map(r=>[r[0],0]))}'>Clear sliders</button></div>`+
+        `<p class="note">No single stream closes a ${f(gap)} gap. Several small ones together can.</p>`:"";
+    }
+    /* pay package needed */
+    {
+      const B=Math.ceil(gross(tgt)/1000)*1000,pk=b=>[["Base salary",b],["Annual incentive (target 8%)",b*.08],["Employer pension match (6%)",b*.06],["Employer-paid health and dental",2996]];
+      const now=pk(SAL),nd=pk(B),tn=now.reduce((t,x)=>t+x[1],0),td=nd.reduce((t,x)=>t+x[1],0),mx=td*1.02;
+      const yrs=r=>Math.ceil(Math.log(B/SAL)/Math.log(1+r));
+      const C=["var(--text)","var(--promo)","var(--scotia)","var(--mix)"];
+      const sb=(lab,arr,tot)=>`<div class="pkr"><div class="lrow" style="margin:0 0 6px"><span>${lab}</span><span><b style="color:var(--text)">${f(tot)}</b> a year</span></div><div class="istk">${arr.map((x,i)=>`<i style="width:${x[1]/mx*100}%;background:${C[i]}" title="${x[0]}"></i>`).join("")}</div></div>`;
+      $("pkgd").textContent=B>SAL?"To take home "+f(tgt)+" a month from salary alone, your base pay would need to be about "+f(B)+", "+pc(B/SAL-1)+" more than today. Here is the full package at that salary, using your Air Canada offer terms.":"Your current salary already reaches the target.";
+      $("pkgbars").innerHTML=sb("Today",now,tn)+sb("Needed",nd,td)+
+        '<div class="legend" style="margin:6px 0 16px">'+now.map((x,i)=>`<span><i style="background:${C[i]}"></i>${x[0].replace(/ \(.*\)/,"")}</span>`).join("")+'</div>';
+      $("pkgt").innerHTML="<tr><th></th><th>Today</th><th>Needed</th><th>Change</th></tr>"+
+        now.map((x,i)=>`<tr><td>${x[0]}</td><td>${f(x[1])}</td><td>${f(nd[i][1])}</td><td class="${nd[i][1]>x[1]?"up":""}">${nd[i][1]>x[1]?"+"+f(nd[i][1]-x[1]):"–"}</td></tr>`).join("")+
+        `<tr class="tt"><td>Total yearly package</td><td>${f(tn)}</td><td>${f(td)}</td><td class="up">+${f(td-tn)}</td></tr>`+
+        `<tr><td>Monthly take-home</td><td>${f(V.net)}</td><td>${f(tgt)}</td><td class="up">+${f(gap)}</td></tr>`;
+      $("pkgn").innerHTML=B>SAL?`<div class="pkf"><div><b>${pc(B/SAL-1)}</b><span>raise needed on base pay</span></div><div><b>${yrs(.03)} years</b><span>with 3% yearly raises</span></div><div><b>${yrs(.05)} years</b><span>with 5% yearly raises</span></div><div><b>${f(B-SAL)}</b><span>more base pay a year</span></div></div>`+
+        '<p class="note" style="margin-top:12px">The incentive pays once a year in March, so it does not raise your monthly take-home and is not counted toward the target. The one-time $5,000 signing bonus, Aeroplan points, profit sharing and ESOP are left out. A promotion, a job change or a mix with the side income above can get there faster than raises alone.</p>':"";
+    }
+    const rn=$("rs_room_n");if(rn)rn.textContent=rm?"Splitting rent with one roommate frees about "+f(rm/2)+" a month.":"";
+    const auto=[["Interest on savings","3% in a high-interest account on your "+f(Math.max(0,last.a))+" balance",Math.max(0,last.a)*.03/12],
+      ["Cashback credit card","1.5% back on everyday spending, paid off monthly",Math.max(0,V.exp-rm)*.015],
+      ["Tax refund (FHSA or RRSP)","about $1,400 a year, spread over 12 months",1400/12]];
+    const CL=["var(--scotia)","var(--mix)","var(--mix)","var(--mix)","var(--promo)"];
+    const segs=RS.map((r,i)=>[r[1],V[r[0]]||0,CL[i]]).concat(auto.map(a=>[a[0],a[2],"var(--std)"])).filter(x=>x[1]>0);
+    const add=segs.reduce((t,x)=>t+x[1],0),nn=V.net+add,mx=Math.max(tgt,nn)*1.02,pct=tgt?nn/tgt:1,st=pct>=1?"good":pct>=.9?"ok":"bad";
+    $("istack").innerHTML=`<div class="istk"><i style="width:${V.net/mx*100}%;background:#52525b" title="Take-home now"></i>${segs.map(x=>`<i style="width:${x[1]/mx*100}%;background:${x[2]}" title="${x[0]}"></i>`).join("")}<s style="left:${tgt/mx*100}%"></s></div>`+
+      `<div class="legend" style="margin:8px 0 0"><span><i style="background:#52525b"></i>Take-home now</span><span><i style="background:var(--scotia)"></i>Work</span><span><i style="background:var(--mix)"></i>Side income</span><span><i style="background:var(--promo)"></i>Housing</span><span><i style="background:var(--std)"></i>Automatic</span><span><i style="background:var(--text);width:2px;height:12px"></i>Target</span></div>`+
+      `<div class="isum ${st}"><b>${f(nn)}</b> a month with these streams, <b>${pc(pct)}</b> of the ${f(tgt)} target. ${pct>=1?"Rent, needs and savings would all fit the guidelines.":"Still "+f(tgt-nn)+" a month to go."}</div>`;
+    $("iauto").innerHTML='<div class="grp" style="margin-top:20px"><span>Already counted, no extra work</span><span>'+f(auto.reduce((t,a)=>t+a[2],0))+'</span></div>'+
+      auto.map(a=>`<div class="kv"><span><i class="sw" style="background:var(--std)"></i>${a[0]} <em>· ${a[1]}</em></span><span>${f(a[2])}</span></div>`).join("")+
+      '<p class="note" style="margin-top:10px">Side income is taxed at your marginal rate, roughly 37% in Quebec at $95,000, so the slider amounts are after that. Check your employment contract before taking outside work.</p>';
+  }
+
+  /* what to do next, ranked by monthly value */
+  const acts=[];
+  const wantsC=V.cats.filter(c=>!c.need&&c.m>0).sort((a,b)=>b.m-a.m);
+  if(lo.bal<0)acts.push([1e9,"Keep a buffer in chequing",`Your balance dips to <b>${f(lo.bal)}</b> on ${MN[lod.getMonth()]} ${lod.getDate()}. Leave <b>${f(-lo.bal)}</b> extra in chequing or move a bill after payday.`]);
+  if(rm/nt>.3)acts.push([rm-.3*V.net,"Lower your housing cost",`Rent is <b>${f(rm)}</b>, ${pc(rm/nt)} of take-home. Getting to 30% would free <b>${f(rm-.3*V.net)}</b> a month. A roommate or a cheaper place at renewal is your biggest lever.`]);
+  if(wantsC[0])acts.push([wantsC[0].m/2,"Trim your biggest want",`<b>${wantsC[0].n}</b> costs ${f(wantsC[0].m)} a month. Halving it saves <b>${f(wantsC[0].m/2)}</b> a month, <b>${f(wantsC[0].m*6)}</b> a year.`]);
+  if(V.grp[1]>0)acts.push([V.grp[1]/3,"Review subscriptions",`They add up to <b>${f(V.grp[1]*12)}</b> a year. Cancel anything you have not used this month.`]);
+  if(left>0)acts.push([left,"Automate your savings",`Set a <b>${f(left)}</b> transfer for payday so it leaves chequing before you can spend it.`]);
+  if(mo3>0)acts.push([V.exp/12,"Build your safety net first",`Park savings in a high-interest account until you hold <b>${f(V.exp*3)}</b> (three months of costs), expected <b>${far[mo3].lab}</b>.`]);
+  if(extra>0)acts.push([extra/Math.max(1,V.n),"Bank bonuses on arrival",`<b>${f(extra)}</b> in bonuses and one-time money lands by ${last.lab}. Send it straight to savings; do not plan bills around it.`]);
+  acts.sort((a,b)=>b[0]-a[0]);
+  $("ins").innerHTML=acts.slice(0,5).map(a=>`<li><b class="at">${a[1]}</b><span>${a[2]}</span></li>`).join("");
+
+  /* quick facts */
+  const D=30.4,wd=21.7;
+  const FX=[[f(Math.max(0,left)/D,2),"saved per day","from your monthly surplus"],
+    [f(V.vr/D,2),"day-to-day spending per day","groceries, eating out, shopping"],
+    [rm?(rm/V.net*wd).toFixed(1)+" days":"–","of work each month pays rent","out of about 22 working days"],
+    [f(V.exp*12),"spent in a year","at today's budget"],
+    [f(Math.max(0,left)*12),"saved from pay in a year","before bonuses"],
+    [f(V.grp[1]*12),"on subscriptions a year",f(V.grp[1])+" a month"]];
+  $("facts").innerHTML=FX.map(x=>`<div class="fact"><b>${x[0]}</b><span>${x[1]}</span><em>${x[2]}</em></div>`).join("");
 
   /* goals */
   const homeNeed=V.home*V.dpp/100+V.home*.03;
@@ -215,9 +375,8 @@ function run(){
   $("dates").innerHTML=KD.map(k=>{const d=Math.ceil((new Date(k[0]+"T23:59:59")-now)/864e5);
     return `<div class="ev${d<0?" past":""}"><b>${k[1]}</b><span>${k[2]}</span><em>${d<0?"passed":d===0?"today":"in "+d+" days"}</em></div>`;}).join("");
 
-  /* table */
-  $("tbl").innerHTML="<tr><th>Month</th><th>Surplus from pay</th><th>Bonuses and one-time</th><th>Total saved</th><th>Savings balance</th></tr>"+
-    rows.map(r=>`<tr><td>${r.lab}</td><td>${f(r.base)}</td><td class="p">${r.extra?f(r.extra):"–"}</td><td>${f(r.dep)}</td><td class="s">${f(r.a)}</td></tr>`).join("");
+  drawMonthly(rows);
+  drawMil(far);
   $("lg").innerHTML='<span><i style="background:var(--text)"></i>Total cash</span>';
   draw(rows,pts,lo,lod);drawBars(rows);renderCar();
 }
@@ -241,6 +400,280 @@ function draw(rows,pts,lo,dlo){
   $("cn").textContent="Lowest point "+f(lo.bal)+" on "+MN[dlo.getMonth()]+" "+dlo.getDate()+". Ends at "+f(endV)+": "+f(sv)+" saved plus "+f(endV-sv)+" of next month's pay that has just arrived (the headline figure leaves that out). Each month the balance drops on the 1st (fixed bills), slides down through the month (other spending), and jumps on the last banking day (pay and any bonus). October's bills are assumed paid already, so just before October's pay you hold your starting savings.";
   const svg=$("chart");svg.setAttribute("viewBox","0 0 640 "+H);svg.innerHTML=g.s;
 }
+/* month by month page */
+const fk=v=>{const a=Math.abs(v),s=v<0?"-":"";if(a>=1e6)return s+"$"+(+(a/1e6).toFixed(2))+"M";return a>=1000?s+"$"+(a/1000).toFixed(a>=10000?0:1)+"k":s+f(a);};
+const mtip=document.createElement("div");mtip.id="mtip";mtip.setAttribute("role","tooltip");document.body.appendChild(mtip);
+let MROWS=[];
+(function(){
+  let cur=null,at=0;
+  const show=b=>{cur=b;at=Date.now();mtip.textContent=b.dataset.tip;mtip.classList.add("txt");mtip.style.display="block";
+    const r=b.getBoundingClientRect(),tw=mtip.offsetWidth,th=mtip.offsetHeight;
+    mtip.style.left=Math.min(Math.max(8,r.left+r.width/2-tw/2),innerWidth-tw-8)+"px";
+    mtip.style.top=(r.bottom+8+th>innerHeight?r.top-th-8:r.bottom+8)+"px";b.setAttribute("aria-describedby","mtip");};
+  const hide=()=>{if(cur)cur.removeAttribute("aria-describedby");cur=null;mtip.style.display="none";mtip.classList.remove("txt");};
+  document.addEventListener("pointerover",e=>{const b=e.target.closest&&e.target.closest(".ktip");if(b&&e.pointerType==="mouse")show(b);});
+  document.addEventListener("pointerout",e=>{const b=e.target.closest&&e.target.closest(".ktip");if(b&&e.pointerType==="mouse")hide();});
+  document.addEventListener("focusin",e=>{const b=e.target.closest&&e.target.closest(".ktip");if(b)show(b);});
+  document.addEventListener("focusout",e=>{if(e.target.closest&&e.target.closest(".ktip"))hide();});
+  document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest(".ktip");if(b){e.preventDefault();if(cur===b&&Date.now()-at>400)hide();else show(b);}else if(cur)hide();});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&cur)hide();});
+  addEventListener("scroll",()=>{if(cur)hide();},{passive:true});
+})();
+function mtipShow(r,x,y){
+  mtip.innerHTML=`<b>${r.lab}</b><div><i style="background:var(--std)"></i>From pay<span>${f(r.base)}</span></div>`+
+    (r.extra?`<div><i style="background:var(--promo)"></i>Bonuses and one-time<span>${f(r.extra)}</span></div>`:"")+
+    `<div class="tt">Saved<span>${f(r.dep)}</span></div><div>Balance<span>${f(r.a)}</span></div>`;
+  mtip.style.display="block";
+  const tw=mtip.offsetWidth,th=mtip.offsetHeight;
+  mtip.style.left=Math.min(Math.max(8,x+14),innerWidth-tw-8)+"px";
+  mtip.style.top=(y+th+14>innerHeight?y-th-14:y+14)+"px";
+}
+const mtipHide=()=>{mtip.style.display="none";};
+function drawMonthly(rows){
+  MROWS=rows;
+  const n=rows.length,tot=rows.reduce((t,r)=>t+r.dep,0),ex=rows.reduce((t,r)=>t+r.extra,0);
+  const paid=rows.filter(r=>r.i>0),avg=paid.length?paid.reduce((t,r)=>t+r.dep,0)/paid.length:0;
+  const best=rows.reduce((b,r)=>r.dep>b.dep?r:b,rows[0]),bm=rows.filter(r=>r.extra>0).length,last=rows[n-1];
+  document.querySelectorAll(".mhz").forEach(s=>{s.value=String(V.n);});
+  $("mkpi").innerHTML=
+    kpi("Balance by "+last.lab,f(last.a),f(tot)+" saved over "+n+" months","hero")+
+    kpi("Typical month",f(avg),"average saved from "+(paid.length?paid[0].lab:"–")+" on",avg<0?"neg":"")+
+    kpi("Best month",f(best.dep),best.lab+(best.extra?" · includes "+f(best.extra)+" bonus":""),"pos")+
+    kpi("Bonuses and one-time",f(ex),bm?bm+" month"+(bm>1?"s":"")+" · "+pc(tot>0?ex/tot:0)+" of all you save":"none in this period",ex?"warn":"");
+  $("mbd").textContent="Hover a bar for the details. "+(ex>0?"Amber tops are bonuses and one-time payments; the green is your steady surplus from pay.":"Every bar is your steady surplus from pay.");
+  /* stacked bars */
+  const svg=$("mbars"),W=Math.round(svg.clientWidth)||640,H=W<520?220:260,L=56,R=12,T=12,B=28,pw=W-L-R,ph=H-T-B,g={s:""};
+  svg.dataset.w=String(W);
+  let mx=Math.max(1,...rows.map(r=>Math.max(0,r.base)+r.extra)),mn=Math.min(0,...rows.map(r=>r.base));
+  mx*=1.08;
+  const Y=v=>T+ph-(v-mn)/(mx-mn)*ph,cw=pw/n,bw=Math.max(2,Math.min(36,cw*.68));
+  grid(g,mn,mx,Y,W,L,R);
+  const top=(x,y,w,h,c)=>{const r=Math.min(4,w/2,h);return `<path d="M${x} ${y+h}V${y+r}Q${x} ${y} ${x+r} ${y}H${x+w-r}Q${x+w} ${y} ${x+w} ${y+r}V${y+h}Z" fill="${c}"/>`;};
+  const step=Math.max(1,Math.ceil(n/Math.max(2,Math.floor(pw/(n<=12?34:52)))));
+  rows.forEach((r,k)=>{
+    const x=L+k*cw+(cw-bw)/2,y0=Y(0);
+    g.s+=`<rect class="hl" data-k="${k}" x="${L+k*cw}" y="${T}" width="${cw}" height="${ph}" fill="transparent"/>`;
+    if(r.base<0){const h=Y(r.base)-y0;g.s+=`<rect x="${x}" y="${y0}" width="${bw}" height="${h}" fill="var(--neg)" pointer-events="none"/>`;}
+    const hb=Math.max(0,y0-Y(Math.max(0,r.base))),he=y0-Y(Math.max(0,r.base)+r.extra)-hb;
+    if(hb>0)g.s+=he>0?`<rect x="${x}" y="${y0-hb}" width="${bw}" height="${hb}" fill="var(--std)" pointer-events="none"/>`:top(x,y0-hb,bw,hb,"var(--std)").replace("/>",' pointer-events="none"/>');
+    if(he>0){const gap=hb>0?2:0;g.s+=top(x,y0-hb-he,bw,Math.max(0,he-gap),"var(--promo)").replace("/>",' pointer-events="none"/>');}
+    const dt=new Date(2026,9+r.i,1);
+    if(k%step===0)g.s+=`<text x="${L+k*cw+cw/2}" y="${H-8}" text-anchor="middle" fill="#a1a1aa" font-size="11" pointer-events="none">${n<=12?MN[dt.getMonth()]:MN[dt.getMonth()]+" ’"+String(dt.getFullYear()).slice(2)}</text>`;
+  });
+  if(avg>0){const ya=Y(avg);g.s+=`<line x1="${L}" x2="${W-R}" y1="${ya}" y2="${ya}" stroke="#fafafa" stroke-opacity=".7" stroke-dasharray="4 4" pointer-events="none"/>`;}
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.innerHTML=g.s;
+  $("mavg").textContent="Monthly average "+f(avg);
+  /* balance line */
+  {
+    const sv=$("mline"),W=Math.round(sv.clientWidth)||640,H=W<520?220:260,L=56,R=16,T=16,B=28,pw=W-L-R,ph=H-T-B,g={s:""};
+    sv.dataset.w=String(W);
+    let hi=Math.max(1,...rows.map(r=>r.a))*1.06,lo=Math.min(0,...rows.map(r=>r.a));
+    const X=k=>L+(n>1?k/(n-1):.5)*pw,Y=v=>T+ph-(v-lo)/(hi-lo)*ph;
+    grid(g,lo,hi,Y,W,L,R);
+    if(lo<0)g.s+=`<line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="#52525b"/>`;
+    const d=rows.map((r,k)=>(k?"L":"M")+X(k).toFixed(1)+" "+Y(r.a).toFixed(1)).join(" ");
+    g.s+=`<defs><linearGradient id="mlg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#34d399" stop-opacity=".22"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/></linearGradient></defs>`;
+    g.s+=`<path d="${d} L${X(n-1).toFixed(1)} ${Y(Math.max(lo,0))} L${X(0).toFixed(1)} ${Y(Math.max(lo,0))}Z" fill="url(#mlg)"/>`;
+    g.s+=`<path d="${d}" fill="none" stroke="var(--std)" stroke-width="2" stroke-linejoin="round"/>`;
+    rows.forEach((r,k)=>{if(r.extra)g.s+=`<circle cx="${X(k)}" cy="${Y(r.a)}" r="4" fill="var(--promo)" stroke="#09090b" stroke-width="2"/>`;});
+    const ls=Math.max(1,Math.ceil(n/Math.max(2,Math.floor(pw/(n<=12?34:52)))));
+    rows.forEach((r,k)=>{if(k%ls===0){const dt=new Date(2026,9+r.i,1);g.s+=`<text x="${X(k)}" y="${H-8}" text-anchor="middle" fill="#a1a1aa" font-size="11">${n<=12?MN[dt.getMonth()]:MN[dt.getMonth()]+" ’"+String(dt.getFullYear()).slice(2)}</text>`;}});
+    g.s+=`<circle cx="${X(n-1)}" cy="${Y(last.a)}" r="4" fill="var(--std)" stroke="#09090b" stroke-width="2"/><text x="${X(n-1)-8}" y="${Y(last.a)-10}" text-anchor="end" fill="#fafafa" font-size="12" font-weight="600">${f(last.a)}</text>`;
+    g.s+=`<g class="xh" style="display:none"><line y1="${T}" y2="${T+ph}" stroke="#a1a1aa" stroke-dasharray="3 3"/><circle r="5" fill="var(--std)" stroke="#09090b" stroke-width="2"/></g>`;
+    g.s+=`<rect class="hit" x="${L}" y="${T}" width="${pw}" height="${ph}" fill="transparent"/>`;
+    sv.setAttribute("viewBox",`0 0 ${W} ${H}`);sv.innerHTML=g.s;
+    sv._geo={X,Y,L,pw,W,n};
+    const first=rows[0];
+    $("mld").textContent="From "+f(first.a)+" in "+first.lab+" to "+f(last.a)+" by "+last.lab+". Hover the line for any month.";
+  }
+  /* year at a glance */
+  const dmax=Math.max(1,...rows.map(r=>r.dep));
+  const yrs=[...new Set(rows.map(r=>new Date(2026,9+r.i,1).getFullYear()))];
+  $("mcal").innerHTML='<div class="mcal"><span></span>'+MN.map(m=>`<span class="mh">${m[0]}<em>${m.slice(1)}</em></span>`).join("")+
+    yrs.map(y=>`<span class="my">${y}</span>`+MN.map((_,mi)=>{
+      const k=(y-2026)*12+mi-9,r=rows[k];
+      if(k<0||!r)return '<span class="mc off"></span>';
+      const p=r.dep<=0?0:Math.round(18+82*r.dep/dmax),bg=r.dep<0?"color-mix(in srgb,var(--neg) 55%,#18181b)":`color-mix(in srgb,var(--std) ${p}%,#18181b)`;
+      return `<span class="mc${p>55?" lt":""}" data-k="${k}" tabindex="0" style="background:${bg}">${r.extra?"<b></b>":""}${fk(r.dep)}</span>`;
+    }).join("")).join("")+'</div>';
+  /* table */
+  const ms=[["1 month of expenses",V.exp],["3 months of expenses",V.exp*3],["$10k",10000],["$25k",25000],["$50k",50000],["$100k",100000]].filter(t=>t[1]>0);
+  const amax=Math.max(1,...rows.map(r=>r.a));
+  let prev=rows.length?rows[0].a-rows[0].dep:0,py=0;
+  $("tbl").innerHTML="<thead><tr><th>Month</th><th>From pay</th><th>Bonuses and one-time</th><th>Saved</th><th class=\"bc\">Balance</th></tr></thead><tbody>"+
+    rows.map(r=>{
+      const y=new Date(2026,9+r.i,1).getFullYear(),hit=ms.filter(t=>prev<t[1]&&r.a>=t[1]).map(t=>t[0]);prev=r.a;
+      const yr=y!==py?`<tr class="yr"><td colspan="5">${y}</td></tr>`:"";py=y;
+      const sp=dmax>0?Math.max(0,r.base)/dmax:0,se=r.extra/dmax;
+      return yr+`<tr class="${r.extra?"bn":""}" data-k="${r.i}"><td>${r.lab}${hit.map(h=>`<span class="tag">${h}</span>`).join("")}</td>`+
+        `<td class="${r.base<0?"n":""}">${f(r.base)}</td><td class="p">${r.extra?f(r.extra):"–"}</td>`+
+        `<td><div class="sv"><span>${f(r.dep)}</span><div class="mini"><i style="width:${sp*100}%;background:var(--std)"></i>${r.extra?`<i style="width:${se*100}%;background:var(--promo)"></i>`:""}</div></div></td>`+
+        `<td class="bc"><div class="sv"><span class="s">${f(r.a)}</span><div class="mini"><i style="width:${Math.max(0,r.a)/amax*100}%;background:var(--std)"></i></div></div></td></tr>`;
+    }).join("")+"</tbody>";
+}
+document.querySelectorAll(".mhz").forEach(sel=>{sel.innerHTML=$("hz").innerHTML;});
+document.querySelectorAll(".mhz").forEach(sel=>sel.addEventListener("change",e=>{const h=$("hz");h.value=e.target.value;h.dispatchEvent(new Event("change",{bubbles:true}));}));
+(function(){
+  const svg=$("mbars"),cal=$("mcal");let on=null;
+  const mark=k=>{if(on)on.classList.remove("on");on=svg.querySelector(`.hl[data-k="${k}"]`);if(on)on.classList.add("on");};
+  svg.addEventListener("pointermove",e=>{const t=e.target.closest(".hl");if(!t){mtipHide();mark(-1);return;}const k=+t.dataset.k;mark(k);mtipShow(MROWS[k],e.clientX,e.clientY);});
+  svg.addEventListener("pointerleave",()=>{mtipHide();mark(-1);});
+  cal.addEventListener("pointermove",e=>{const t=e.target.closest(".mc[data-k]");if(!t){mtipHide();return;}mtipShow(MROWS[+t.dataset.k],e.clientX,e.clientY);});
+  cal.addEventListener("pointerleave",mtipHide);
+  cal.addEventListener("focusin",e=>{const t=e.target.closest(".mc[data-k]");if(!t)return;const b=t.getBoundingClientRect();mtipShow(MROWS[+t.dataset.k],b.left,b.bottom);});
+  cal.addEventListener("focusout",mtipHide);
+  const ln=$("mline");
+  ln.addEventListener("pointermove",e=>{
+    const G=ln._geo;if(!G||!MROWS.length)return;
+    const b=ln.getBoundingClientRect(),vx=(e.clientX-b.left)*G.W/b.width;
+    const k=Math.max(0,Math.min(G.n-1,Math.round((vx-G.L)/G.pw*(G.n-1)))),r=MROWS[k];
+    const xh=ln.querySelector(".xh");xh.style.display="";
+    const x=G.X(k),y=G.Y(r.a);xh.querySelector("line").setAttribute("x1",x);xh.querySelector("line").setAttribute("x2",x);
+    xh.querySelector("circle").setAttribute("cx",x);xh.querySelector("circle").setAttribute("cy",y);
+    mtipShow(r,e.clientX,e.clientY);
+  });
+  ln.addEventListener("pointerleave",()=>{mtipHide();const xh=ln.querySelector(".xh");if(xh)xh.style.display="none";});
+  const ro=new ResizeObserver(()=>{if(!MROWS.length)return;const a=Math.round(svg.clientWidth),b=Math.round(ln.clientWidth);if((a&&String(a)!==svg.dataset.w)||(b&&String(b)!==ln.dataset.w))drawMonthly(MROWS);});
+  ro.observe(svg);ro.observe(ln);
+})();
+/* road to millionaire page */
+const ym=m=>m===null?"Not within 50 years":(Math.floor(m/12)?Math.floor(m/12)+" yrs ":"")+(m%12?m%12+" mo":"").trim()||"now";
+function msim(start,c0,ret,rais,tgt,N=600){
+  const r=ret/1200;let b=start,c=c0,put=start;const bal=[b],inn=[put];let hit=b>=tgt?0:null;
+  for(let m=1;m<=N;m++){b=b*(1+r)+c;put+=c;if(m%12===0)c*=1+rais/100;bal.push(b);inn.push(put);if(hit===null&&b>=tgt)hit=m;}
+  return{bal,inn,hit};
+}
+let MIL=null;
+function drawMil(far){
+  const rsOn=V.mil_rs,rsSum=rsOn&&typeof RS!=="undefined"?RS.reduce((t,r)=>t+(V[r[0]]||0),0):0;
+  const start=far[0].a,c0=Math.max(0,V.dep)+(V.mil_extra||0)+rsSum,tgt=V.target;
+  const S=msim(start,c0,V.ret,V.rais,tgt),hit=S.hit;
+  document.querySelectorAll(".mirror").forEach(el=>{const src=$(el.dataset.for);if(!src)return;el.value=src.value;setP(el);el.closest(".ctl").querySelector("output").textContent=el._fm(+src.value);});
+  const T=hit===null?600:hit,putT=S.inn[T],grT=S.bal[T]-putT,infl=tgt/Math.pow(1.02,T/12);
+  $("mkp").innerHTML=
+    kpi("You reach "+f(tgt),hit===null?"Not within 50 yrs":dl(hit),hit===null?"raise what you invest":"in "+ym(hit),"hero")+
+    kpi("Invest each month",f(c0),"growing "+V.rais+"% a year · "+V.ret+"% return")+
+    kpi("You put in",f(putT),hit===null?"over 50 years":pc(putT/S.bal[T])+" of the total")+
+    kpi("Growth from returns",f(grT),hit===null?"over 50 years":pc(grT/S.bal[T])+" of the total","pos")+
+    kpi("In today's dollars",f(infl),"what "+f(tgt)+" buys after 2% yearly inflation");
+  $("milin").innerHTML=`<div class="grp" style="margin-top:20px"><span>Monthly investment</span><span>${f(c0)}</span></div>`+
+    `<div class="kv"><span>Surplus from your plan</span><span>${f(Math.max(0,V.dep))}</span></div>`+
+    `<div class="kv"><span>Extra you add</span><span>${f(V.mil_extra||0)}</span></div>`+
+    `<div class="kv"><span>Income streams from Insights${rsOn?"":" <em>· off</em>"}</span><span>${f(rsSum)}</span></div>`+
+    `<div class="kv"><span>Starting balance</span><span>${f(start)}</span></div>`;
+  /* chart */
+  const Y=Math.min(50,hit===null?50:Math.max(10,Math.ceil(hit/12)+5)),M=Y*12;
+  MIL={S,M,tgt,c0};
+  $("mct").textContent="The road to "+f(tgt);
+  $("mcd").textContent=hit===null?"At this pace you do not reach the target within 50 years. Try a higher monthly amount.":"Blue is your own money; green is what the market adds on top. By year "+Math.ceil(hit/12)+" growth is doing "+pc(grT/S.bal[T])+" of the work.";
+  drawMilChart();
+  /* road */
+  const stops=[.1,.25,.5,.75,1].map(x=>x*tgt);
+  $("road").innerHTML=stops.map((v,i)=>{const m=S.bal.findIndex(b=>b>=v),ok=m>=0&&m<=600;const g=ok?Math.max(0,S.bal[m]-S.inn[m])/S.bal[m]:0;
+    return `<div class="stop${i===stops.length-1?" end":""}"><div class="dotw"><i></i></div><b>${fk(v)}</b><span>${ok?dl(m):"Not reached"}</span><em>${ok?(m===0?"already there":"in "+ym(m)):""}</em>${ok?`<div class="gs"><div class="bar"><i style="width:${g*100}%;background:var(--std)"></i></div><small>${pc(g)} from returns</small></div>`:""}</div>`;}).join("");
+  /* returns table */
+  const rets=[...new Set([0,4,6,8,10,V.ret])].sort((a,b)=>a-b);
+  const rr=rets.map(r=>[r,msim(start,c0,r,V.rais,tgt)]),ymax=Math.max(...rr.map(x=>x[1].hit===null?600:x[1].hit));
+  $("mret").innerHTML=rr.map(([r,x])=>`<div class="sc${r===V.ret?" cur":""}"><b style="font-weight:${r===V.ret?600:500}">${r}% a year</b><span>${x.hit===null?"50+ yrs":ym(x.hit)}</span><span style="min-width:74px;text-align:right">${x.hit===null?"–":dl(x.hit)}</span>${bar((x.hit===null?600:x.hit)/ymax,r===V.ret?"var(--std)":"var(--scotia)")}</div>`).join("")+
+    '<p class="note">Shorter bars are better. 0% is like keeping it all in a regular savings account.</p>';
+  /* faster */
+  const F=[["Invest $250 more a month",msim(start,c0+250,V.ret,V.rais,tgt)],["Invest $500 more a month",msim(start,c0+500,V.ret,V.rais,tgt)],["Invest $1,000 more a month",msim(start,c0+1000,V.ret,V.rais,tgt)],
+    ["Earn 1% more a year (lower fees, more stocks)",msim(start,c0,V.ret+1,V.rais,tgt)],["Grow what you invest 2% faster each year",msim(start,c0,V.ret,V.rais+2,tgt)],["Add a one-time $10,000 now",msim(start+10000,c0,V.ret,V.rais,tgt)]];
+  $("mfast").innerHTML=F.map(([n,x])=>{const d=hit===null||x.hit===null?null:hit-x.hit;
+    return `<div class="kv"><span>${n}</span><span class="${d>0?"fs":""}">${x.hit===null?"still 50+ yrs":d===null?dl(x.hit):d>0?ym(d)+" sooner":"no change"}</span></div>`;}).join("")+
+    '<p class="note" style="margin-top:10px">The first years matter most. Money invested early has the longest time to grow.</p>';
+  /* where */
+  const W=[["Safety net first","Hold three months of costs ("+f(V.exp*3)+") in a high-interest savings account. Do not invest money you might need soon."],
+    ["FHSA if you may buy a home","Up to $8,000 a year, $40,000 lifetime. Deductible going in, tax-free coming out for a first home."],
+    ["TFSA","$7,000 of new room each year. Growth and withdrawals are tax-free, so it suits long-term investing."],
+    ["RRSP","Up to 18% of last year's income. Best when your tax rate is high; your refund can go straight back in."],
+    ["Low-cost index funds","An all-in-one index ETF holds thousands of companies for about 0.2% a year in fees. High fees quietly cost years."]];
+  /* retirement at 65 (born 2 Jul 1997, so 65 on 2 Jul 2062) */
+  {
+    const R65=new Date(2062,6,2),m65=(R65.getFullYear()-2026)*12+R65.getMonth()-9;
+    const sg=V.ret_sg/100,pr=V.ret_pr/1200,wr=V.ret_wr/100,inf=V.ret_inf/100;
+    let pot=2*950,sal=95000,mine=950,match=950;const pots=[pot];
+    for(let m=1;m<=m65;m++){const c=sal/12*.06;pot=pot*(1+pr)+2*c;mine+=c;match+=c;if(m%12===0)sal*=1+sg;pots.push(pot);}
+    const grow=pot-mine-match;
+    const dfl=m=>Math.pow(1+inf,m/12),real=pot/dfl(m65),lastSal=sal;
+    const own=S.bal[Math.min(m65,600)],ownR=Math.max(0,own)/dfl(m65);
+    const SRC=[["Air Canada pension",real*wr/12,pot*wr/12,"var(--scotia)",`${f(real)} pot at ${V.ret_wr}% a year`],
+      ["Your own investments",ownR*wr/12,Math.max(0,own)*wr/12,"var(--std)",`${f(ownR)} from the millionaire plan above`],
+      ["Quebec Pension Plan (QPP)",1450,1450*dfl(m65),"var(--mix)","near the maximum after a full career"],
+      ["Old Age Security (OAS)",740,740*dfl(m65),"var(--promo)","full amount with 40 years in Canada"]];
+    const tot=SRC.reduce((t,x)=>t+x[1],0),totN=SRC.reduce((t,x)=>t+x[2],0),rep=V.net?tot/V.net:0,rst=rep>=.7?"good":rep>=.5?"ok":"bad";
+    $("rtd").textContent="You turn 65 on July 2, 2062, "+ym(m65)+" from now. Amounts are monthly and shown in today's dollars, so you can compare them with what you live on now.";
+    $("pkp").innerHTML=
+      kpi("Total pension at 65",f(pot),f(real)+" in today's dollars · Jul 2062","hero","Your contributions "+f(mine)+" (automatic) + Air Canada's match "+f(match)+" (automatic) + investment growth "+f(grow)+" (grows on its own) = "+f(pot)+". See the breakdown below.")+
+      kpi("Your contributions",f(mine),"6% of your salary · "+pc(mine/pot)+" of the pot")+
+      kpi("Air Canada adds",f(match),"the 6% employer match · "+pc(match/pot),"")+
+      kpi("Investment growth",f(grow),"at "+V.ret_pr+"% a year · "+pc(grow/pot)+" of the pot","pos")+
+      kpi("Monthly income at 65",f(tot),"today's dollars, all sources · "+pc(rep)+" of take-home",rst==="good"?"pos":rst==="bad"?"neg":"");
+    const mx=Math.max(tot,V.net)*1.05;
+    $("rtbar").innerHTML=`<div class="lrow" style="margin:18px 0 6px"><span>Monthly income at 65</span><span><b style="color:var(--text)">${f(tot)}</b> vs ${f(V.net)} today</span></div><div class="istk">${SRC.map(x=>`<i style="width:${x[1]/mx*100}%;background:${x[3]}" title="${x[0]}"></i>`).join("")}<s style="left:${V.net/mx*100}%"></s></div>`+
+      `<div class="legend" style="margin:8px 0 14px">${SRC.map(x=>`<span><i style="background:${x[3]}"></i>${x[0].replace(/ \(.*\)/,"")}</span>`).join("")}<span><i style="background:var(--text);width:2px;height:12px"></i>Take-home today</span></div>`;
+    /* breakdown: how the totals are built, and what needs action */
+    {
+      const TG={auto:"Automatic",org:"Grows on its own",act:"You must act"};
+      const tg=k=>`<span class="tg ${k}">${TG[k]}</span>`;
+      const row=(c,n,v,k,why)=>`<div class="bkr"><span class="bkop">${c}</span><div class="bkn"><b>${n}</b>${tg(k)}<p>${why}</p></div><div class="bkv">${v}</div></div>`;
+      const potRows=[
+        ["",`Your contributions`,f(mine),"auto",`6% of every paycheque goes in before you see it, ${f(950/2)} a month today and rising with your salary. Nothing to do; just do not opt out or lower it.`],
+        ["+",`Air Canada's match`,f(match),"auto",`Air Canada adds the same 6% as long as you contribute 6% and stay employed. Check the vesting rules: leaving very early can forfeit part of the match.`],
+        ["+",`Investment growth`,f(grow),"org",`The fund earns about ${V.ret_pr}% a year on everything above, and the earnings compound for ${Math.round(m65/12)} years. Your only job is to pick a growth fund once, not leave it in cash.`]];
+      $("bkd").textContent="Your pension pot at 65 is three pieces added together. Two arrive through payroll with no effort, and the biggest one is growth on that money.";
+      $("bkpot").innerHTML=`<div class="grp"><span>Air Canada pension pot at 65</span><span></span></div>`+
+        `<div class="istk" style="margin:12px 0 4px"><i style="width:${mine/pot*100}%;background:var(--scotia)"></i><i style="width:${match/pot*100}%;background:var(--mix)"></i><i style="width:${grow/pot*100}%;background:var(--std)"></i></div>`+
+        `<div class="legend" style="margin:6px 0 8px"><span><i style="background:var(--scotia)"></i>You ${pc(mine/pot)}</span><span><i style="background:var(--mix)"></i>Air Canada ${pc(match/pot)}</span><span><i style="background:var(--std)"></i>Growth ${pc(grow/pot)}</span></div>`+
+        potRows.map(r=>row(...r)).join("")+
+        `<div class="bkr tot"><span class="bkop">=</span><div class="bkn"><b>Total pension at 65</b><p>${f(real)} in today's dollars. Everything here happens without extra effort beyond picking the fund.</p></div><div class="bkv">${f(pot)}</div></div>`;
+      const ACT=[["auto","Paid from the pot above at "+V.ret_wr+"% a year. Automatic once you set up withdrawals at retirement."],
+        ["act",`Only exists if you invest about ${f(c0)} a month yourself, every month until 65, as on the Millionaire page. Skip it and this line is $0.`],
+        ["auto","Already deducted from every paycheque. Apply when you retire; it pays more if you wait past 65."],
+        ["auto","Paid by the government with 40 years in Canada after age 18. Usually starts automatically at 65; it shrinks if your retirement income is high."]];
+      const noAct=SRC.filter((x,i)=>ACT[i][0]!=="act").reduce((t,x)=>t+x[1],0);
+      $("bkinc").innerHTML=`<div class="grp" style="margin-top:28px"><span>Monthly income at 65, today's dollars</span><span></span></div>`+
+        SRC.map((x,i)=>row(i?"+":"",x[0],f(x[1]),ACT[i][0],ACT[i][1])).join("")+
+        `<div class="bkr tot"><span class="bkop">=</span><div class="bkn"><b>Total a month</b><p>${f(totN)} in 2062 dollars.</p></div><div class="bkv">${f(tot)}</div></div>`+
+        `<div class="isum ${noAct/(V.net||1)>=.7?"good":noAct/(V.net||1)>=.5?"ok":"bad"}">If you do nothing extra: <b>${f(noAct)}</b> a month, <b>${pc(noAct/(V.net||1))}</b> of today's take-home. Investing on your own adds <b>${f(tot-noAct)}</b> on top.</div>`;
+    }
+    const ages=[35,45,55,65].map(A=>{const m=Math.min(m65,(A-29)*12-3);return [A,pots[m]/dfl(m),dl(m)];}),amx=ages[ages.length-1][1]||1;
+    $("rtages").innerHTML=ages.map(a=>`<div class="sc"><b style="font-weight:500">Age ${a[0]} <em style="font-style:normal;color:var(--mute)">· ${a[2]}</em></b><span>${f(a[1])}</span><span style="min-width:74px"></span>${bar(a[1]/amx,"var(--scotia)")}</div>`).join("");
+    $("rtn").textContent="Assumes the Air Canada plan works like a defined-contribution account: your 6% plus the 6% employer match ("+f(950)+" a month today) on a salary rising "+V.ret_sg+"% a year to about "+f(lastSal)+" by 2062. If your plan is defined-benefit, the pension follows a formula instead; check your plan booklet on HR Connex. QPP ($1,450) and OAS ($740) are rough 2026 estimates; OAS is reduced if your retirement income is high, and both can start earlier or later. Withdrawing "+V.ret_wr+"% a year is a common rule of thumb for making savings last about 30 years.";
+  }
+  $("mwhere").innerHTML=W.map(w=>`<li><b class="at">${w[0]}</b><span>${w[1]}</span></li>`).join("");
+}
+function drawMilChart(){
+  if(!MIL)return;
+  const {S,M,tgt}=MIL,svg=$("milchart"),W=Math.round(svg.clientWidth)||640,H=W<520?240:320,L=64,R=16,T=16,B=28,pw=W-L-R,ph=H-T-B,g={s:""};
+  svg.dataset.w=String(W);
+  const raw=Math.max(tgt*1.05,S.bal[M])/4,p10=Math.pow(10,Math.floor(Math.log10(raw))),stp=[1,2,2.5,5,10].map(x=>x*p10).find(x=>x>=raw),top=stp*4;
+  const X=m=>L+m/M*pw,Yv=v=>T+ph-Math.max(0,v)/top*ph;
+  for(let k=0;k<=4;k++){const v=stp*k,y=Yv(v);g.s+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="#27272a"/><text x="${L-8}" y="${y+4}" text-anchor="end" fill="#a1a1aa" font-size="11">${fk(v)}</text>`;}
+  const yStep=Math.max(1,Math.ceil(M/12/Math.max(2,Math.floor(pw/56))));
+  for(let y=0;y<=M/12;y+=yStep)g.s+=`<text x="${X(y*12)}" y="${H-8}" text-anchor="middle" fill="#a1a1aa" font-size="11">${y===0?"Now":2026+y}</text>`;
+  const pts=k=>{let d="";for(let m=0;m<=M;m++)d+=(m?"L":"M")+X(m).toFixed(1)+" "+Yv(k(m)).toFixed(1);return d;};
+  const base=`L${X(M).toFixed(1)} ${Yv(0)} L${X(0).toFixed(1)} ${Yv(0)}Z`;
+  g.s+=`<path d="${pts(m=>S.bal[m])} ${base}" fill="var(--std)" fill-opacity=".35"/>`;
+  g.s+=`<path d="${pts(m=>Math.min(S.inn[m],S.bal[m]))} ${base}" fill="var(--scotia)" fill-opacity=".45"/>`;
+  g.s+=`<path d="${pts(m=>S.bal[m])}" fill="none" stroke="var(--std)" stroke-width="2"/>`;
+  const yt=Yv(tgt);g.s+=`<line x1="${L}" x2="${W-R}" y1="${yt}" y2="${yt}" stroke="#fafafa" stroke-opacity=".7" stroke-dasharray="4 4"/>`;
+  [.1,.25,.5,.75,1].forEach(x=>{const m=S.bal.findIndex(b=>b>=x*tgt);if(m<0||m>M)return;g.s+=`<circle cx="${X(m)}" cy="${Yv(S.bal[m])}" r="5" fill="#fafafa" stroke="#09090b" stroke-width="2"/>`;
+    if(x===1)g.s+=`<text x="${X(m)-10}" y="${Yv(S.bal[m])-12}" text-anchor="end" fill="#fafafa" font-size="12" font-weight="600">${f(tgt)} · ${dl(m)}</text>`;});
+  g.s+=`<g class="xh" style="display:none"><line y1="${T}" y2="${T+ph}" stroke="#a1a1aa" stroke-dasharray="3 3"/><circle r="5" fill="var(--std)" stroke="#09090b" stroke-width="2"/></g>`;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.innerHTML=g.s;
+  svg._geo={X,Yv,L,pw,W,M};
+}
+(function(){
+  const svg=$("milchart");
+  svg.addEventListener("pointermove",e=>{const G=svg._geo;if(!G||!MIL)return;const b=svg.getBoundingClientRect(),vx=(e.clientX-b.left)*G.W/b.width;
+    const m=Math.max(0,Math.min(G.M,Math.round((vx-G.L)/G.pw*G.M))),bal=MIL.S.bal[m],inn=MIL.S.inn[m];
+    const xh=svg.querySelector(".xh");xh.style.display="";const x=G.X(m);xh.querySelector("line").setAttribute("x1",x);xh.querySelector("line").setAttribute("x2",x);xh.querySelector("circle").setAttribute("cx",x);xh.querySelector("circle").setAttribute("cy",G.Yv(bal));
+    mtip.innerHTML=`<b>${dl(m)}</b><div><i style="background:var(--scotia)"></i>You put in<span>${f(inn)}</span></div><div><i style="background:var(--std)"></i>Growth<span>${f(bal-inn)}</span></div><div class="tt">Balance<span>${f(bal)}</span></div>`;
+    mtip.style.display="block";const tw=mtip.offsetWidth,th=mtip.offsetHeight;mtip.style.left=Math.min(Math.max(8,e.clientX+14),innerWidth-tw-8)+"px";mtip.style.top=(e.clientY+th+14>innerHeight?e.clientY-th-14:e.clientY+14)+"px";});
+  svg.addEventListener("pointerleave",()=>{mtip.style.display="none";const xh=svg.querySelector(".xh");if(xh)xh.style.display="none";});
+  new ResizeObserver(()=>{const w=Math.round(svg.clientWidth);if(w&&String(w)!==svg.dataset.w)drawMilChart();}).observe(svg);
+})();
 /* extra cards that fill the input columns */
 function addCtl(parent,id,lab,mn,mx,st,val,fm){
   V[id]=val;const d=document.createElement("div");d.className="ctl";
@@ -279,6 +712,34 @@ addCtl($("gsl"),"dpp","Down payment",5,25,1,10,v=>v+"%");
 addCtl($("gsl"),"target","Millionaire target",250000,3000000,50000,1000000,v=>f(v));
 addCtl($("gsl"),"ret","Yearly investment return (millionaire path only)",0,12,.5,6,v=>v+"%");
 addCtl($("gsl"),"rais","Yearly increase in what you save",0,10,.5,3,v=>v+"%");
+/* millionaire page controls: mirrors of the goal sliders plus its own extras */
+function mirrorCtl(parent,src,lab,fm){
+  const s0=$(src),d=document.createElement("div");d.className="ctl";
+  d.innerHTML=`<label>${lab}<output>${fm(+s0.value)}</output></label><input type="range" class="mirror" data-for="${src}" min="${s0.min}" max="${s0.max}" step="${s0.step}" value="${s0.value}" aria-label="${lab}">`;
+  parent.appendChild(d);const inp=d.querySelector("input");inp._fm=fm;setP(inp);
+  inp.addEventListener("input",e=>{s0.value=e.target.value;s0.dispatchEvent(new Event("input",{bubbles:true}));});
+}
+mirrorCtl($("milctl"),"target","Target",v=>f(v));
+mirrorCtl($("milctl"),"ret","Yearly investment return",v=>v+"%");
+mirrorCtl($("milctl"),"rais","Yearly increase in what you invest",v=>v+"%");
+addCtl($("milctl"),"mil_extra","Extra you invest each month",0,3000,50,0,v=>f(v));
+/* retirement at 65 controls */
+addCtl($("retctl"),"ret_sg","Yearly salary growth",0,6,.5,2.5,v=>v+"%");
+addCtl($("retctl"),"ret_pr","Pension fund return",2,9,.5,5,v=>v+"%");
+addCtl($("retctl"),"ret_wr","Yearly withdrawal in retirement",3,6,.5,4,v=>v+"%");
+addCtl($("retctl"),"ret_inf","Inflation",1,4,.5,2,v=>v+"%");
+{const d=document.createElement("label");d.className="chk";d.innerHTML='<input type="checkbox" id="mil_rs"> Add my income streams from Insights';$("milctl").appendChild(d);
+ V.mil_rs=false;$("mil_rs").addEventListener("change",e=>{V.mil_rs=e.target.checked;run();});}
+/* income streams for the Insights income target */
+const RS=[["rs_raise","Raise or promotion at work",0,1500,25,0,"A 5% raise on $95,000 is about $234 a month after tax.",0],
+  ["rs_free","Freelance or consulting",0,3000,50,0,"10 hours a month at $60 an hour is about $380 after tax.",1],
+  ["rs_side","Side gig (tutoring, delivery, reselling)",0,1500,25,0,"4 hours a week at $20 an hour is about $220 after tax.",1],
+  ["rs_dig","Digital products or content",0,2000,25,0,"Templates, courses, writing. Slow to start, so treat it as upside.",1],
+  ["rs_room","Roommate or renting a room",0,1500,50,0,"",2]];
+RS.forEach(r=>{addCtl($("isl"),r[0],`<span><i class="sw" style="background:${["var(--scotia)","var(--mix)","var(--promo)"][r[7]]}"></i>${r[1]}</span>`,r[2],r[3],r[4],r[5],v=>f(v));
+  const n=document.createElement("p");n.className="note rsn";n.id=r[0]+"_n";n.textContent=r[6];$("isl").appendChild(n);});
+$("itplan").addEventListener("click",e=>{const b=e.target.closest("button[data-mix]");if(!b)return;
+  JSON.parse(b.dataset.mix).forEach(([id,v])=>{const el=$(id);if(!el)return;el.value=v;el.dispatchEvent(new Event("input",{bubbles:true}));});});
 function loan(P,apr,n,extra){
   const r=apr/1200;if(P<=0)return{pm:0,months:0,int:0,bal:[0]};
   const pm=r?P*r/(1-Math.pow(1+r,-n)):P/n;let b=P,m=0,int=0;const bal=[P];
@@ -498,10 +959,7 @@ run();
   if(!pass){toLogin(false);return;}
   const endSkel=()=>document.body.classList.remove("sk");
   setTimeout(endSkel,8000);
-  const bar=document.createElement("div");bar.className="chips";
-  bar.innerHTML='<span class="chip" id="syncChip">Sync <b>starting</b></span><button type="button" class="chip" id="lockBtn" style="background:none;cursor:pointer;font:inherit;font-size:12.5px">Lock</button>';
-  document.querySelector(".top-r").appendChild(bar);
-  $("lockBtn").addEventListener("click",()=>toLogin(false));
+  $("syncSlot").innerHTML='<span id="syncChip">Sync <b>starting</b></span>';
   const setS=(t,c)=>{const el=$("syncChip");el.innerHTML="Sync <b></b>";el.lastChild.textContent=t;el.lastChild.style.color=c||"";};
 
   const fields=()=>[...document.querySelectorAll("input[id],select[id]")].filter(el=>!el.closest("#oolist,#oxlist")&&(el.type==="range"||el.type==="checkbox"||el.type==="number"||el.tagName==="SELECT"));
