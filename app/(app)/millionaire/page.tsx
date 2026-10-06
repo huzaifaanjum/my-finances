@@ -1,4 +1,16 @@
-// Road to millionaire. The dashboard is mounted by the shared layout (components/Shell.tsx); this route only selects which sections show.
+import type { Metadata } from "next";
+import PageShell from "@/components/layout/PageShell";
+import MillionaireView from "@/components/planner/millionaire/MillionaireView";
+
+export const metadata: Metadata = { title: "Road to millionaire" };
+
 export default function MillionairePage() {
-  return null;
+  return (
+    <PageShell
+      title="Road to millionaire"
+      subtitle="When your savings reach your target if you invest them, and what gets you there sooner."
+    >
+      <MillionaireView />
+    </PageShell>
+  );
 }

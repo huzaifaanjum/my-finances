@@ -55,8 +55,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media (max-width:1000px){.layout{grid-template-columns:1fr;grid-template-rows:none}.ca,.cb,.cc,.cg,.ci{grid-column:1;grid-row:auto}}
 .stack{display:grid;gap:16px}
 .panel{border-top:1px solid var(--line);padding:24px 0;margin:0}
+.panel.flush{border-top:0;padding-top:0}
 .grp{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin:18px 0 6px;padding-bottom:6px;border-bottom:1px solid var(--line)}
-#c3 .ctl{margin-bottom:14px}
+.exp-col .ctl{margin-bottom:14px}
 
 /* expenses: total + left over on one line */
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px}
@@ -75,7 +76,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .legend i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
 svg{width:100%;height:auto;display:block}
 
-#c3>.card{margin-top:20px}
+.exp-col>.card{margin-top:20px}
 .carlay{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:24px 40px;margin-top:8px}
 @media (max-width:1000px){.carlay{grid-template-columns:1fr}}
 .carlay h3.sec{margin:0 0 12px}
@@ -293,16 +294,16 @@ table.mt td{padding-top:12px;padding-bottom:12px}
 .mhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .mhz{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;flex:none}
 .legend i.dash{background:repeating-linear-gradient(90deg,#fafafa 0 4px,transparent 4px 8px);height:2px}
-#mbars .hl.on{fill:#ffffff0d}
-#mtip{display:none;position:fixed;z-index:60;background:#18181b;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12.5px;min-width:200px;pointer-events:none;box-shadow:0 8px 24px #0008}
+.hl.on{fill:#ffffff0d}
+.mtip{position:fixed;z-index:60;background:#18181b;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12.5px;min-width:200px;pointer-events:none;box-shadow:0 8px 24px #0008}
 .ktip{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:6px;padding:0;border-radius:50%;border:1px solid #52525b;background:none;color:var(--mute);font:italic 600 10.5px/1 Georgia,serif;cursor:help;vertical-align:1px}
 .ktip:hover,.ktip:focus-visible{color:var(--text);border-color:var(--text);outline:none}
-#mtip.txt{max-width:280px;min-width:0;color:var(--text);font-size:13px;line-height:1.45;text-align:left}
-#mtip b{display:block;margin-bottom:6px;font-weight:600;font-size:13px}
-#mtip div{display:flex;align-items:center;gap:6px;color:var(--mute);padding:2px 0}
-#mtip div span{margin-left:auto;padding-left:16px;color:var(--text);font-variant-numeric:tabular-nums}
-#mtip div i{width:8px;height:8px;border-radius:2px}
-#mtip div.tt{border-top:1px solid var(--line);margin-top:4px;padding-top:6px;color:var(--text);font-weight:600}
+.mtip.txt{max-width:280px;min-width:0;color:var(--text);font-size:13px;line-height:1.45;text-align:left}
+.mtip b{display:block;margin-bottom:6px;font-weight:600;font-size:13px}
+.mtip div{display:flex;align-items:center;gap:6px;color:var(--mute);padding:2px 0}
+.mtip div span{margin-left:auto;padding-left:16px;color:var(--text);font-variant-numeric:tabular-nums}
+.mtip div i{width:8px;height:8px;border-radius:2px}
+.mtip div.tt{border-top:1px solid var(--line);margin-top:4px;padding-top:6px;color:var(--text);font-weight:600}
 .mcal{display:grid;grid-template-columns:44px repeat(12,minmax(0,1fr));gap:4px;font-variant-numeric:tabular-nums}
 .mcal .mh{font-size:11.5px;color:var(--mute);text-align:center}
 .mcal .my{font-size:12.5px;color:var(--mute);align-self:center}
@@ -343,9 +344,7 @@ td.s{color:var(--std)}td.p{color:var(--promo)}
 .foot{color:var(--mute);font-size:13px;margin:40px 0 0}
 
 /* skeleton loading */
-body.sk main{visibility:hidden}
-#skel{display:none}
-body.sk #skel{display:block;position:fixed;inset:0;overflow:hidden;background:var(--bg);z-index:50;padding:24px clamp(16px,3vw,40px)}
+.skel{position:fixed;inset:0;overflow:hidden;background:var(--bg);z-index:50;padding:24px clamp(16px,3vw,40px)}
 .sk-in{max-width:1500px;margin:0 auto}
 .sk-b{background:linear-gradient(90deg,#18181b 25%,#27272a 37%,#18181b 63%);background-size:400% 100%;animation:shim 1.4s ease infinite;border-radius:10px}
 @keyframes shim{0%{background-position:100% 50%}100%{background-position:0 50%}}
@@ -360,10 +359,10 @@ body.sk #skel{display:block;position:fixed;inset:0;overflow:hidden;background:va
 /* tooltips */
 .gl{border-bottom:1px dotted var(--mute);cursor:help}
 .gl:hover,.gl:focus-visible{border-bottom-color:var(--std);color:var(--text)}
-#tipbox{position:fixed;z-index:100;display:none;max-width:min(320px,calc(100vw - 16px));background:#18181b;border:1px solid #3f3f46;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.5);pointer-events:none;font-weight:400;text-align:left}
-#tipbox b{display:block;margin-bottom:6px;font-weight:600}
-#tipbox p{margin:0 0 6px;color:var(--mute)}#tipbox p:last-child{margin:0}
-#tipbox p span{display:block;color:var(--std);font-weight:600;font-size:12px}
+.tipbox{position:fixed;z-index:100;max-width:min(320px,calc(100vw - 16px));background:#18181b;border:1px solid #3f3f46;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,.5);pointer-events:none;font-weight:400;text-align:left}
+.tipbox b{display:block;margin-bottom:6px;font-weight:600}
+.tipbox p{margin:0 0 6px;color:var(--mute)}.tipbox p:last-child{margin:0}
+.tipbox p span{display:block;color:var(--std);font-weight:600;font-size:12px}
 
 /* app nav */
 .nav{position:sticky;top:0;z-index:40;background:rgba(9,9,11,.92);backdrop-filter:blur(8px);box-shadow:inset 0 -1px 0 var(--line)}
@@ -382,17 +381,3 @@ body.sk #skel{display:block;position:fixed;inset:0;overflow:hidden;background:va
 .nav-lock:hover{border-color:var(--mute)}
 @media (max-width:640px){.nav-sync{display:none}}
 .nav a:focus-visible,.nav-lock:focus-visible{outline:2px solid var(--promo);outline-offset:2px}
-
-/* route visibility: each planner section lists the routes it belongs to */
-body[data-route="overview"] [data-r]:not([data-r~="overview"]),
-body[data-route="plan"] [data-r]:not([data-r~="plan"]),
-body[data-route="insights"] [data-r]:not([data-r~="insights"]),
-body[data-route="monthly"] [data-r]:not([data-r~="monthly"]),
-body[data-route="goals"] [data-r]:not([data-r~="goals"]),
-body[data-route="millionaire"] [data-r]:not([data-r~="millionaire"]),
-body[data-route="pension"] [data-r]:not([data-r~="pension"]){display:none}
-body[data-route="knowledge"] #plannerMain,body[data-route="knowledge"] #skel{display:none}
-body[data-route="overview"] .layout,body[data-route="insights"] .layout{grid-template-columns:1fr}
-body[data-route="overview"] .cg,body[data-route="insights"] .ci{grid-column:1;grid-row:1}
-body[data-route="overview"] .panel.cg{border-top:0;padding-top:0}
-body[data-route="insights"] .panel.ci{border-top:0;padding-top:0}

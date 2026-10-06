@@ -1,4 +1,13 @@
-// Insights. The dashboard is mounted by the shared layout (components/Shell.tsx); this route only selects which sections show.
+import type { Metadata } from "next";
+import PageShell from "@/components/layout/PageShell";
+import InsightsView from "@/components/planner/insights/InsightsView";
+
+export const metadata: Metadata = { title: "Insights" };
+
 export default function InsightsPage() {
-  return null;
+  return (
+    <PageShell title="Insights" subtitle="A quick health check of your budget, what to do next, and the numbers behind it.">
+      <InsightsView />
+    </PageShell>
+  );
 }

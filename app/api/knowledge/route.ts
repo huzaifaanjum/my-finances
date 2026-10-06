@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { guard, json } from "@/lib/auth";
-import { stateCollection } from "@/lib/mongo";
+import { guard, json } from "@/lib/server/auth";
+import { stateCollection } from "@/lib/server/mongo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

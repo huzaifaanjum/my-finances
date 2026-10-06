@@ -1,4 +1,13 @@
-// Monthly. The dashboard is mounted by the shared layout (components/Shell.tsx); this route only selects which sections show.
+import type { Metadata } from "next";
+import PageShell from "@/components/layout/PageShell";
+import MonthlyView from "@/components/planner/monthly/MonthlyView";
+
+export const metadata: Metadata = { title: "Month by month" };
+
 export default function MonthlyPage() {
-  return null;
+  return (
+    <PageShell title="Month by month" subtitle="What you save each month, where it comes from, and how your balance builds.">
+      <MonthlyView />
+    </PageShell>
+  );
 }

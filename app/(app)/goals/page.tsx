@@ -1,4 +1,13 @@
-// Goals. The dashboard is mounted by the shared layout (components/Shell.tsx); this route only selects which sections show.
+import type { Metadata } from "next";
+import PageShell from "@/components/layout/PageShell";
+import GoalsView from "@/components/planner/goals/GoalsView";
+
+export const metadata: Metadata = { title: "Goals" };
+
 export default function GoalsPage() {
-  return null;
+  return (
+    <PageShell title="Goals" subtitle="Plan the big purchases you are saving for.">
+      <GoalsView />
+    </PageShell>
+  );
 }

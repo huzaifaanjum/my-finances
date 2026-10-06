@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "My Finances",
+  title: { default: "My Finances", template: "%s · My Finances" },
   description: "Personal savings planner",
   robots: { index: false, follow: false },
 };
@@ -17,7 +17,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="sk">{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

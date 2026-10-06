@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactElement } from "react";
-import type { DemoKey } from "@/lib/rules";
+import type { DemoKey } from "@/lib/knowledge/rules";
 import { C, Bar, Demo, Note, Slider, Stat, Stats, Verdict, fvMonthly, loanPayment, money, neededMonthly, num, s } from "./ui";
 
 function PayFirst() {
