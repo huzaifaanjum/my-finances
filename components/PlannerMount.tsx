@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import markup from "@/lib/markup";
 import { initPlanner } from "@/lib/planner";
 
-export default function Home() {
+// Mounted once in the shared layout, so the planner keeps its state while you move between pages.
+function PlannerMount() {
   const started = useRef(false);
 
   useEffect(() => {
@@ -25,3 +26,5 @@ export default function Home() {
 
   return <div dangerouslySetInnerHTML={{ __html: markup }} />;
 }
+
+export default memo(PlannerMount);

@@ -1,10 +1,4 @@
-import { MongoClient, type Collection } from "mongodb";
-
-export interface StateDoc {
-  _id: string;
-  state: Record<string, unknown>;
-  updatedAt: number;
-}
+import { MongoClient, type Collection, type Document } from "mongodb";
 
 const globalForMongo = globalThis as unknown as { _mongo?: Promise<MongoClient> };
 
@@ -20,6 +14,11 @@ function client(): Promise<MongoClient> {
   return globalForMongo._mongo;
 }
 
-export async function stateCollection(): Promise<Collection<StateDoc>> {
-  return (await client()).db("planner").collection<StateDoc>("state");
+/**
+ * One small collection holds every document:
+ *   _id "main"      -> { state, updatedAt }   planner numbers
+ *   _id "knowledge" -> { read: { [ruleId]: timestamp } }   checklist progress
+ */
+export async function stateCollection(): Promise<Collection<Document>> {
+  return (await client()).db("planner").collection("state");
 }
