@@ -1,10 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import FloatingTip from "./FloatingTip";
 
+interface Props {
+  text: ReactNode;
+  /** shows a labelled pill instead of the bare "i" */
+  label?: string;
+  /** a wider box for longer notes */
+  wide?: boolean;
+}
+
 /** Small "i" button that explains a stat card. Hover, focus or tap to open. */
-export default function InfoTip({ text }: { text: string }) {
+export default function InfoTip({ text, label, wide }: Props) {
   const [anchor, setAnchor] = useState<DOMRect | null>(null);
   const openedAt = useRef(0);
   const btn = useRef<HTMLButtonElement>(null);
@@ -37,8 +45,8 @@ export default function InfoTip({ text }: { text: string }) {
       <button
         ref={btn}
         type="button"
-        className="ktip"
-        aria-label="What this means"
+        className={label ? "ktip pill" : "ktip"}
+        aria-label={label ?? "What this means"}
         aria-describedby={anchor ? "kpi-tip" : undefined}
         onPointerEnter={(e) => e.pointerType === "mouse" && show()}
         onPointerLeave={(e) => e.pointerType === "mouse" && hide()}
@@ -51,10 +59,17 @@ export default function InfoTip({ text }: { text: string }) {
           else show();
         }}
       >
-        i
+        {label ? (
+          <>
+            <i>i</i>
+            {label}
+          </>
+        ) : (
+          "i"
+        )}
       </button>
       {anchor && (
-        <FloatingTip id="kpi-tip" className="mtip txt" anchor={anchor}>
+        <FloatingTip id="kpi-tip" className={`mtip txt${wide ? " wide" : ""}`} anchor={anchor}>
           {text}
         </FloatingTip>
       )}

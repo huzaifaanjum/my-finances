@@ -15,6 +15,8 @@ interface PlannerActions {
   addOneTime: (kind: OneTimeKind) => void;
   updateOneTime: (kind: OneTimeKind, id: number, patch: Partial<Omit<OneTimeItem, "id">>) => void;
   removeOneTime: (kind: OneTimeKind, id: number) => void;
+  /** swap in a whole saved state, e.g. to undo a session of edits */
+  replaceState: (state: PlannerState) => void;
 }
 
 interface PlannerContextValue extends PlannerActions {
@@ -61,6 +63,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         })),
       removeOneTime: (kind, id) =>
         edit((s) => ({ ...s, oneTime: { ...s.oneTime, [kind]: s.oneTime[kind].filter((o) => o.id !== id) } })),
+      replaceState: (next) => edit(() => next),
     }),
     [edit],
   );

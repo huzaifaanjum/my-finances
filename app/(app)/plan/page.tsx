@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/layout/PageShell";
-import PlanColumns from "@/components/planner/plan/PlanColumns";
-import OverviewKpis from "@/components/planner/shared/OverviewKpis";
+import PlanFacts from "@/components/planner/plan/PlanFacts";
+import PlanView from "@/components/planner/plan/PlanView";
 
 export const metadata: Metadata = { title: "Plan" };
 
@@ -9,10 +9,11 @@ export default function PlanPage() {
   return (
     <PageShell
       title="Plan"
-      subtitle="Starts October 2026. Defaults come from your September pay stub: $4,387.37 net plus $293.53 of one-time retro deductions added back, about $4,681 a month (set to $4,680). Change any input and every page updates."
+      subtitle="Adjust income and expenses and watch your projection move. The dashed line is where you stood before."
+      facts={<PlanFacts />}
+      notes="header"
     >
-      <OverviewKpis />
-      <PlanColumns />
+      <PlanView />
     </PageShell>
   );
 }

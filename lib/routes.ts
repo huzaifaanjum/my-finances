@@ -6,6 +6,7 @@ export const ROUTES = [
   { href: "/goals", label: "Goals" },
   { href: "/millionaire", label: "Millionaire" },
   { href: "/pension", label: "Pension" },
+  { href: "/offer", label: "My offer" },
   { href: "/knowledge", label: "Knowledge" },
 ] as const;
 

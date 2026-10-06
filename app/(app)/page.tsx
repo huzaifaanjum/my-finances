@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/layout/PageShell";
 import MoneyOverTime from "@/components/planner/overview/MoneyOverTime";
+import KeyDatesCard from "@/components/planner/plan/KeyDatesCard";
 import Recommendations from "@/components/planner/overview/Recommendations";
 import OverviewKpis from "@/components/planner/shared/OverviewKpis";
 
@@ -12,6 +13,9 @@ export default function OverviewPage() {
       <OverviewKpis />
       <MoneyOverTime />
       <Recommendations />
+      <div className="ov-dates">
+        <KeyDatesCard />
+      </div>
     </PageShell>
   );
 }
