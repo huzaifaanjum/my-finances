@@ -8,6 +8,7 @@ export const ROUTES = [
   { href: "/pension", label: "Pension" },
   { href: "/offer", label: "My offer" },
   { href: "/knowledge", label: "Knowledge" },
+  { href: "/glossary", label: "Glossary" },
 ] as const;
 
 export type RouteHref = (typeof ROUTES)[number]["href"];

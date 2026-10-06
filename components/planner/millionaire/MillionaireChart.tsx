@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Crosshair, plotHeight, plotWidth, viewBoxX, XLabel, YGrid, type Frame } from "@/components/charts/axes";
 import { TipRow, TipTitle } from "@/components/charts/TooltipRows";
 import FloatingTip from "@/components/ui/FloatingTip";
-import { useElementWidth } from "@/hooks/useElementWidth";
+import { useElementSize } from "@/hooks/useElementWidth";
 import { compactMoney, money } from "@/lib/format";
 import { monthLabel, PLAN_START_YEAR } from "@/lib/planner/calendar";
 import type { Simulation } from "@/lib/planner/finance";
@@ -19,12 +19,12 @@ function niceStep(raw: number): number {
 
 /** Stacked areas: your own money and the growth on top, up to the target. */
 export default function MillionaireChart({ sim, target }: { sim: Simulation; target: number }) {
-  const [ref, width] = useElementWidth<SVGSVGElement>();
+  const [ref, { width, height }] = useElementSize<HTMLDivElement>();
   const [hover, setHover] = useState<{ m: number; x: number; y: number } | null>(null);
 
   const years = Math.min(50, sim.hit === null ? 50 : Math.max(10, Math.ceil(sim.hit / 12) + 5));
   const M = years * 12;
-  const frame: Frame = { width, height: width < 520 ? 240 : 320, left: 64, right: 16, top: 16, bottom: 28 };
+  const frame: Frame = { width, height, left: 64, right: 16, top: 16, bottom: 28 };
   const pw = plotWidth(frame);
   const ph = plotHeight(frame);
   const step = niceStep(Math.max(target * 1.05, sim.bal[M]) / 4);
@@ -43,9 +43,8 @@ export default function MillionaireChart({ sim, target }: { sim: Simulation; tar
   const stops = MILESTONES.map((x) => ({ x, m: sim.bal.findIndex((b) => b >= x * target) })).filter((s) => s.m >= 0 && s.m <= M);
 
   return (
-    <>
+    <div ref={ref} className="milc">
       <svg
-        ref={ref}
         viewBox={`0 0 ${frame.width} ${frame.height}`}
         role="img"
         aria-label="Projected investment balance over time"
@@ -85,6 +84,6 @@ export default function MillionaireChart({ sim, target }: { sim: Simulation; tar
           <TipRow label="Balance" value={sim.bal[hover.m]} total />
         </FloatingTip>
       )}
-    </>
+    </div>
   );
 }

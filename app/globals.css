@@ -466,8 +466,8 @@ td.s{color:var(--std)}td.p{color:var(--promo)}
 .off-area-h span{font-size:12.5px;color:var(--mute);font-variant-numeric:tabular-nums}
 .off-area ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
 .off-area li{text-align:left}
-.off-area label{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px;padding:8px 0;cursor:pointer}
-.off-area input{margin:3px 0 0}
+.off-area label{display:grid;grid-template-columns:18px minmax(0,1fr);align-items:start;gap:10px;padding:8px 0;cursor:pointer}
+.off-area input{align-self:start;margin:2px 0 0;width:16px;height:16px}
 .off-area label>span{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:baseline}
 .off-area b{font-weight:500;font-size:14px}
 .off-area em{font-style:normal;font-size:11.5px;color:var(--promo);white-space:nowrap}
@@ -475,3 +475,26 @@ td.s{color:var(--std)}td.p{color:var(--promo)}
 .off-area li.done b{color:var(--mute);text-decoration:line-through}
 .off-area li.done em{color:var(--mute)}
 @media (max-width:420px){.off-areas{grid-template-columns:1fr}}
+/* glossary page */
+.gls{display:grid;gap:36px}
+.gls-bar{display:grid;gap:12px}
+.gls-bar input{width:100%;max-width:420px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font:inherit;font-size:14px}
+.gls-bar input:focus{outline:none;border-color:var(--mute)}
+.gls-chips{display:flex;flex-wrap:wrap;gap:6px}
+.gls-chips .chip{background:none;font:inherit;font-size:12.5px;cursor:pointer}
+.gls-chips .chip:hover{color:var(--text)}
+.gls-chips .chip[aria-pressed=true]{color:var(--bg);background:var(--text);border-color:var(--text)}
+.gls-count{font-size:12.5px;color:var(--mute)}
+.gls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:12px}
+.gls-term{border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:8px;align-content:start}
+.gls-term h3{margin:0}
+.gls-term p{margin:0;font-size:13.5px;line-height:1.55}
+.gls-why{color:var(--mute)}
+.gls-why b{display:block;font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--std);margin-bottom:2px}
+@media (max-width:360px){.gls-grid{grid-template-columns:1fr}}
+/* millionaire: the chart card matches the plan card's height and the chart fills what is left */
+.milg{align-items:stretch}
+.milg>.card{display:flex;flex-direction:column}
+.milc{position:relative;flex:1 1 auto;min-height:320px}
+.milc>svg{position:absolute;inset:0;width:100%;height:100%}
+@media (max-width:520px){.milc{min-height:240px}}
