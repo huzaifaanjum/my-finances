@@ -21,7 +21,7 @@ export default function RangeControl({ label, value, min, max, step, format, onC
     <GlossaryScope>
       <div className="ctl">
         <label htmlFor={id}>
-          {typeof label === "string" ? <G>{label}</G> : label}
+          <span>{typeof label === "string" ? <G>{label}</G> : label}</span>
           <output htmlFor={id}>{format(value)}</output>
         </label>
         <input

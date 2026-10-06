@@ -73,7 +73,7 @@ function HouseKpis({ plan, h }: { plan: Plan; h: HousePlan }) {
   );
 }
 
-/** Sliders, the buy-date check, and the cash and down payment details under them. */
+/** Sliders and the buy-date check. */
 function HouseControls({ plan, h }: { plan: Plan; h: HousePlan }) {
   return (
     <div className="stack">
@@ -89,7 +89,20 @@ function HouseControls({ plan, h }: { plan: Plan; h: HousePlan }) {
         </div>
         <BuyCheck h={h} />
       </div>
+      <Note>
+        An FHSA can hold up to $40,000 of the down payment tax-free, and first-time buyers can also borrow up to $60,000 from an RRSP. Property tax, home
+        insurance, utilities and condo fees are not included, so add them to your expenses.
+      </Note>
+    </div>
+  );
+}
 
+/** Cash and down payment details, then amortization length, paying extra, and a different rate. */
+function MortgageComparisons({ plan, h }: { plan: Plan; h: HousePlan }) {
+  const nt = plan.net || 1;
+  const extras = [...new Set([0, 100, 250, 500, 1000, h.extra])].sort((a, b) => a - b);
+  return (
+    <div className="goal-row3">
       <Card title="Cash needed, line by line" description={`For a ${money(h.price)} home with ${h.dppPct}% down.`}>
         <KeyValue label={`Down payment (${h.dppPct}%)`} value={money(h.down)} />
         <KeyValue label="Closing costs, about 3%" value={money(h.closing)} />
@@ -128,20 +141,6 @@ function HouseControls({ plan, h }: { plan: Plan; h: HousePlan }) {
         </div>
       </Card>
 
-      <Note>
-        An FHSA can hold up to $40,000 of the down payment tax-free, and first-time buyers can also borrow up to $60,000 from an RRSP. Property tax, home
-        insurance, utilities and condo fees are not included, so add them to your expenses.
-      </Note>
-    </div>
-  );
-}
-
-/** Amortization length, paying extra, and a different rate, side by side like the car loan. */
-function MortgageComparisons({ plan, h }: { plan: Plan; h: HousePlan }) {
-  const nt = plan.net || 1;
-  const extras = [...new Set([0, 100, 250, 500, 1000, h.extra])].sort((a, b) => a - b);
-  return (
-    <div className="goal-row3">
       <Card title="Compare amortizations" description="Same home and down payment. A longer amortization lowers the payment but costs more in interest.">
         <div className="scroll">
           <table className="t2">
