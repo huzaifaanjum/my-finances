@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Goals" };
 
 export default function GoalsPage() {
   return (
-    <PageShell title="Goals" subtitle="Plan the big purchases you are saving for.">
+    <PageShell title="Goals" subtitle="The big purchases you are saving for. Each goal assumes all your savings go to it. Open one to adjust it and see the full projection.">
       <GoalsView />
     </PageShell>
   );

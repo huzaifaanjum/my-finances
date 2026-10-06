@@ -11,7 +11,7 @@ export default function PlanPage() {
       title="Plan"
       subtitle="Adjust income and expenses and watch your projection move. The dashed line is where you stood before."
       facts={<PlanFacts />}
-      notes="header"
+      assumptions
     >
       <PlanView />
     </PageShell>

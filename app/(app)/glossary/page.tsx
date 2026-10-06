@@ -9,7 +9,6 @@ export default function GlossaryPage() {
     <PageShell
       title="Glossary"
       subtitle="Plain-language explanations of the money words used across the app. Underlined words on other pages open the same explanations."
-      notes="none"
     >
       <GlossaryView />
     </PageShell>

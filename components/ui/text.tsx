@@ -61,7 +61,10 @@ export function Legend({ items, style }: { items: LegendItem[]; style?: CSSPrope
       {items.map((it, k) => (
         <span key={k}>
           {it.kind === "dash" ? (
-            <i className="dash" />
+            <i
+              className="dash"
+              style={it.color ? { background: `repeating-linear-gradient(90deg,${it.color} 0 4px,transparent 4px 8px)` } : undefined}
+            />
           ) : it.kind === "dot" ? (
             <i className="dot" style={it.color ? { background: it.color } : undefined} />
           ) : it.kind === "tick" ? (

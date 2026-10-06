@@ -10,17 +10,20 @@ export interface Loan {
   interest: number;
   /** balance after each month, starting with the principal */
   balances: number[];
+  /** what you pay each month, extra included; payments[k] is month k + 1 */
+  payments: number[];
 }
 
 /** Level-payment loan, optionally with a fixed extra payment each month. */
 export function amortize(principal: number, aprPct: number, termMonths: number, extra = 0): Loan {
-  if (principal <= 0) return { payment: 0, months: 0, interest: 0, balances: [0] };
+  if (principal <= 0) return { payment: 0, months: 0, interest: 0, balances: [0], payments: [] };
   const r = aprPct / 1200;
   const payment = r ? (principal * r) / (1 - Math.pow(1 + r, -termMonths)) : principal / termMonths;
   let b = principal;
   let months = 0;
   let interest = 0;
   const balances = [principal];
+  const payments: number[] = [];
   while (b > 0.005 && months < 600) {
     const i = b * r;
     const pay = Math.min(b + i, payment + extra);
@@ -28,8 +31,9 @@ export function amortize(principal: number, aprPct: number, termMonths: number, 
     interest += i;
     months++;
     balances.push(Math.max(0, b));
+    payments.push(pay);
   }
-  return { payment, months, interest, balances };
+  return { payment, months, interest, balances, payments };
 }
 
 /* ---------- investing ---------- */

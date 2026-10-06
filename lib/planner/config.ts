@@ -29,6 +29,10 @@ export const SLIDERS = {
 
   home: slider("Home price", 250000, 1200000, 10000, 450000),
   dpp: slider("Down payment", 5, 25, 1, 10, pctLabel),
+  hrate: slider("Mortgage rate", 2, 8, 0.05, 4.5, (v) => `${v.toFixed(2)}%`),
+  hamort: slider("Amortization", 15, 30, 5, 25, (v) => `${v} years`),
+  hextra: slider("Extra you pay each month", 0, 2000, 50, 0),
+  hbuy: slider("Buy the home in", 0, 120, 1, 36, (v) => (v === 0 ? "now" : monthLabel(v))),
   target: slider("Millionaire target", 250000, 3000000, 50000, 1000000),
   ret: slider("Yearly investment return (millionaire path only)", 0, 12, 0.5, 6, pctLabel),
   rais: slider("Yearly increase in what you save", 0, 10, 0.5, 3, pctLabel),

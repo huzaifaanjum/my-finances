@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { G, GlossaryScope } from "@/components/glossary/GlossaryText";
 import { usePlanner } from "@/components/providers/PlannerProvider";
@@ -26,15 +27,17 @@ const NOTES_TIP = (
 interface Props {
   title: string;
   subtitle: string;
+  /** parent page, shown before the title as a breadcrumb */
+  back?: { href: string; label: string };
   /** extra header content under the subtitle, e.g. live facts */
   facts?: ReactNode;
-  /** where the planner assumptions go: a footnote (default), a header tooltip, or nowhere */
-  notes?: "footer" | "header" | "none";
+  /** show the planner assumptions in a header tooltip */
+  assumptions?: boolean;
   children: ReactNode;
 }
 
-/** Frame for every planner page: header with the budget health badge, the content and the footnote. */
-export default function PageShell({ title, subtitle, facts, notes = "footer", children }: Props) {
+/** Frame for every planner page: header with the budget health badge, then the content. */
+export default function PageShell({ title, subtitle, back, facts, assumptions, children }: Props) {
   const { plan, ready } = usePlanner();
   if (!ready) return <DashboardSkeleton />;
 
@@ -44,13 +47,25 @@ export default function PageShell({ title, subtitle, facts, notes = "footer", ch
       <GlossaryScope>
         <header className="top">
           <div>
-            <h1>{title}</h1>
+            <h1>
+              {back && (
+                <>
+                  <Link href={back.href} className="top-back">
+                    {back.label}
+                  </Link>
+                  <span className="top-sep" aria-hidden="true">
+                    /
+                  </span>
+                </>
+              )}
+              {title}
+            </h1>
             <p className="sub">
               <G>{subtitle}</G>
             </p>
           </div>
           <div className="top-side">
-            {notes === "header" && <InfoTip label="Assumptions" text={NOTES_TIP} wide />}
+            {assumptions && <InfoTip label="Assumptions" text={NOTES_TIP} wide />}
             <div className={`badge ${health.tone}`}>
               <i />
               {health.label}
@@ -60,13 +75,6 @@ export default function PageShell({ title, subtitle, facts, notes = "footer", ch
         </header>
       </GlossaryScope>
       {children}
-      {notes === "footer" && (
-        <GlossaryScope>
-          <p className="foot">
-            <G>{NOTES.join(" ")}</G>
-          </p>
-        </GlossaryScope>
-      )}
     </main>
   );
 }

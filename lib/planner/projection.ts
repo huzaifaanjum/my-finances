@@ -170,3 +170,26 @@ export function healthOf(plan: Plan): Health {
   if (plan.rate >= 0.2) return { tone: "pos", label: "On track" };
   return { tone: "warn", label: plan.rate >= 0.1 ? "Tight" : "Low savings" };
 }
+
+/**
+ * Savings by month with and without a purchase: `upfront` leaves savings in the month you buy,
+ * each loan payment comes out of the months after, and `relief` (e.g. rent you stop paying) comes back in.
+ */
+export function savingsWithPurchase(
+  plan: Plan,
+  months: number,
+  buy: number,
+  upfront: number,
+  payments: number[],
+  relief = 0,
+): { without: number[]; withLoan: number[] } {
+  const without = project(plan.state, months, plan.left).map((r) => r.balance);
+  let out = 0;
+  const withLoan = without.map((b, m) => {
+    if (m < buy) return b;
+    if (m === buy) out = upfront;
+    else out += (payments[m - buy - 1] ?? 0) - relief;
+    return b - out;
+  });
+  return { without, withLoan };
+}

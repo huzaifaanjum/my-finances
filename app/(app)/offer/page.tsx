@@ -11,7 +11,6 @@ export default function OfferPage() {
     <PageShell
       title="My offer"
       subtitle="Your Air Canada offer from August 3, 2026, what it adds up to, where each monthly paycheque goes, and how to get the most out of it."
-      notes="none"
     >
       <div className="off">
         <OfferSummary />
