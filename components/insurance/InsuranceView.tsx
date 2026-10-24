@@ -235,8 +235,8 @@ export default function InsuranceView() {
       <SeeAlso href="/insights" label="Insights">
         Key insights on your coverage: disability vs take-home, the life cover cap, premium tax and the spending account
       </SeeAlso>
-      <SeeAlso href="/recommendations" label="Recommendations">
-        What to do: claim the spending account, name beneficiaries, review life cover and use your health plans
+      <SeeAlso href="/benefits" label="Benefits">
+        What to do: claim the spending account, name beneficiaries, review life cover and use your health plans, as a checklist
       </SeeAlso>
     </div>
   );

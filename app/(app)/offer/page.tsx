@@ -20,8 +20,8 @@ export default function OfferPage() {
           <SeeAlso href="/payslips" label="Payslips">
             Where each paycheque actually goes, line by line, from your real payslips
           </SeeAlso>
-          <SeeAlso href="/recommendations" label="Recommendations">
-            How to make the most of your benefits, pension and perks, as a checklist
+          <SeeAlso href="/benefits" label="Benefits">
+            How to make the most of your pension match, health plans, spending account and perks, as a checklist
           </SeeAlso>
         </div>
       </div>

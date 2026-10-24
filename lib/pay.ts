@@ -21,6 +21,10 @@ export const PAY = {
   employerHealth: COSTS.employerTaxable,
   /** Lifestyle Spending Account, not on payslips */
   lsa: LSA_MONTHLY,
+  /** what lands on payday from each $2,500 signing payment (Feb and Aug 2027), per the payslip forecast */
+  signingNet: 1_400,
+  /** what lands on payday from the first, prorated incentive (March 2027) */
+  firstAipNet: 1_550,
 };
 
 /** Marginal tax rate, what you keep of an extra $1,000, and what $1,000 in an RRSP saves, at your payslip's pay. */

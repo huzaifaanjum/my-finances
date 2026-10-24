@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { usePlan } from "@/components/providers/PlannerProvider";
 import { useKnowledgeProgress } from "@/hooks/useKnowledgeProgress";
 import { checklist, recContext } from "@/lib/recommendations";
+import SeeAlso from "@/components/ui/SeeAlso";
 import Checklist from "./Checklist";
 import DatesTimeline from "./DatesTimeline";
 import DoNext from "./DoNext";
@@ -23,6 +24,9 @@ export default function RecommendationsView() {
       <DoNext />
       <MoneyLadder />
       <DatesTimeline />
+      <SeeAlso href="/benefits" label="Benefits">
+        Using your Air Canada benefits (pension match, health and dental, spending account, travel and perks) has its own checklist
+      </SeeAlso>
       <Checklist steps={steps} read={read} toggle={toggle} error={error} />
     </div>
   );

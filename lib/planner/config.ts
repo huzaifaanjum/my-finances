@@ -23,11 +23,11 @@ const slider = (
 /** Every slider in the planner. Keys double as the ids stored in the cloud copy, so do not rename them. */
 export const SLIDERS = {
   // defaults from your October 2026 payslip; bonus amounts are what lands on payday at your tax rates
-  net: slider("Monthly take-home pay", 3000, 8000, 10, 4740),
+  net: slider("Monthly take-home pay", 3000, 8000, 10, Math.round(PAY.usualNet / 10) * 10),
   start: slider("Savings you already have", 0, 10000, 100, 0),
   lump: slider("One-time extra money you add now", 0, 10000, 100, 0),
-  sign: slider("Signing bonus, net per payment", 0, 2500, 50, 1400),
-  aipAmt: slider("Annual incentive bonus, net", 0, 5000, 50, 1550),
+  sign: slider("Signing bonus, net per payment", 0, 2500, 50, PAY.signingNet),
+  aipAmt: slider("Annual incentive bonus, net", 0, 5000, 50, PAY.firstAipNet),
 
   home: slider("Home price", 250000, 1200000, 10000, 450000),
   dpp: slider("Down payment", 5, 25, 1, 10, pctLabel),

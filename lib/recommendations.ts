@@ -3,13 +3,12 @@
 // of duplicates folded into a step, which count as done too.
 
 import { money } from "@/lib/format";
-import { benefit, COSTS, LSA_YEARLY } from "@/lib/benefits";
-import { EMPLOYER_HEALTH, OFFER } from "@/lib/offer";
+import { OFFER } from "@/lib/offer";
 import { payMarginal } from "@/lib/pay";
 import type { Plan } from "@/lib/planner/projection";
 
 export type Priority = "now" | "soon" | "later";
-export type AreaId = "habits" | "debt" | "tax" | "invest" | "home" | "protect" | "payslips" | "perks";
+export type AreaId = "habits" | "debt" | "tax" | "invest" | "home" | "protect" | "payslips";
 
 export interface Step {
   /** saved with the Knowledge progress, so keep it stable */
@@ -33,9 +32,8 @@ export const AREAS: Record<AreaId, { title: string; color: string }> = {
   tax: { title: "Tax", color: "var(--scotia)" },
   invest: { title: "Pension and investing", color: "var(--promo)" },
   home: { title: "Home and big purchases", color: "var(--mix)" },
-  protect: { title: "Health, insurance and estate", color: "#f472b6" },
+  protect: { title: "Insurance and estate", color: "#f472b6" },
   payslips: { title: "Your payslips", color: "#a1a1aa" },
-  perks: { title: "Perks and extras", color: "#2dd4bf" },
 };
 
 export const PRIORITIES: Record<Priority, { title: string; note: string }> = {
@@ -78,10 +76,7 @@ export function rrspRoomEstimate(year: number) {
 }
 
 export function checklist(ctx: RecContext): Step[] {
-  const base = OFFER.salary / 12;
-  const pension = base * OFFER.pensionMax;
   const m = payMarginal(ctx.year + 1);
-  const match = OFFER.salary * OFFER.pensionMax;
   const rrsp = rrspRoomEstimate(ctx.year);
   const rentShare = ctx.net ? ctx.rent / ctx.net : 0;
 
@@ -212,14 +207,6 @@ export function checklist(ctx: RecContext): Step[] {
       body: "If you contribute to an RRSP or FHSA regularly, file form T1213 with the CRA and TP-1016-V with Revenu Québec. Once approved, Air Canada withholds less tax from each payslip.",
     },
     {
-      id: "pay-bonus-rrsp",
-      area: "tax",
-      priority: "soon",
-      title: "Route the March incentive into your RRSP",
-      body: `Bonuses are taxed at your marginal rate, so you keep only about ${money(m.keep)} of each $1,000. Ask HR whether the incentive can go straight into the Group RRSP, where it is not taxed at source.`,
-      when: "Before March",
-    },
-    {
       id: "pay-claim-amounts",
       area: "tax",
       priority: "later",
@@ -235,34 +222,6 @@ export function checklist(ctx: RecContext): Step[] {
       when: "Tax time",
     },
     {
-      id: "offer-medical-credit",
-      area: "tax",
-      priority: "later",
-      title: "Keep receipts for what the plan does not pay",
-      body: "Your share of medical, dental and vision costs can count toward the medical expense tax credit on both federal and Quebec returns.",
-      when: "Tax time",
-    },
-
-    // pension and investing
-    {
-      id: "offer-keep-6",
-      area: "invest",
-      priority: "now",
-      title: "Keep contributing 6%",
-      body: `That gets the full ${money(match)} a year match. Dropping to 3% would cost you ${money(match / 2)} a year of free money.`,
-      impact: match,
-      link: { href: "/pension", label: "Pension" },
-    },
-    {
-      id: "offer-dc-funds",
-      also: ["pay-pension-fund"],
-      area: "invest",
-      priority: "now",
-      title: "Choose your pension investments",
-      body: `${money(pension * 2)} goes in every month. Log in to Manulife and check which fund it sits in: with 35+ years to go, a low-fee growth or target-date fund beats a cautious default by hundreds of thousands at 65.`,
-      link: { href: "/pension", label: "Pension" },
-    },
-    {
       id: "rec-tfsa-room",
       area: "invest",
       priority: "now",
@@ -276,20 +235,6 @@ export function checklist(ctx: RecContext): Step[] {
       title: "Use one low-cost all-in-one ETF",
       body: "A single all-in-one index ETF holds thousands of companies for about 0.2% a year. A typical 2% mutual fund costs $1,800 more a year on every $100,000 invested.",
       link: { href: "/millionaire", label: "Millionaire" },
-    },
-    {
-      id: "offer-group-rrsp-tfsa",
-      area: "invest",
-      priority: "soon",
-      title: "Look at the Group RRSP and TFSA",
-      body: "Payroll deductions make saving automatic, and group plans often have lower fees than a bank. Group RRSP deductions also lower the tax taken off each paycheque.",
-    },
-    {
-      id: "offer-esop",
-      area: "invest",
-      priority: "later",
-      title: "Join the ESOP, but keep it small",
-      body: "Air Canada matches part of what you put into its shares, which is free money. Your job already depends on Air Canada, so don't let its shares become a big part of your savings.",
     },
     {
       id: "rec-rebalance",
@@ -326,7 +271,7 @@ export function checklist(ctx: RecContext): Step[] {
       link: { href: "/goals/car", label: "Car goal" },
     },
 
-    // health, insurance and estate
+    // insurance and estate (benefit steps live on the Benefits tab)
     {
       id: "rec-tenant-insurance",
       area: "protect",
@@ -335,108 +280,12 @@ export function checklist(ctx: RecContext): Step[] {
       body: "Usually $20 to $30 a month for your belongings and, more importantly, liability if water from your unit damages a neighbour's. Many leases require it.",
     },
     {
-      id: "rec-lsa-claim",
-      area: "protect",
-      priority: "now",
-      title: `Claim your ${money(LSA_YEARLY)} Lifestyle Spending Account`,
-      body: `Air Canada puts ${money(LSA_YEARLY / 12, 2)} a month into it. A gym membership, running shoes, a fitness tracker, a course, books or software all qualify; submit receipts in the Manulife app before the plan year ends. Claims are taxable, so it is worth about ${money(LSA_YEARLY * (1 - m.rate))} after tax.`,
-      impact: LSA_YEARLY * (1 - m.rate),
-      when: "Before plan year ends",
-      link: { href: "/insurance", label: "Insurance" },
-    },
-    {
-      id: "rec-life-check",
-      area: "protect",
-      priority: "soon",
-      title: `Check you only pay for ${money(benefit("life").pays!.amount)} of life cover`,
-      body: `You asked for 30× monthly earnings ($237,600) but basic life is capped at ${money(benefit("life").pays!.amount)}. Manulife bills what you asked for until it is approved, so confirm on your next statement that the ${money(benefit("life").price, 2)} a month matches the capped amount.`,
-      link: { href: "/insurance", label: "Insurance" },
-    },
-    {
-      id: "rec-benefits-reenrol",
-      area: "protect",
-      priority: "later",
-      title: "Re-check your benefit choices at annual enrolment",
-      body: `You pay ${money(benefit("dental").price - benefit("dental").flex, 2)} a month for Premium dental and ${money(benefit("life").price, 2)} for enhanced life. If you mostly need cleanings, or nobody depends on you, a lower level could save money; move any spare flex dollars to the Health Spending Account.`,
-      when: "Annual enrolment",
-      link: { href: "/insurance", label: "Insurance" },
-    },
-    {
-      id: "offer-manulife-account",
-      area: "protect",
-      priority: "now",
-      title: "Set up your Manulife member account and app",
-      body: "Get your digital benefits card, read the coverage booklet, and add direct deposit so claims are paid straight to your bank.",
-    },
-    {
-      id: "offer-beneficiaries",
-      area: "protect",
-      priority: "now",
-      title: "Name beneficiaries",
-      body: "Set a beneficiary for life insurance, AD&D and your DC pension on the Manulife site. Without one, money can get stuck in your estate.",
-    },
-    {
-      id: "offer-dental-checkup",
-      area: "protect",
-      priority: "soon",
-      title: "Book a dental checkup and cleaning",
-      body: "Preventive care is usually the best-covered part of a dental plan. Check how often cleanings are covered and book the first one.",
-    },
-    {
-      id: "offer-paramedical",
-      also: ["pay-use-benefits"],
-      area: "protect",
-      priority: "soon",
-      title: "Use paramedical and vision coverage before it resets",
-      body: `Your extended health is at the Premium level: physio, massage, psychologist, eye exams and glasses have yearly limits that are lost if unused. You already pay Quebec tax on ${money(EMPLOYER_HEALTH * 12)} a year of this coverage.`,
-      link: { href: "/insurance", label: "Insurance" },
-      when: "Before limits reset",
-    },
-    {
-      id: "offer-vision",
-      area: "protect",
-      priority: "later",
-      title: "Check vision coverage",
-      body: "If the plan covers eye exams, glasses or contacts, use it when you need a new prescription.",
-    },
-    {
-      id: "offer-telemedicine",
-      area: "protect",
-      priority: "soon",
-      title: "Install LifeWorks telemedicine",
-      body: "Talk to a doctor 24/7 by video instead of waiting at a walk-in clinic. Included for you and your immediate family.",
-    },
-    {
-      id: "rec-travel-insurance",
-      area: "protect",
-      priority: "later",
-      title: "Check your travel medical cover before you fly",
-      body: "Your extended health and drug plans include leisure travel, so emergency care on personal trips is covered. Before using travel privileges, look up the days-per-trip limit and save Manulife's assistance number; many plans need a call before treatment.",
-      when: "Before Mar 2027",
-    },
-    {
       id: "rec-will",
       area: "protect",
       priority: "later",
       title: "Make a will and a protection mandate",
       body: "In Quebec a notarial will and a protection mandate (who decides for you if you can't) keep your pension, savings and affairs out of court. A notary can do both in one visit.",
     },
-    {
-      id: "offer-ltd-tax-free",
-      area: "protect",
-      priority: "later",
-      title: "Know that your disability cover is tax-free",
-      body: `You pay ${money(COSTS.youTotal, 2)} a month in premiums from after-tax pay, so long-term disability would pay ${money(benefit("ltd").pays!.amount)} a month, generally tax-free: about your whole take-home. That makes it the cover most worth keeping.`,
-    },
-    {
-      id: "offer-optional-life",
-      area: "protect",
-      priority: "later",
-      title: "Skip optional life insurance unless someone depends on you",
-      body: `You already have ${money(benefit("life").pays!.amount)} of basic life plus ${money(benefit("add").pays!.amount)} accidental cover. Optional life only makes sense once a partner or family relies on your income.`,
-    },
-
-    // payslips
     {
       id: "pay-upload-monthly",
       area: "payslips",
@@ -461,74 +310,6 @@ export function checklist(ctx: RecContext): Step[] {
       title: "Match December's year-to-date totals to your T4 and RL-1",
       body: "In February, check that gross, tax, QPP, EI and QPIP on the slips match the year-to-date column of your last payslip of the year.",
       when: "February",
-    },
-
-    // perks and extras
-    {
-      id: "offer-aeroplan-link",
-      area: "perks",
-      priority: "soon",
-      title: "Make sure your Aeroplan account is linked",
-      body: "The 15,000-point grant arrives each January, starting January 2027. Confirm on the portal which Aeroplan number it goes to.",
-      when: "Before Jan 2027",
-    },
-    {
-      id: "offer-time-off",
-      area: "perks",
-      priority: "soon",
-      title: "Use your vacation and catch-up days",
-      body: "Both are prorated for 2026. Look up how many you have left and whether they carry over, so none expire unused.",
-      when: "Before Dec 31",
-    },
-    {
-      id: "offer-aip-goals",
-      area: "perks",
-      priority: "soon",
-      title: "Ask how your incentive is scored",
-      body: `The incentive ranges from 8% to 16% of salary, ${money(OFFER.salary * 0.08)} to ${money(OFFER.salary * 0.16)}, partly on your own objectives. Ask your manager what they are, so you can aim above target.`,
-    },
-    {
-      id: "offer-travel-rules",
-      area: "perks",
-      priority: "later",
-      title: "Read the Employee Travel Site rules",
-      body: "Travel privileges start after 28 weeks, around Mar 1, 2027. You are responsible for anyone using your privileges following the rules, so learn them first.",
-      when: "Mar 2027",
-    },
-    {
-      id: "offer-aeroplan-flights",
-      area: "perks",
-      priority: "later",
-      title: "Spend points on flights, not merchandise",
-      body: "Points usually go much further on flights than on gift cards or merchandise. 15,000 points can cover a short-haul flight in Canada.",
-    },
-    {
-      id: "offer-plan-trip",
-      area: "perks",
-      priority: "later",
-      title: "Plan a trip around your vacation days",
-      body: "Pair standby travel with your three weeks of vacation and catch-up days. Flexible dates and off-peak flights give the best standby odds.",
-    },
-    {
-      id: "offer-expenses",
-      area: "perks",
-      priority: "later",
-      title: "Claim work expenses",
-      body: "Read the Travel and Business Expenses policy on HR Connex and claim what you are entitled to instead of paying it yourself.",
-    },
-    {
-      id: "rec-training",
-      area: "perks",
-      priority: "later",
-      title: "Ask about a training or certification budget",
-      body: "Many employers pay for courses, conferences or certifications. It raises your next salary review at no cost to you.",
-    },
-    {
-      id: "offer-shine",
-      area: "perks",
-      priority: "later",
-      title: "Redeem Shine points",
-      body: "Recognition points from colleagues build up in your Shine balance and can be swapped for gift cards and experiences.",
     },
   ];
 }

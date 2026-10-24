@@ -968,3 +968,38 @@ textarea.ps-in{resize:vertical}
 .ps-more{display:inline-block;margin-top:10px;font-size:12.5px;color:var(--mute);text-decoration:none}
 .ps-more:hover{color:var(--std)}
 .off-grp .ps-more{margin:2px 0 6px 16px}
+/* benefits checklist */
+.bn{display:grid;gap:28px}
+.bn-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.bn-sec{display:grid;gap:12px;margin-bottom:12px}
+.bn-sh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.bn-sh h2{display:flex;align-items:center;gap:8px;font-size:16px}
+.bn-sh h2 i{width:10px;height:10px;border-radius:3px}
+.bn-sh span{font-size:13px;color:var(--mute)}
+.bn-grid{columns:2 420px;column-gap:16px}
+.bn-card{--c:var(--std);break-inside:avoid;display:grid;gap:10px;margin:0 0 16px;border:1px solid var(--line);border-top:3px solid var(--c);border-radius:12px;padding:16px 18px;text-align:left}
+.bn-card.all{background:color-mix(in srgb,var(--std) 4%,transparent)}
+.bn-card header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.bn-card h3{margin:0 0 4px;font-size:15px}
+.bn-val{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+.bn-val b{font-size:22px;font-weight:600;color:var(--std);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.bn-val span{font-size:12.5px;color:var(--mute)}
+.bn-count{flex:none;font-size:12px;font-weight:600;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-variant-numeric:tabular-nums}
+.bn-count.all{color:var(--std);border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.08)}
+.bn-prog{height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.bn-prog i{display:block;height:100%;background:var(--c);transition:width .3s}
+@media (prefers-reduced-motion:reduce){.bn-prog i{transition:none}}
+.bn-what{margin:0;font-size:13px;line-height:1.55;color:var(--mute)}
+.bn-card ul{list-style:none;margin:0;padding:0;display:grid;gap:2px;border-top:1px solid var(--line);padding-top:6px}
+.bn-card li{text-align:left}
+.bn-card label{display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px;align-items:start;padding:7px 0;cursor:pointer}
+.bn-card input{width:16px;height:16px;margin:2px 0 0}
+.bn-card label>span{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:baseline}
+.bn-card label b{font-weight:500;font-size:14px}
+.bn-card label em{font-style:normal;font-size:11.5px;color:var(--promo);white-space:nowrap}
+.bn-card label small{grid-column:1/-1;font-size:12.5px;line-height:1.5;color:var(--mute);text-align:justify;hyphens:auto}
+.bn-card li.done b{color:var(--mute);text-decoration:line-through}
+.bn-card li.done em{color:var(--mute)}
+.bn-card .ps-more{margin-top:0;justify-self:start}
+/* fourteen tabs in a nav capped at 1500px wide: keep them tight at every width */
+.nav-links a{padding:0 5px;font-size:13px}.nav-in{gap:10px}
