@@ -16,7 +16,7 @@ export default function DoNext() {
       <GlossaryScope>
         <ol className="dn">
           {actions.map((a, k) => (
-            <li key={a.title} className={k === 0 ? "top" : undefined}>
+            <li key={a.title} className={k === 0 ? "dn-lead" : undefined}>
               <div className="dn-h">
                 <span className="dn-n">{k + 1}</span>
                 <em className={a.worth >= 1e9 ? "urgent" : undefined}>{a.worth >= 1e9 ? "Urgent" : `≈ ${money(a.worth)} a month`}</em>

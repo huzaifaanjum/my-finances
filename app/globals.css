@@ -120,8 +120,6 @@ table.t2 tr.sel td{color:var(--std);font-weight:600}
 .row input:focus{outline:none;border-color:var(--mute)}
 .card p.s{margin:8px 0 14px;font-size:13px;color:var(--mute)}
 .card p.s b{color:var(--text);font-weight:600}
-.ins{margin:0;padding-left:18px;color:var(--mute);columns:2 340px;column-gap:40px}
-.ins li{margin-bottom:8px;break-inside:avoid}.ins b{color:var(--text);font-weight:600}
 
 /* one-time payments list */
 .oo{display:grid;grid-template-columns:18px minmax(0,1fr) 72px 98px 24px;gap:6px;align-items:center;margin-bottom:12px}
@@ -747,10 +745,10 @@ textarea.ps-in{resize:vertical}
 /* do next */
 .dn{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 .dn li{display:grid;grid-template-rows:auto auto 1fr;gap:8px;border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-align:left}
-.dn li.top{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.05)}
+.dn li.dn-lead{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.05)}
 .dn-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .dn-n{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--mute)}
-.dn li.top .dn-n{background:var(--std);border-color:var(--std);color:var(--bg)}
+.dn li.dn-lead .dn-n{background:var(--std);border-color:var(--std);color:var(--bg)}
 .dn-h em{font-style:normal;font-size:12px;font-weight:600;color:var(--std);background:rgba(52,211,153,.1);border-radius:999px;padding:3px 10px;white-space:nowrap}
 .dn-h em.urgent{color:var(--neg);background:rgba(248,113,113,.12)}
 .dn b{font-size:15px;font-weight:600}
@@ -895,3 +893,5 @@ textarea.ps-in{resize:vertical}
 @media (max-width:1360px){.nav-links a{padding:0 6px;font-size:13px}.nav-in{gap:10px}.nav-r{gap:8px}}
 .ins .irow{align-items:start}
 .ins-cov{align-items:start}
+/* each row of Do next cards shares one height; the row grows with its tallest card */
+.dn{grid-auto-rows:1fr}
