@@ -4,12 +4,10 @@ import { G } from "@/components/glossary/GlossaryText";
 import { usePlanner } from "@/components/providers/PlannerProvider";
 import { ProgressBar, SegmentBar } from "@/components/ui/bars";
 import Card from "@/components/ui/Card";
-import NumberField from "@/components/ui/NumberField";
 import { LegendRow } from "@/components/ui/text";
 import { money, percent } from "@/lib/format";
 import { EXPENSE_GROUPS } from "@/lib/planner/config";
 import { savingsMilestones } from "@/lib/planner/milestones";
-import { project } from "@/lib/planner/projection";
 
 /** Spending by group, and the five biggest categories. */
 export function MoneyMixCard() {
@@ -62,55 +60,6 @@ export function MilestonesCard() {
           </div>
         );
       })}
-    </Card>
-  );
-}
-
-/** TFSA and FHSA room, and how much of it your savings would fill. */
-export function TaxRoomCard() {
-  const { plan, setNumber } = usePlanner();
-  const { tfsa, fhsa } = plan.state.numbers;
-  const saved = plan.last.balance;
-  // savings by Dec 31, 2026 (plan month 2)
-  const dec = Math.max(0, project(plan.state, 3, plan.left)[2].balance);
-  const fhsaContribution = Math.min(dec, fhsa);
-  const refund = fhsaContribution <= 4000 ? fhsaContribution * 0.36 : 1450 + (fhsaContribution - 4000) * 0.3;
-
-  return (
-    <Card title="Tax-sheltered room" description="TFSA and FHSA room. Edit the amounts to match your own records.">
-      <div className="row">
-        <label htmlFor="tfsa">
-          <G>TFSA room</G>
-        </label>
-        <NumberField id="tfsa" min={0} step={500} value={tfsa} onChange={(v) => setNumber("tfsa", v)} />
-      </div>
-      <ProgressBar style={{ marginTop: 8 }} value={tfsa ? saved / tfsa : 0} color="var(--std)" />
-      <p className="s">
-        {tfsa ? (
-          <>
-            Your savings by <b>{plan.last.label}</b> would use <b>{percent(Math.min(1, saved / tfsa))}</b> of this room. Room fills up: <b>{plan.eta(tfsa)}</b>.
-          </>
-        ) : (
-          "Enter your TFSA room."
-        )}
-      </p>
-      <div className="row">
-        <label htmlFor="fhsa">
-          <G>FHSA room, 2026</G>
-        </label>
-        <NumberField id="fhsa" min={0} step={500} value={fhsa} onChange={(v) => setNumber("fhsa", v)} />
-      </div>
-      <ProgressBar style={{ marginTop: 8 }} value={fhsa ? dec / fhsa : 0} color="var(--scotia)" />
-      <p className="s">
-        {fhsa ? (
-          <>
-            By Dec 31 your savings would be about <b>{money(dec)}</b>. Contributing that to an FHSA by Dec 31 could add roughly <b>{money(refund)}</b> to your
-            2026 refund (estimate). Cover your 1-month fund first.
-          </>
-        ) : (
-          "Enter your FHSA room."
-        )}
-      </p>
     </Card>
   );
 }

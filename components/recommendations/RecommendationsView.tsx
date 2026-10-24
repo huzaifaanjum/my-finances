@@ -1,37 +1,29 @@
 "use client";
 
-import NextActionsCard from "@/components/planner/insights/NextActionsCard";
-import { TaxRoomCard } from "@/components/planner/insights/SpendingCards";
-import WhereCard from "@/components/planner/millionaire/WhereCard";
-import KeyDatesCard from "@/components/planner/plan/KeyDatesCard";
+import { useMemo } from "react";
 import { usePlan } from "@/components/providers/PlannerProvider";
-import { SectionHeading } from "@/components/ui/text";
+import { useKnowledgeProgress } from "@/hooks/useKnowledgeProgress";
+import { checklist, recContext } from "@/lib/recommendations";
 import Checklist from "./Checklist";
+import DatesTimeline from "./DatesTimeline";
+import DoNext from "./DoNext";
+import MoneyLadder from "./MoneyLadder";
+import RecSummary from "./RecSummary";
 
-/** Every recommendation in the app, in one place: what to do now, where the money goes, and a checklist. */
+/** Every recommendation in the app, in one place. */
 export default function RecommendationsView() {
   const plan = usePlan();
+  const { read, loading, error, toggle } = useKnowledgeProgress();
+  const ctx = recContext(plan);
+  const steps = useMemo(() => checklist(ctx), [ctx.cardDebt, ctx.rent, ctx.net, ctx.safetyNet, ctx.subs, ctx.year]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="rec">
-      <section className="rec-sec">
-        <SectionHeading title="Do next">The steps worth most to you right now, worked out from your plan, and the dates coming up.</SectionHeading>
-        <div className="irow">
-          <NextActionsCard />
-          <KeyDatesCard />
-        </div>
-      </section>
-
-      <section className="rec-sec">
-        <SectionHeading title="Where to put your money">
-          The order to fill accounts in, and how much tax-sheltered room your savings would use.
-        </SectionHeading>
-        <div className="irow">
-          <WhereCard plan={plan} />
-          <TaxRoomCard />
-        </div>
-      </section>
-
-      <Checklist />
+      <RecSummary steps={steps} read={read} loading={loading} />
+      <DoNext />
+      <MoneyLadder />
+      <DatesTimeline />
+      <Checklist steps={steps} read={read} toggle={toggle} error={error} />
     </div>
   );
 }

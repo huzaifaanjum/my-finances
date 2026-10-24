@@ -16,7 +16,7 @@ import { investmentPlan } from "@/lib/planner/finance";
 import { GOALS } from "@/lib/planner/goals";
 import { healthTiles } from "@/lib/planner/insights";
 import { retirement } from "@/lib/planner/retirement";
-import { checklist } from "@/lib/recommendations";
+import { checklist, isDone, recContext } from "@/lib/recommendations";
 
 interface Tile {
   href: string;
@@ -31,7 +31,7 @@ export default function TabSummaries() {
   const plan = usePlan();
   const { read } = useKnowledgeProgress();
   const vault = useVault();
-  const steps = useMemo(() => checklist().flatMap((a) => a.steps), []);
+  const steps = useMemo(() => checklist(recContext(plan)), [plan]);
 
   const health = healthTiles(plan);
   const acts = health.filter((t) => t.level === "act");
@@ -40,7 +40,7 @@ export default function TabSummaries() {
   const onTrack = goals.filter((x) => x.s.onTrack).length;
   const hit = investmentPlan(plan).sim.hit;
   const r = retirement(plan, usePensionStart());
-  const done = steps.filter((s) => read[s.id] || s.also?.some((id) => read[id])).length;
+  const done = steps.filter((s) => isDone(s, read)).length;
   const month = monthlyStats(plan.rows);
   const slips = vault.payslips.filter((p) => !p.excluded);
   const latest = slips[slips.length - 1];
