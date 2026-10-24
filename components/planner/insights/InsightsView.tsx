@@ -3,9 +3,9 @@ import GuidelinesSection from "./GuidelinesSection";
 import HealthCheck from "./HealthCheck";
 import IncomeStreamsCard from "./IncomeStreamsCard";
 import IncomeTargetCard from "./IncomeTargetCard";
-import NextActionsCard from "./NextActionsCard";
 import PayNeededCard from "./PayNeededCard";
-import { MilestonesCard, MoneyMixCard, QuickFacts, TaxRoomCard } from "./SpendingCards";
+import SeeAlso from "@/components/ui/SeeAlso";
+import { MilestonesCard, MoneyMixCard, QuickFacts } from "./SpendingCards";
 import WaffleCard from "./WaffleCard";
 
 export default function InsightsView() {
@@ -13,9 +13,12 @@ export default function InsightsView() {
     <Panel className="flush">
       <div className="ins-wrap">
         <HealthCheck />
+        <SeeAlso href="/recommendations" label="Recommendations">
+          What to do about it: next steps ranked by what they are worth, where to put your money, and your checklist
+        </SeeAlso>
         <div className="irow">
           <WaffleCard />
-          <NextActionsCard />
+          <MoneyMixCard />
         </div>
         <GuidelinesSection />
         <div>
@@ -29,9 +32,7 @@ export default function InsightsView() {
           <PayNeededCard />
         </div>
         <div className="cards">
-          <MoneyMixCard />
           <MilestonesCard />
-          <TaxRoomCard />
         </div>
         <QuickFacts />
       </div>

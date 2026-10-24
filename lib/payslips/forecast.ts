@@ -89,7 +89,8 @@ function firstBonusShare(): { year: number; share: number } {
   return { year: start.getFullYear(), share: (end.getTime() - start.getTime()) / (365 * 864e5) };
 }
 
-export function forecast(latest: PayslipData, s: ForecastSettings, years = 50): Forecast {
+/** `pensionSoFar` is everything contributed to the DC pension across all years (see pensionStartFrom). */
+export function forecast(latest: PayslipData, s: ForecastSettings, years = 50, pensionSoFar?: number): Forecast {
   const perYear = PERIODS[latest.payFrequency.toLowerCase()] ?? 12;
   const base0 = (baseSalary(latest) * perYear) / 12;
   const salary = base0 * 12;
@@ -127,7 +128,7 @@ export function forecast(latest: PayslipData, s: ForecastSettings, years = 50): 
     qpip: taxLine(latest, QPIP, "ytd"),
   };
   // contributions so far stand in for today's balance
-  let pot = pensionLine(latest, "ytd") + employerPension(latest, "ytd");
+  let pot = pensionSoFar ?? pensionLine(latest, "ytd") + employerPension(latest, "ytd");
   let p: TaxYear = p0;
   let max = payrollMax(p);
 
@@ -213,8 +214,13 @@ export function forecast(latest: PayslipData, s: ForecastSettings, years = 50): 
 
 /** On a full year at today's pay: what you keep of an extra $1,000 (a bonus, say) and what a $1,000 RRSP contribution saves. */
 export function marginal(latest: PayslipData, year: number) {
+  return marginalFor({ base: baseSalary(latest), pension: pensionLine(latest), benefits: quebecTaxableBenefits(latest) }, year);
+}
+
+/** The same, from monthly base pay, pension contribution and Quebec-taxable benefits (no payslip needed). */
+export function marginalFor(m: { base: number; pension: number; benefits: number }, year: number) {
   const p = taxYear(year);
-  const i = annualised(baseSalary(latest), pensionLine(latest), quebecTaxableBenefits(latest));
+  const i = annualised(m.base, m.pension, m.benefits);
   const tax = (x: YearIncome) => federalTax(x, p) + quebecTax(x, p);
   const extraTax = tax(plus(i, 1000)) - tax(i);
   // payroll plans only take a cut while you are under their yearly maximums

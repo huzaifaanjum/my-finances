@@ -16,7 +16,7 @@ interface Action {
   body: ReactNode;
 }
 
-function nextActions(plan: Plan): Action[] {
+export function nextActions(plan: Plan): Action[] {
   const { low, lowDate, rent, net, left, exp, far, bonusTotal, last, months } = plan;
   const nt = net || 1;
   const { threeMonthIndex: mo3 } = safetyNet(plan);

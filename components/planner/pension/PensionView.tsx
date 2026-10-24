@@ -1,6 +1,7 @@
 "use client";
 
 import { usePlan } from "@/components/providers/PlannerProvider";
+import { usePensionStart } from "@/components/payslips/usePensionStart";
 import { retirement } from "@/lib/planner/retirement";
 import BreakdownCard from "./BreakdownCard";
 import PensionKpis from "./PensionKpis";
@@ -8,7 +9,8 @@ import RetirementIncomeCard from "./RetirementIncomeCard";
 
 export default function PensionView() {
   const plan = usePlan();
-  const r = retirement(plan);
+  const start = usePensionStart();
+  const r = retirement(plan, start);
   const { ret_pr, ret_sg, ret_wr } = plan.state.numbers;
   return (
     <div className="mil">

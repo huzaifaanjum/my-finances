@@ -14,6 +14,7 @@ import { BUCKETS, MONTHS_LONG } from "@/lib/payslips/analysis";
 import { forecast, type ForecastMonth, type ForecastSettings } from "@/lib/payslips/forecast";
 import { INDEX } from "@/lib/payslips/tax";
 import type { PayslipData } from "@/lib/payslips/types";
+import { SLIDERS } from "@/lib/planner/config";
 import { RETIREMENT_DATE } from "@/lib/planner/finance";
 import SalaryBreakdown from "./SalaryBreakdown";
 
@@ -95,17 +96,19 @@ interface Props {
   latest: PayslipData;
   settings: ForecastSettings;
   onSettings: (s: ForecastSettings) => void;
+  /** DC pension contributed so far, all years */
+  pensionSoFar: number;
 }
 
 /** What your pay adds up to over 1 to 50 years, and where it goes. */
-export default function PayForecast({ latest, settings, onSettings }: Props) {
+export default function PayForecast({ latest, settings, onSettings, pensionSoFar }: Props) {
   const [years, setYears] = useState<Horizon>(5);
   const [running, setRunning] = useState(false);
   const [real, setReal] = useState(false);
   const [hover, setHover] = useState<{ i: number; x: number; y: number } | null>(null);
   const [ref, width] = useElementWidth<HTMLDivElement>(720);
 
-  const fc = useMemo(() => forecast(latest, settings, 50), [latest, settings]);
+  const fc = useMemo(() => forecast(latest, settings, 50, pensionSoFar), [latest, settings, pensionSoFar]);
   const months = useMemo(() => fc.months.slice(0, years * 12), [fc, years]);
   const monthly = years <= 2;
   const bars = useMemo(() => toBars(months, monthly, real, running), [months, monthly, real, running]);
@@ -249,14 +252,14 @@ export default function PayForecast({ latest, settings, onSettings }: Props) {
           )}
         </Card>
 
-        <Card title="Assumptions" description="Change them and the chart, totals and insights update.">
+        <Card title="Assumptions" description="Raise and pension return are shared with the Pension tab, so both always agree.">
           <div className="stack">
             <RangeControl
               label="Raise each January"
               value={settings.raise * 100}
-              min={0}
-              max={8}
-              step={0.5}
+              min={SLIDERS.ret_sg.min}
+              max={SLIDERS.ret_sg.max}
+              step={SLIDERS.ret_sg.step}
               format={pctLabel}
               onChange={(v) => onSettings({ ...settings, raise: v / 100 })}
             />
@@ -272,9 +275,9 @@ export default function PayForecast({ latest, settings, onSettings }: Props) {
             <RangeControl
               label="Pension fund return"
               value={settings.growth * 100}
-              min={0}
-              max={10}
-              step={0.5}
+              min={SLIDERS.ret_pr.min}
+              max={SLIDERS.ret_pr.max}
+              step={SLIDERS.ret_pr.step}
               format={pctLabel}
               onChange={(v) => onSettings({ ...settings, growth: v / 100 })}
             />

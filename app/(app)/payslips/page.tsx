@@ -8,7 +8,7 @@ export default function PayslipsPage() {
   return (
     <PageShell
       title="Payslips"
-      subtitle="Every payslip, read and encrypted in your browser: where each paycheque goes, what you'll earn over the years, and how to make the most of it."
+      subtitle="Every payslip, read and encrypted in your browser: where each paycheque goes, what changed, and what you'll earn over the years."
     >
       <PayslipsView />
     </PageShell>

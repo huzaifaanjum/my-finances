@@ -3,7 +3,7 @@
 import { G } from "@/components/glossary/GlossaryText";
 import Card from "@/components/ui/Card";
 
-const KEY_DATES: { date: string; label: string; what: string }[] = [
+export const KEY_DATES: { date: string; label: string; what: string }[] = [
   { date: "2026-12-31", label: "Dec 31, 2026", what: "Last day to contribute to an FHSA and claim it on your 2026 return (open the account first)" },
   { date: "2027-01-31", label: "Jan 2027", what: "Air Canada's yearly 15,000 Aeroplan points are granted" },
   { date: "2027-02-17", label: "Feb 17, 2027", what: "Probation ends. First $2,500 signing payment (gross), if still employed" },

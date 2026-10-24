@@ -2,6 +2,7 @@ export const ROUTES = [
   { href: "/", label: "Overview" },
   { href: "/plan", label: "Plan" },
   { href: "/insights", label: "Insights" },
+  { href: "/recommendations", label: "Recommendations" },
   { href: "/monthly", label: "Month by month" },
   { href: "/goals", label: "Goals" },
   { href: "/millionaire", label: "Millionaire" },

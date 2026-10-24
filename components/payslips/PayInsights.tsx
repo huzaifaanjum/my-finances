@@ -33,11 +33,11 @@ interface Insight {
 const payDay = (year: number, month: number) => `${MONTHS_LONG[month].slice(0, 3)} ${new Date(year, month + 1, 0).getDate()}`;
 
 /** What your payslips say, in plain terms. */
-export default function PayInsights({ used, settings }: { used: Payslip[]; settings: ForecastSettings }) {
+export default function PayInsights({ used, settings, pensionSoFar }: { used: Payslip[]; settings: ForecastSettings; pensionSoFar: number }) {
   const { state, setNumber } = usePlanner();
   const latest = used[used.length - 1].data;
   const prev = used[used.length - 2]?.data;
-  const fc = useMemo(() => forecast(latest, settings, 50), [latest, settings]);
+  const fc = useMemo(() => forecast(latest, settings, 50, pensionSoFar), [latest, settings, pensionSoFar]);
   const year = Number(latest.periodEnd.slice(0, 4)) || new Date().getFullYear();
   const m = useMemo(() => marginal(latest, year + 1), [latest, year]);
   const usual = usualNet(latest);

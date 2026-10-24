@@ -1,5 +1,5 @@
-import { INCOME_STREAMS, PENSION_MONTHLY, SALARY } from "./config";
-import { planIndex } from "./calendar";
+import { INCOME_STREAMS } from "./config";
+import { monthDate, planIndex } from "./calendar";
 import type { Plan } from "./projection";
 
 /* ---------- loans ---------- */
@@ -110,26 +110,66 @@ export interface PensionProjection {
   match: number;
   growth: number;
   finalSalary: number;
+  /** what goes in each month right now, from the latest payslip */
+  monthlyNow: { mine: number; match: number };
+  /** contributed so far, both sides, and the payslip it came from */
+  soFar: number;
+  source: string;
   /** pot at the end of each month */
   pots: number[];
   deflator: (month: number) => number;
 }
 
-export function projectPension(plan: Plan): PensionProjection {
+/** Where the DC pension stands, read from your payslips. */
+export interface PensionStart {
+  /** yearly base salary on the latest payslip */
+  salary: number;
+  /** your contribution and Air Canada's, as shares of base salary */
+  employeeRate: number;
+  employerRate: number;
+  /** everything contributed so far, both sides (growth to date is not on payslips) */
+  mine: number;
+  match: number;
+  /** plan month the latest payslip covers (0 = October 2026) */
+  through: number;
+  /** where these numbers came from, for the notes */
+  source: string;
+}
+
+/**
+ * From the October 2026 payslip, used while the payslips are locked:
+ * $7,917 a month, 6% from you and 6% matched, $1,064.96 a side contributed Aug-Oct.
+ */
+export const PENSION_FROM_OCT_PAYSLIP: PensionStart = {
+  salary: 7_917 * 12,
+  employeeRate: 0.06,
+  employerRate: 0.06,
+  mine: 1_064.96,
+  match: 1_064.96,
+  through: 0,
+  source: "your October 2026 payslip",
+};
+
+/** Builds the pot month by month from the latest payslip to 65: raises each January, returns compounded monthly. */
+export function projectPension(plan: Plan, start: PensionStart = PENSION_FROM_OCT_PAYSLIP): PensionProjection {
   const { ret_sg, ret_pr, ret_inf } = plan.state.numbers;
-  const r = ret_pr / 1200;
-  // Aug and Sep 2026 are already in: two months of each side's half.
-  let pot = 2 * PENSION_MONTHLY;
-  let mine = PENSION_MONTHLY;
-  let match = PENSION_MONTHLY;
-  let salary = SALARY;
-  const pots = [pot];
-  for (let m = 1; m <= RETIREMENT_MONTH; m++) {
-    const c = (salary / 12) * 0.06;
-    pot = pot * (1 + r) + 2 * c;
-    mine += c;
-    match += c;
-    if (m % 12 === 0) salary *= 1 + ret_sg / 100;
+  const r = Math.pow(1 + ret_pr / 100, 1 / 12) - 1;
+  let mine = start.mine;
+  let match = start.match;
+  let pot = mine + match;
+  let salary = start.salary;
+  const pots: number[] = [];
+  for (let m = 0; m <= RETIREMENT_MONTH; m++) {
+    if (m <= start.through) {
+      pots.push(pot);
+      continue;
+    }
+    if (monthDate(m).getMonth() === 0) salary *= 1 + ret_sg / 100;
+    const you = (salary / 12) * start.employeeRate;
+    const them = (salary / 12) * start.employerRate;
+    pot = pot * (1 + r) + you + them;
+    mine += you;
+    match += them;
     pots.push(pot);
   }
   const deflator = (m: number) => Math.pow(1 + ret_inf / 100, m / 12);
@@ -140,6 +180,9 @@ export function projectPension(plan: Plan): PensionProjection {
     match,
     growth: pot - mine - match,
     finalSalary: salary,
+    monthlyNow: { mine: (start.salary / 12) * start.employeeRate, match: (start.salary / 12) * start.employerRate },
+    soFar: start.mine + start.match,
+    source: start.source,
     pots,
     deflator,
   };

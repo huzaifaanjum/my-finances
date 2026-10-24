@@ -24,7 +24,7 @@ interface Summary {
 
 const when = (m: number) => (m === 0 ? "now" : monthLabel(m));
 
-function summarize(id: GoalId, plan: Plan): Summary {
+export function summarize(id: GoalId, plan: Plan): Summary {
   if (id === "house") {
     const h = housePlan(plan);
     return {

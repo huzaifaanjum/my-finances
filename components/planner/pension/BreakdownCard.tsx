@@ -4,7 +4,6 @@ import { SegmentBar } from "@/components/ui/bars";
 import Card from "@/components/ui/Card";
 import { GroupHeader, Legend } from "@/components/ui/text";
 import { money, percent } from "@/lib/format";
-import { PENSION_MONTHLY } from "@/lib/planner/config";
 import { RETIREMENT_MONTH } from "@/lib/planner/finance";
 import type { Retirement } from "@/lib/planner/retirement";
 import BreakdownRow, { EffortTag } from "./BreakdownRow";
@@ -49,7 +48,7 @@ export default function BreakdownCard({ r, net, fundReturn }: { r: Retirement; n
         name="Your contributions"
         value={money(mine)}
         effort="auto"
-        why={`6% of every paycheque goes in before you see it, ${money(PENSION_MONTHLY / 2)} a month today and rising with your salary. Nothing to do; just do not opt out or lower it.`}
+        why={`6% of every paycheque goes in before you see it, ${money(r.pension.monthlyNow.mine, 2)} a month on ${r.pension.source} and rising with your salary. Nothing to do; just do not opt out or lower it.`}
       />
       <BreakdownRow
         op="+"

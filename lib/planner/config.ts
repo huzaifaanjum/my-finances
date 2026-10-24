@@ -177,5 +177,3 @@ export const SALARY = 95000;
 export const EMPLOYER_HEALTH = 2996;
 /** Each extra dollar of salary adds about 50¢ to take-home at this tax bracket (incl. 6% pension). */
 export const TAKE_HOME_PER_GROSS = 0.5;
-/** Combined monthly pension contribution today: your 6% plus Air Canada's 6% match. */
-export const PENSION_MONTHLY = 950;

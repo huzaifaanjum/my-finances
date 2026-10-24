@@ -6,7 +6,6 @@ import Card from "@/components/ui/Card";
 import { CompareRow, GroupHeader, Legend, LegendRow, Note } from "@/components/ui/text";
 import { duration, money } from "@/lib/format";
 import { monthLabel } from "@/lib/planner/calendar";
-import { PENSION_MONTHLY } from "@/lib/planner/config";
 import { RETIREMENT_MONTH } from "@/lib/planner/finance";
 import type { Retirement } from "@/lib/planner/retirement";
 
@@ -78,7 +77,7 @@ export default function RetirementIncomeCard({ r, net, numbers }: { r: Retiremen
         />
       ))}
       <Note style={{ marginTop: 12 }}>
-        Assumes the Air Canada plan works like a defined-contribution account: your 6% plus the 6% employer match ({money(PENSION_MONTHLY)} a month today) on a
+        Assumes the Air Canada plan works like a defined-contribution account: your 6% plus the 6% employer match ({money(r.pension.monthlyNow.mine + r.pension.monthlyNow.match, 2)} a month on {r.pension.source}, {money(r.pension.soFar, 2)} contributed so far) on a
         salary rising {numbers.ret_sg}% a year to about {money(finalSalary)} by 2062. If your plan is defined-benefit, the pension follows a formula instead;
         check your plan booklet on HR Connex. QPP ($1,450) and OAS ($740) are rough 2026 estimates; OAS is reduced if your retirement income is high, and both
         can start earlier or later. Withdrawing {numbers.ret_wr}% a year is a common rule of thumb for making savings last about 30 years.

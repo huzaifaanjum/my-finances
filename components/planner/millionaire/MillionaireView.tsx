@@ -8,7 +8,7 @@ import MillionaireKpis from "./MillionaireKpis";
 import PlanCard from "./PlanCard";
 import ReturnsCard from "./ReturnsCard";
 import RoadCard from "./RoadCard";
-import WhereCard from "./WhereCard";
+import SeeAlso from "@/components/ui/SeeAlso";
 
 export default function MillionaireView() {
   const plan = usePlan();
@@ -25,7 +25,9 @@ export default function MillionaireView() {
         <ReturnsCard plan={plan} invest={invest} />
         <FasterCard plan={plan} invest={invest} />
       </div>
-      <WhereCard plan={plan} />
+      <SeeAlso href="/recommendations" label="Recommendations">
+        Which accounts to fill first (FHSA, TFSA, RRSP) and how much tax-sheltered room you have
+      </SeeAlso>
     </div>
   );
 }

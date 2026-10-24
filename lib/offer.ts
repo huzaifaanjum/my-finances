@@ -1,4 +1,5 @@
 // Facts from the Air Canada offer (Aug 3, 2026) and the September 2026 pay stub.
+// Actual payslips live (encrypted) on the Payslips tab; these figures need no unlocking.
 // Personal identifiers (address, employee ID, bank account) are left out on purpose.
 
 export const OFFER = {
@@ -27,75 +28,14 @@ export const OFFER = {
 /** Employer-paid health and dental each month, from the stub. */
 export const EMPLOYER_HEALTH = 37.11 + 212.55;
 
-export interface StubLine {
-  label: string;
-  amount: number;
-  /** short explanation shown under the label */
-  note?: string;
-}
+/** Year-one compensation at target incentive, and its parts. */
+export const COMP = (() => {
+  const aip = OFFER.salary * OFFER.aipTarget;
+  const signing = OFFER.signing.reduce((t, s) => t + s.amount, 0);
+  const match = OFFER.salary * OFFER.pensionMax;
+  const health = Math.round(EMPLOYER_HEALTH * 12);
+  return { aip, signing, match, health, yearOne: OFFER.salary + aip + signing + match + health };
+})();
 
-export interface StubGroup {
-  id: "pension" | "tax" | "payroll" | "insurance";
-  title: string;
-  color: string;
-  lines: StubLine[];
-}
-
-export const STUB = {
-  period: "September 2026",
-  gross: 7_917,
-  net: 4_387.37,
-  /** one-time catch-up deductions for August's insurance, also on September's stub */
-  retro: 293.53,
-  ytdGross: 11_747.81,
-  ytdNet: 7_293.78,
-};
-
-/** Recurring monthly deductions, retro excluded. */
-export const STUB_GROUPS: StubGroup[] = [
-  {
-    id: "tax",
-    title: "Income tax",
-    color: "var(--scotia)",
-    lines: [
-      { label: "Quebec income tax", amount: 1_022.93 },
-      { label: "Federal income tax", amount: 795.8, note: "after the 16.5% Quebec abatement" },
-    ],
-  },
-  {
-    id: "payroll",
-    title: "Government plans",
-    color: "var(--mix)",
-    lines: [
-      { label: "Quebec Pension Plan (QPP)", amount: 511.85, note: "stops once the yearly maximum is reached" },
-      { label: "Employment Insurance (EI)", amount: 102.92, note: "stops once the yearly maximum is reached" },
-      { label: "Quebec Parental Insurance (QPIP)", amount: 34.05 },
-    ],
-  },
-  {
-    id: "pension",
-    title: "Your pension",
-    color: "var(--promo)",
-    lines: [{ label: "DC pension, 6% of salary", amount: 475.02, note: "before tax, so it lowers your income tax" }],
-  },
-  {
-    id: "insurance",
-    title: "Insurance",
-    color: "#f472b6",
-    lines: [
-      { label: "Long-term disability", amount: 165.56 },
-      { label: "Life insurance", amount: 54.94 },
-      { label: "Dental", amount: 46.82 },
-      { label: "Short-term disability", amount: 22.72 },
-      { label: "AD&D", amount: 3.49 },
-    ],
-  },
-];
-
-export const EMPLOYER_PAID: StubLine[] = [
-  { label: "Pension match", amount: 475.02, note: "matches your 6%, the most they will match" },
-  { label: "Extended health", amount: 212.55, note: "taxable in Quebec" },
-  { label: "Dental", amount: 37.11, note: "taxable in Quebec" },
-];
-
-export const groupTotal = (g: StubGroup) => g.lines.reduce((t, l) => t + l.amount, 0);
+/** Your monthly insurance premiums (disability, life, dental, AD&D), from the September 2026 stub. */
+export const INSURANCE_PREMIUMS = 165.56 + 54.94 + 46.82 + 22.72 + 3.49;

@@ -2,15 +2,11 @@ import { SegmentBar } from "@/components/ui/bars";
 import Card from "@/components/ui/Card";
 import { KeyValue, LegendRow, Note, SectionHeading } from "@/components/ui/text";
 import { money, percent } from "@/lib/format";
-import { EMPLOYER_HEALTH, OFFER } from "@/lib/offer";
+import { COMP, OFFER } from "@/lib/offer";
 
 const { salary } = OFFER;
-const aip = salary * OFFER.aipTarget;
+const { aip, signing, match, health, yearOne } = COMP;
 const aipMax = salary * OFFER.aipMax;
-const signing = OFFER.signing.reduce((t, s) => t + s.amount, 0);
-const match = salary * OFFER.pensionMax;
-const health = Math.round(EMPLOYER_HEALTH * 12);
-const yearOne = salary + aip + signing + match + health;
 const weekly = salary / 52;
 
 const PACKAGE = [

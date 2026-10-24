@@ -11,7 +11,8 @@ const FRAME: Frame = { width: 640, height: 280, left: 56, right: 12, top: 12, bo
 const labelStep = (n: number) => (n <= 6 ? 1 : n <= 12 ? 2 : n <= 24 ? 3 : n <= 36 ? 6 : 12);
 
 /** Day-by-day chequing balance: bills on the 1st, spending through the month, pay at the end. */
-export default function CashBalanceChart({ plan }: { plan: Plan }) {
+/** `compact` drops the title and the explanation, for a card that already has both. */
+export default function CashBalanceChart({ plan, compact }: { plan: Plan; compact?: boolean }) {
   const { days, months } = plan;
   const vals = days.map((p) => p.bal);
   let max = Math.max(...vals);
@@ -28,7 +29,7 @@ export default function CashBalanceChart({ plan }: { plan: Plan }) {
 
   return (
     <div>
-      <div className="ct">Cash balance</div>
+      {!compact && <div className="ct">Cash balance</div>}
       <svg viewBox={`0 0 ${FRAME.width} ${FRAME.height}`} role="img" aria-label="Savings balance chart">
         <YGrid frame={FRAME} values={fiveTicks(min, max)} y={Y} />
         {min < 0 && <line x1={FRAME.left} x2={FRAME.width - FRAME.right} y1={Y(0)} y2={Y(0)} stroke="#f87171" strokeDasharray="4 4" />}
@@ -54,12 +55,12 @@ export default function CashBalanceChart({ plan }: { plan: Plan }) {
           Total cash
         </span>
       </div>
-      <Note>
+      {!compact && <Note>
         Lowest point {money(plan.low.bal)} on {dayLabel(monthDate(plan.low.i, plan.low.d))}. Ends at {money(end)}: {money(saved)} saved plus{" "}
         {money(end - saved)} of next month&apos;s pay that has just arrived (the headline figure leaves that out). Each month the balance drops on the 1st
         (fixed bills), slides down through the month (other spending), and jumps on the last banking day (pay and any bonus). October&apos;s bills are
         assumed paid already, so just before October&apos;s pay you hold your starting savings.
-      </Note>
+      </Note>}
     </div>
   );
 }

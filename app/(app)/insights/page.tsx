@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Insights" };
 
 export default function InsightsPage() {
   return (
-    <PageShell title="Insights" subtitle="A quick health check of your budget, what to do next, and the numbers behind it.">
+    <PageShell title="Insights" subtitle="A quick health check of your budget and the numbers behind it: where your money goes, the guidelines, and the pay you would need.">
       <InsightsView />
     </PageShell>
   );

@@ -69,12 +69,14 @@ export default function ProjectionChart({ rows, before, changed }: { rows: Month
         <path d={now} fill="none" stroke="var(--std)" strokeWidth="2.25" strokeLinejoin="round" />
         {hover !== null && <Crosshair x={X(k)} y={Y(row.balance)} top={FRAME.top} bottom={FRAME.top + ph} />}
       </svg>
-      <Legend
-        items={[
-          { label: "With your changes", color: "var(--std)" },
-          ...(changed ? [{ label: "Before your changes", kind: "dash" as const }] : []),
-        ]}
-      />
+      {changed && (
+        <Legend
+          items={[
+            { label: "With your changes", color: "var(--std)" },
+            { label: "Before your changes", kind: "dash" as const },
+          ]}
+        />
+      )}
     </div>
   );
 }

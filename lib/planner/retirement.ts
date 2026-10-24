@@ -1,5 +1,5 @@
 import { money } from "@/lib/format";
-import { investmentPlan, projectPension, RETIREMENT_MONTH, type InvestmentPlan, type PensionProjection } from "./finance";
+import { investmentPlan, projectPension, RETIREMENT_MONTH, type InvestmentPlan, type PensionProjection, type PensionStart } from "./finance";
 import type { Plan } from "./projection";
 
 export type Effort = "auto" | "org" | "act";
@@ -31,8 +31,8 @@ export interface Retirement {
   status: "good" | "ok" | "bad";
 }
 
-export function retirement(plan: Plan): Retirement {
-  const pension = projectPension(plan);
+export function retirement(plan: Plan, start?: PensionStart): Retirement {
+  const pension = projectPension(plan, start);
   const invest = investmentPlan(plan);
   const { ret_wr } = plan.state.numbers;
   const wr = ret_wr / 100;
