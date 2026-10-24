@@ -36,6 +36,3 @@ export const COMP = (() => {
   const health = Math.round(EMPLOYER_HEALTH * 12);
   return { aip, signing, match, health, yearOne: OFFER.salary + aip + signing + match + health };
 })();
-
-/** Your monthly insurance premiums (disability, life, dental, AD&D), from the September 2026 stub. */
-export const INSURANCE_PREMIUMS = 165.56 + 54.94 + 46.82 + 22.72 + 3.49;

@@ -9,6 +9,7 @@ export const ROUTES = [
   { href: "/pension", label: "Pension" },
   { href: "/offer", label: "My offer" },
   { href: "/payslips", label: "Payslips" },
+  { href: "/insurance", label: "Insurance" },
   { href: "/knowledge", label: "Knowledge" },
   { href: "/glossary", label: "Glossary" },
 ] as const;

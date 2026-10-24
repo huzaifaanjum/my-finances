@@ -3,7 +3,8 @@
 // of duplicates folded into a step, which count as done too.
 
 import { money } from "@/lib/format";
-import { EMPLOYER_HEALTH, INSURANCE_PREMIUMS, OFFER } from "@/lib/offer";
+import { benefit, COSTS, LSA_YEARLY } from "@/lib/benefits";
+import { EMPLOYER_HEALTH, OFFER } from "@/lib/offer";
 import { marginalFor } from "@/lib/payslips/forecast";
 import type { Plan } from "@/lib/planner/projection";
 
@@ -332,6 +333,33 @@ export function checklist(ctx: RecContext): Step[] {
       body: "Usually $20 to $30 a month for your belongings and, more importantly, liability if water from your unit damages a neighbour's. Many leases require it.",
     },
     {
+      id: "rec-lsa-claim",
+      area: "protect",
+      priority: "now",
+      title: `Claim your ${money(LSA_YEARLY)} Lifestyle Spending Account`,
+      body: `Air Canada puts ${money(LSA_YEARLY / 12, 2)} a month into it. A gym membership, running shoes, a fitness tracker, a course, books or software all qualify; submit receipts in the Manulife app before the plan year ends. Claims are taxable, so it is worth about ${money(LSA_YEARLY * (1 - m.rate))} after tax.`,
+      impact: LSA_YEARLY * (1 - m.rate),
+      when: "Before plan year ends",
+      link: { href: "/insurance", label: "Insurance" },
+    },
+    {
+      id: "rec-life-check",
+      area: "protect",
+      priority: "soon",
+      title: `Check you only pay for ${money(benefit("life").pays!.amount)} of life cover`,
+      body: `You asked for 30× monthly earnings ($237,600) but basic life is capped at ${money(benefit("life").pays!.amount)}. Manulife bills what you asked for until it is approved, so confirm on your next statement that the ${money(benefit("life").price, 2)} a month matches the capped amount.`,
+      link: { href: "/insurance", label: "Insurance" },
+    },
+    {
+      id: "rec-benefits-reenrol",
+      area: "protect",
+      priority: "later",
+      title: "Re-check your benefit choices at annual enrolment",
+      body: `You pay ${money(benefit("dental").price - benefit("dental").flex, 2)} a month for Premium dental and ${money(benefit("life").price, 2)} for enhanced life. If you mostly need cleanings, or nobody depends on you, a lower level could save money; move any spare flex dollars to the Health Spending Account.`,
+      when: "Annual enrolment",
+      link: { href: "/insurance", label: "Insurance" },
+    },
+    {
       id: "offer-manulife-account",
       area: "protect",
       priority: "now",
@@ -358,7 +386,8 @@ export function checklist(ctx: RecContext): Step[] {
       area: "protect",
       priority: "soon",
       title: "Use paramedical and vision coverage before it resets",
-      body: `Physio, massage, psychologist, eye exams and glasses have yearly limits that are lost if unused. You already pay Quebec tax on ${money(EMPLOYER_HEALTH * 12)} a year of this coverage.`,
+      body: `Your extended health is at the Premium level: physio, massage, psychologist, eye exams and glasses have yearly limits that are lost if unused. You already pay Quebec tax on ${money(EMPLOYER_HEALTH * 12)} a year of this coverage.`,
+      link: { href: "/insurance", label: "Insurance" },
       when: "Before limits reset",
     },
     {
@@ -379,8 +408,8 @@ export function checklist(ctx: RecContext): Step[] {
       id: "rec-travel-insurance",
       area: "protect",
       priority: "later",
-      title: "Check out-of-country medical cover before you fly",
-      body: "Before using travel privileges, look up the emergency travel medical cover in your Manulife booklet: how many days per trip and whether you need to call before treatment.",
+      title: "Check your travel medical cover before you fly",
+      body: "Your extended health and drug plans include leisure travel, so emergency care on personal trips is covered. Before using travel privileges, look up the days-per-trip limit and save Manulife's assistance number; many plans need a call before treatment.",
       when: "Before Mar 2027",
     },
     {
@@ -395,14 +424,14 @@ export function checklist(ctx: RecContext): Step[] {
       area: "protect",
       priority: "later",
       title: "Know that your disability cover is tax-free",
-      body: `You pay ${money(INSURANCE_PREMIUMS, 2)} a month in premiums from after-tax pay, so if you ever claim long-term disability the benefit is generally not taxed. That makes it worth keeping.`,
+      body: `You pay ${money(COSTS.youTotal, 2)} a month in premiums from after-tax pay, so long-term disability would pay ${money(benefit("ltd").pays!.amount)} a month, generally tax-free: about your whole take-home. That makes it the cover most worth keeping.`,
     },
     {
       id: "offer-optional-life",
       area: "protect",
       priority: "later",
       title: "Skip optional life insurance unless someone depends on you",
-      body: "Optional employee, spouse and child life cover costs extra. Only add it if a partner or family relies on your income.",
+      body: `You already have ${money(benefit("life").pays!.amount)} of basic life plus ${money(benefit("add").pays!.amount)} accidental cover. Optional life only makes sense once a partner or family relies on your income.`,
     },
 
     // payslips
