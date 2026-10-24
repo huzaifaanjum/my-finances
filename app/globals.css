@@ -937,3 +937,30 @@ textarea.ps-in{resize:vertical}
 .iv-facts .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:640px){.iv-facts .facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .iv-facts .fact{min-width:0}
+/* millionaire: road map */
+.rm{width:100%;overflow:hidden;margin:4px 0 6px}
+.rm svg{width:100%;height:auto;display:block}
+.rm text{font-size:12px;fill:var(--mute)}
+.rm .rm-t{font-size:14px;font-weight:600;fill:var(--text)}
+.rm .milestone .rm-t,.rm .finish .rm-t{fill:var(--std)}
+.rm .checkpoint .rm-t{font-size:12.5px;fill:var(--promo)}
+.rm .rm-w{font-size:12px;fill:var(--mute)}
+.rm .rm-n{font-size:11.5px;fill:#71717a}
+.rm-list{display:none;list-style:none;margin:8px 0 0;padding:0}
+@media (max-width:640px){
+  .rm{display:none}
+  .rm-list{display:grid}
+  .rm-list li{position:relative;display:grid;grid-template-columns:22px minmax(0,1fr);gap:12px;padding:0 0 18px;text-align:left}
+  .rm-list li::before{content:"";position:absolute;left:10px;top:18px;bottom:0;width:3px;background:#2c2c31;border-radius:2px}
+  .rm-list li:last-child::before{display:none}
+  .rm-list i{width:18px;height:18px;margin-top:1px;border-radius:50%;border:3px solid var(--std);background:var(--bg);z-index:1}
+  .rm-list li.start i{background:var(--text);border-color:var(--text)}
+  .rm-list li.finish i{background:var(--std)}
+  .rm-list li.checkpoint i{width:12px;height:12px;margin:4px 0 0 3px;border-radius:2px;transform:rotate(45deg);border-color:var(--promo)}
+  .rm-list div{display:grid;gap:1px}
+  .rm-list b{font-size:15px}
+  .rm-list li.milestone b,.rm-list li.finish b{color:var(--std)}
+  .rm-list li.checkpoint b{color:var(--promo);font-size:14px}
+  .rm-list span{font-size:13px;color:var(--mute)}
+  .rm-list em{font-style:normal;font-size:12.5px;color:#71717a}
+}
