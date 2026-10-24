@@ -30,6 +30,8 @@ export interface ForecastSettings {
   bonus: number;
   /** yearly return on the DC pension */
   growth: number;
+  /** false leaves out the two signing payments (the incentive is left out with bonus: 0) */
+  signing?: boolean;
 }
 
 export interface ForecastMonth {
@@ -156,12 +158,12 @@ export function forecast(latest: PayslipData, s: ForecastSettings, years = 50, p
     const insurance = insurance0 * grow;
 
     let bonus = 0;
-    if (month === 2) {
+    if (month === 2 && s.bonus > 0) {
       const prevSalary = base0 * 12 * Math.pow(1 + s.raise, Math.max(0, raises - 1));
       const share = year - 1 === firstBonus.year ? firstBonus.share : year - 1 > firstBonus.year ? 1 : 0;
       bonus += prevSalary * s.bonus * share;
     }
-    for (const sg of signing) if (sg.year === year && sg.month === month) bonus += sg.amount;
+    if (s.signing !== false) for (const sg of signing) if (sg.year === year && sg.month === month) bonus += sg.amount;
 
     const gross = base + bonus;
     const pension = dc * base;

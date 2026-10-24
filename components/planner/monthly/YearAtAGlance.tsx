@@ -18,6 +18,30 @@ const METRICS: Record<Metric, { label: string; color: string; describe: string }
 
 const TIGHT = 500;
 
+type MomentKind = "best" | "tight" | "bonus" | "milestone";
+const ORDER: MomentKind[] = ["tight", "bonus", "best", "milestone"];
+
+interface Moment {
+  i: number;
+  kind: MomentKind;
+  title: string;
+  month: string;
+  value?: string;
+  tone?: string;
+}
+
+/** The same symbols as the calendar markers, so moments and squares read together. */
+function Glyph({ kind }: { kind: MomentKind }) {
+  return (
+    <svg className={`ya-g ${kind}`} viewBox="0 0 12 12" aria-hidden="true">
+      {kind === "bonus" && <circle cx="6" cy="6" r="4" />}
+      {kind === "milestone" && <rect x="2.5" y="2.5" width="7" height="7" transform="rotate(45 6 6)" />}
+      {kind === "best" && <path d="M6 2l4.5 8h-9z" />}
+      {kind === "tight" && <path d="M6 10L1.5 2h9z" />}
+    </svg>
+  );
+}
+
 const valueOf = (r: LedgerRow, m: Metric) => (m === "saved" ? r.saved : m === "balance" ? r.balance : m === "rate" ? r.rate : r.cover);
 
 function format(v: number, m: Metric): string {
@@ -42,7 +66,22 @@ export default function YearAtAGlance({ selected: sel, onPick }: { selected: num
   const tightest = ledger.reduce((b, r) => (r.lowest < b.lowest ? r : b), ledger[0]);
   const milestoneMonths = ledger.flatMap((r) => r.events.filter((e) => e.kind === "milestone").map((e) => ({ name: e.label, r })));
   const bonusMonths = ledger.filter((r) => r.events.some((e) => e.kind === "bonus"));
-  const typical = flows.length ? flows.reduce((t, r) => t + r.saved, 0) / flows.length : 0;
+  // key moments, in time order, shown above the calendar with the same symbols as its markers
+  const moments: Moment[] = [
+    ...(best ? [{ i: best.i, kind: "best" as const, title: "Best month", month: best.label, value: `${money(best.saved)} saved`, tone: "pos" }] : []),
+    {
+      i: tightest.i,
+      kind: "tight" as const,
+      title: "Tightest month",
+      month: tightest.label,
+      value: `lowest ${money(tightest.lowest)}`,
+      tone: tightest.lowest < 0 ? "neg" : tightest.lowest < TIGHT ? "warn" : undefined,
+    },
+    ...bonusMonths.flatMap((r) =>
+      r.events.filter((e) => e.kind === "bonus").map((e) => ({ i: r.i, kind: "bonus" as const, title: e.label, month: r.label, value: `+${money(r.extraIn)}`, tone: "warn" })),
+    ),
+    ...milestoneMonths.map((m) => ({ i: m.r.i, kind: "milestone" as const, title: m.name, month: m.r.label, value: "reached", tone: undefined })),
+  ].sort((a, b) => a.i - b.i || ORDER.indexOf(a.kind) - ORDER.indexOf(b.kind));
   const setSel = (i: number) => onPick(i);
 
   const fill = (r: LedgerRow): { background: string; strength: number } => {
@@ -75,39 +114,18 @@ export default function YearAtAGlance({ selected: sel, onPick }: { selected: num
         </div>
       }
     >
-      <div className="ya-hl">
-        <div className="ya-typ">
-          <span>Typical month</span>
-          <b>{money(typical)}</b>
-          <em>saved on average</em>
-        </div>
-        {best && (
-          <button type="button" onClick={() => setSel(best.i)}>
-            <span>Best month</span>
-            <b>{best.label}</b>
-            <em>{money(best.saved)} saved</em>
-          </button>
-        )}
-        <button type="button" className={tightest.lowest < 0 ? "neg" : tightest.lowest < TIGHT ? "warn" : undefined} onClick={() => setSel(tightest.i)}>
-          <span>Tightest month</span>
-          <b>{tightest.label}</b>
-          <em>lowest cash {money(tightest.lowest)}</em>
-        </button>
-        {milestoneMonths.slice(0, 3).map((m) => (
-          <button key={m.name} type="button" className="ya-ms" onClick={() => setSel(m.r.i)}>
-            <span>{m.name}</span>
-            <b>{m.r.label}</b>
-            <em>milestone reached</em>
-          </button>
+      <ol className="ya-mo" aria-label="Key moments">
+        {moments.map((m, k) => (
+          <li key={k}>
+            <button type="button" onClick={() => setSel(m.i)} className={sel === m.i ? "on" : undefined}>
+              <Glyph kind={m.kind} />
+              <span>{m.title}</span>
+              <b>{m.month}</b>
+              {m.value && <em className={m.tone}>{m.value}</em>}
+            </button>
+          </li>
         ))}
-        {bonusMonths.length > 0 && (
-          <button type="button" className="ya-bn" onClick={() => setSel(bonusMonths[0].i)}>
-            <span>Bonus months</span>
-            <b>{bonusMonths.length}</b>
-            <em>{bonusMonths.map((r) => r.label.split(" ")[0]).join(", ")}</em>
-          </button>
-        )}
-      </div>
+      </ol>
 
       <div className="ya-cal" role="grid" aria-label={`Months coloured by ${METRICS[metric].label.toLowerCase()}`}>
         <span />

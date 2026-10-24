@@ -695,7 +695,7 @@ textarea.ps-in{resize:vertical}
 .rs-ring span{font-size:11px;color:var(--mute)}
 .rs-stats{flex:1 1 420px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 28px;margin:0}
 .rs-stats div{display:grid;gap:2px;padding-left:14px;border-left:2px solid var(--line)}
-.rs-stats .pos{border-left-color:var(--std)}.rs-stats .warn{border-left-color:var(--promo)}
+.rs-stats .pos dd{color:var(--std)}.rs-stats .warn dd{color:var(--promo)}.rs-stats dd small{color:var(--mute)}
 .rs-stats dt{font-size:12px;color:var(--mute)}
 .rs-stats dd{margin:0;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .rs-stats dd small{font-size:12.5px;font-weight:400;color:var(--mute);letter-spacing:0}
@@ -961,8 +961,8 @@ textarea.ps-in{resize:vertical}
 /* insurance: claim limits */
 .cl-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.6fr);gap:12px}
 @media (max-width:900px){.cl-sum{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.cl-sum>div{display:grid;gap:2px;align-content:start;border:1px solid var(--line);border-left:3px solid var(--line);border-radius:10px;padding:12px 14px}
-.cl-sum>div.pos{border-left-color:var(--std)}.cl-sum>div.warn{border-left-color:var(--promo)}
+.cl-sum>div{display:grid;gap:2px;align-content:start;padding:2px 0 2px 16px;border-left:1px solid var(--line)}
+.cl-sum>div:first-child{border-left:0;padding-left:0}.cl-sum>div.pos b{color:var(--std)}.cl-sum>div.warn b{color:var(--promo)}
 .cl-sum span{font-size:12.5px;color:var(--mute)}
 .cl-sum b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
 .cl-sum small{font-size:11.5px;color:var(--none)}
@@ -1022,14 +1022,8 @@ textarea.ps-in{resize:vertical}
 .nav-menu{min-width:300px}
 /* cash flow ledger */
 .cf{padding:20px 24px!important}
-.cf-sum{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
-@media (max-width:1100px){.cf-sum{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:640px){.cf-sum{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.cf-sum>div{display:grid;gap:1px;align-content:start;border:1px solid var(--line);border-left:3px solid var(--line);border-radius:10px;padding:10px 12px}
-.cf-sum>div.pos{border-left-color:var(--std)}.cf-sum>div.warn{border-left-color:var(--promo)}.cf-sum>div.neg{border-left-color:var(--neg)}
-.cf-sum span{font-size:12px;color:var(--mute)}
-.cf-sum b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
-.cf-sum small{font-size:11.5px;color:var(--none);line-height:1.35}
+@media (max-width:1100px){}
+@media (max-width:640px){}
 .cf-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .cf-filters button{background:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--mute);font:inherit;font-size:12.5px;cursor:pointer}
 .cf-filters button:hover{color:var(--text);border-color:#52525b}
@@ -1086,13 +1080,6 @@ textarea.ps-in{resize:vertical}
 .cf-next em{font-style:normal;color:var(--text);margin-left:4px}
 /* year at a glance */
 .ya{padding:20px 24px!important}
-.ya-hl{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px}
-.ya-hl button{--c:var(--std);display:grid;gap:1px;text-align:left;background:none;border:1px solid var(--line);border-left:3px solid var(--c);border-radius:10px;padding:8px 12px;color:var(--text);font:inherit;cursor:pointer}
-.ya-hl button:hover{background:#111114}
-.ya-hl button.warn{--c:var(--promo)}.ya-hl button.neg{--c:var(--neg)}.ya-hl button.ya-ms{--c:var(--scotia)}.ya-hl button.ya-bn{--c:var(--promo)}
-.ya-hl span{font-size:11.5px;color:var(--mute)}
-.ya-hl b{font-size:15px;font-weight:600}
-.ya-hl em{font-style:normal;font-size:11.5px;color:var(--mute)}
 .ya-cal{display:grid;grid-template-columns:44px repeat(12,minmax(0,1fr)) 170px;gap:5px;align-items:stretch;font-variant-numeric:tabular-nums}
 .ya-mh{font-size:11.5px;color:var(--mute);text-align:center;padding-bottom:2px}
 .ya-mh em{font-style:normal}
@@ -1136,8 +1123,53 @@ textarea.ps-in{resize:vertical}
 .cs-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px}
 .cs-h h2{font-size:16px}
 .cs-h label{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--mute)}
-.cs .cf-sum{margin:0}
-.ya-typ{display:grid;gap:1px;border:1px solid var(--line);border-left:3px solid var(--mute);border-radius:10px;padding:8px 12px}
-.ya-typ span,.ya-typ em{font-size:11.5px;color:var(--mute);font-style:normal}
-.ya-typ b{font-size:15px;font-weight:600}
+.cs .cf-r[data-i]:focus{outline:none}
+@media (max-width:1000px){}
+/* year at a glance: key moments */
+.ya-mo{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-wrap:wrap;gap:4px 6px}
+.ya-mo button{display:inline-flex;align-items:baseline;gap:6px;background:none;border:0;border-radius:999px;padding:5px 10px;color:var(--mute);font:inherit;font-size:12.5px;cursor:pointer}
+.ya-mo button:hover,.ya-mo button.on{background:#18181b;color:var(--text)}
+.ya-mo b{color:var(--text);font-weight:600}
+.ya-mo em{font-style:normal}
+.ya-mo em.pos{color:var(--std)}.ya-mo em.warn{color:var(--promo)}.ya-mo em.neg{color:var(--neg)}
+.ya-g{width:10px;height:10px;align-self:center;flex:none}
+.ya-g.bonus{fill:var(--promo)}.ya-g.milestone{fill:var(--scotia)}.ya-g.best{fill:var(--std)}.ya-g.tight{fill:var(--neg)}
+/* cash flow: summary card */
+.cs-card{display:grid;gap:14px;border:1px solid var(--line);border-radius:12px;padding:20px 24px}
+.cs-lead{margin:0;font-size:16px;line-height:1.5;color:var(--mute);text-align:left}
+.cs-lead b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.cs-lead b.pos{color:var(--std)}.cs-lead b.warn{color:var(--promo)}
+.cs-bar{position:relative;display:flex;gap:2px;height:26px;border-radius:7px;overflow:visible;background:#1d1d21}
+.cs-bar i{display:block;height:100%}
+.cs-bar i:first-child{border-radius:7px 0 0 7px}
+.cs-bar i:last-of-type{border-radius:0 7px 7px 0}
+.cs-bar s{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--text);border-radius:1px}
+.cs-keys{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:12.5px;color:var(--mute)}
+.cs-keys span{display:inline-flex;align-items:center;gap:6px}
+.cs-keys i{width:9px;height:9px;border-radius:2px}
+.cs-keys b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.cs-keys em{font-style:normal;color:var(--none)}
+.cs-keys .cs-guide i{width:2px;height:12px;border-radius:1px;background:var(--text)}
+.cs-figs{margin:4px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);padding-top:14px}
+.cs-figs>div{display:grid;gap:2px;align-content:start;padding:0 16px;border-left:1px solid var(--line)}
+.cs-figs>div:first-child{padding-left:0;border-left:0}
+.cs-figs dt{font-size:12px;color:var(--mute)}
+.cs-figs dd{margin:0;font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.cs-figs small{font-size:12px;color:var(--mute)}
+.cs-figs .pos{color:var(--std)}.cs-figs .warn{color:var(--promo)}.cs-figs .neg{color:var(--neg)}
+@media (max-width:760px){.cs-card{padding:16px}.cs-figs{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:14px}.cs-figs>div:nth-child(3){padding-left:0;border-left:0}}
 .cf-r[data-i]:focus{outline:none}
+.cs-row{display:grid;gap:8px}
+.cs-rh{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.cs-rh span{font-size:13px;color:var(--mute)}
+.cs-rh span em{font-style:normal;color:var(--none);font-size:12px}
+.cs-rh b{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.cs-keys small{font-size:11.5px;color:var(--none);margin-left:2px}
+.cs-keys .cs-rate{margin-left:auto}
+.cs-keys .cs-rate.pos b{color:var(--std)}.cs-keys .cs-rate.warn b{color:var(--promo)}
+@media (max-width:640px){.cs-keys span{flex-wrap:wrap;row-gap:0}.cs-keys small{flex-basis:100%;margin-left:15px}}
+.cs-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
+.cs-ctl .ps-switch{font-size:13px;color:var(--mute)}
+.cs-note{margin:2px 0 0;font-size:13px;color:var(--mute);text-align:left}
+.cs-note b{font-weight:600;font-variant-numeric:tabular-nums}
+.cs-note b.pos{color:var(--std)}.cs-note b.warn{color:var(--promo)}
