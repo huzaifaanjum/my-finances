@@ -1,13 +1,12 @@
 "use client";
 
+import { payMarginal } from "@/lib/pay";
 import { G, GlossaryScope } from "@/components/glossary/GlossaryText";
 import { usePlanner } from "@/components/providers/PlannerProvider";
 import { ProgressBar } from "@/components/ui/bars";
 import NumberField from "@/components/ui/NumberField";
 import { Note, SectionHeading } from "@/components/ui/text";
 import { money } from "@/lib/format";
-import { EMPLOYER_HEALTH, OFFER } from "@/lib/offer";
-import { marginalFor } from "@/lib/payslips/forecast";
 import { project } from "@/lib/planner/projection";
 import { rrspRoomEstimate } from "@/lib/recommendations";
 
@@ -21,7 +20,7 @@ export default function MoneyLadder() {
   const safetyDone = saved >= safety;
   // savings by Dec 31 (plan month 2), what could go into an FHSA this year
   const dec = Math.max(0, project(plan.state, 3, plan.left)[2].balance);
-  const m = marginalFor({ base: OFFER.salary / 12, pension: (OFFER.salary / 12) * OFFER.pensionMax, benefits: EMPLOYER_HEALTH }, year);
+  const m = payMarginal(year);
   const fhsaNow = Math.min(dec, fhsa);
   const rrsp = rrspRoomEstimate(year);
 

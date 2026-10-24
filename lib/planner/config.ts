@@ -1,4 +1,5 @@
 import { money, pctLabel } from "@/lib/format";
+import { PAY, takeHomePerGross } from "@/lib/pay";
 import { monthLabel } from "./calendar";
 
 export interface SliderDef {
@@ -21,11 +22,12 @@ const slider = (
 
 /** Every slider in the planner. Keys double as the ids stored in the cloud copy, so do not rename them. */
 export const SLIDERS = {
-  net: slider("Monthly take-home pay", 3000, 8000, 10, 4680),
+  // defaults from your October 2026 payslip; bonus amounts are what lands on payday at your tax rates
+  net: slider("Monthly take-home pay", 3000, 8000, 10, 4740),
   start: slider("Savings you already have", 0, 10000, 100, 0),
   lump: slider("One-time extra money you add now", 0, 10000, 100, 0),
-  sign: slider("Signing bonus, net per payment", 0, 2500, 50, 1500),
-  aipAmt: slider("Annual incentive bonus, net", 0, 5000, 50, 1700),
+  sign: slider("Signing bonus, net per payment", 0, 2500, 50, 1400),
+  aipAmt: slider("Annual incentive bonus, net", 0, 5000, 50, 1550),
 
   home: slider("Home price", 250000, 1200000, 10000, 450000),
   dpp: slider("Down payment", 5, 25, 1, 10, pctLabel),
@@ -173,7 +175,9 @@ export const INCOME_STREAMS: { key: StreamKey; kind: StreamKind; hint: string }[
 
 /* ---------- facts from the offer letter and pay stub ---------- */
 
-export const SALARY = 95000;
-export const EMPLOYER_HEALTH = 2996;
-/** Each extra dollar of salary adds about 50¢ to take-home at this tax bracket (incl. 6% pension). */
-export const TAKE_HOME_PER_GROSS = 0.5;
+/** From your payslip: $7,917 a month. */
+export const SALARY = PAY.salary;
+/** Employer-paid health and dental a year, as on your payslip. */
+export const EMPLOYER_HEALTH = Math.round(PAY.employerHealth * 12);
+/** Of each extra dollar of salary, what reaches take-home after the 6% pension, tax and payroll plans (about 60¢). */
+export const TAKE_HOME_PER_GROSS = takeHomePerGross();

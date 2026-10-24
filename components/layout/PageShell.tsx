@@ -10,10 +10,10 @@ import DashboardSkeleton from "./DashboardSkeleton";
 
 const NOTES = [
   "Estimates only, not financial advice. Bonuses are net amounts.",
-  "Per your offer letter, the two $2,500 (gross) signing payments arrive once each, in February 2027 and August 2027 (6 and 12 months after your Aug 17 start), and the annual incentive arrives each March.",
+  "Take-home, tax rates, pension and insurance come from your October 2026 payslip and your Manulife coverage summary; the Payslips tab uses your latest uploaded payslip.",
+  "Per your offer letter, the two $2,500 (gross) signing payments arrive in February and August 2027 (6 and 12 months after your Aug 17 start), about $1,400 each after tax; the annual incentive arrives each March (the first, prorated, about $1,550 after tax).",
   "Pay lands on the last banking day of the month, shown as the last day of the month in the chart.",
-  "Pay is assumed flat. In practice EI and QPP stop being withheld late each year once their annual maximums are reached, so real take-home should rise in the last months of each year; that is not modelled.",
-  "The FHSA refund effect is a rough estimate based on about $65,000 of 2026 income.",
+  "The plan keeps pay flat. EI and QPP stop being withheld late each year once their maximums are reached, so real deposits rise in the last months; the Payslips forecast shows that.",
 ];
 
 const NOTES_TIP = (

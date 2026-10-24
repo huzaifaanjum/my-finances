@@ -5,7 +5,7 @@ import { money, percent } from "@/lib/format";
 import { COMP, OFFER } from "@/lib/offer";
 
 const { salary } = OFFER;
-const { aip, signing, match, health, yearOne } = COMP;
+const { aip, signing, match, health, lsa, yearOne } = COMP;
 const aipMax = salary * OFFER.aipMax;
 const weekly = salary / 52;
 
@@ -15,6 +15,7 @@ const PACKAGE = [
   { label: "Pension match (6%)", value: match, color: "var(--scotia)" },
   { label: "Signing bonus, first year only", value: signing, color: "var(--mix)" },
   { label: "Employer-paid health and dental", value: health, color: "#f472b6" },
+  { label: "Lifestyle Spending Account", value: lsa, color: "#2dd4bf" },
 ];
 
 const FACTS = [

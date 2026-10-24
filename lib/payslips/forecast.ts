@@ -18,7 +18,9 @@ import {
   quebecTaxableBenefits,
   taxLine,
 } from "./analysis";
-import { federalTax, INDEX, payrollMax, quebecTax, taxYear, type TaxYear, type YearIncome } from "./tax";
+import { federalTax, INDEX, marginalFor, payrollMax, quebecTax, taxYear, type TaxYear, type YearIncome } from "./tax";
+
+export { marginalFor };
 import type { PayslipData } from "./types";
 
 export interface ForecastSettings {
@@ -215,27 +217,4 @@ export function forecast(latest: PayslipData, s: ForecastSettings, years = 50, p
 /** On a full year at today's pay: what you keep of an extra $1,000 (a bonus, say) and what a $1,000 RRSP contribution saves. */
 export function marginal(latest: PayslipData, year: number) {
   return marginalFor({ base: baseSalary(latest), pension: pensionLine(latest), benefits: quebecTaxableBenefits(latest) }, year);
-}
-
-/** The same, from monthly base pay, pension contribution and Quebec-taxable benefits (no payslip needed). */
-export function marginalFor(m: { base: number; pension: number; benefits: number }, year: number) {
-  const p = taxYear(year);
-  const i = annualised(m.base, m.pension, m.benefits);
-  const tax = (x: YearIncome) => federalTax(x, p) + quebecTax(x, p);
-  const extraTax = tax(plus(i, 1000)) - tax(i);
-  // payroll plans only take a cut while you are under their yearly maximums
-  const pensionable = i.qcTaxable + (i.gross - i.fedTaxable);
-  const payroll =
-    1000 *
-    ((pensionable < p.qpp.ympe ? p.qpp.rate : pensionable < p.qpp.yampe ? p.qpp.rate2 : 0) +
-      (i.gross < p.ei.maxInsurable ? p.ei.rate : 0) +
-      (i.gross < p.qpip.maxInsurable ? p.qpip.rate : 0));
-  const rrsp = tax(i) - tax({ ...i, fedTaxable: i.fedTaxable - 1000, qcTaxable: i.qcTaxable - 1000 });
-  return {
-    keep: 1000 - extraTax - payroll,
-    /** combined federal + Quebec marginal tax rate */
-    rate: extraTax / 1000,
-    qcRate: (quebecTax(plus(i, 1000), p) - quebecTax(i, p)) / 1000,
-    rrsp,
-  };
 }

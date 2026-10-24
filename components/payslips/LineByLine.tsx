@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import Card from "@/components/ui/Card";
 import { Legend } from "@/components/ui/text";
@@ -100,6 +101,16 @@ export default function LineByLine({ chosen, div, latest, scope }: Props) {
             <span>{share(g.value, gross)}</span>
           </div>
           <RowBar row={{ label: g.b, value: g.value, recent: g.recent }} color={BUCKETS[g.b].color} max={max} cumulative={cumulative} />
+          {g.b === "insurance" && (
+            <Link href="/insurance" className="ps-more">
+              What each insurance line covers →
+            </Link>
+          )}
+          {g.b === "pension" && (
+            <Link href="/pension" className="ps-more">
+              Where your pension is heading →
+            </Link>
+          )}
           {g.rows.map((r) => (
             <div key={r.label} className="off-line ps-lrowbar">
               <div>

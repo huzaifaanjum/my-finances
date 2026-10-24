@@ -18,6 +18,8 @@ import {
   type Bucket,
 } from "@/lib/payslips/analysis";
 import type { Payslip, PayslipData } from "@/lib/payslips/types";
+import Link from "next/link";
+import { LSA_MONTHLY } from "@/lib/benefits";
 import LineByLine from "./LineByLine";
 
 type Mode = "latest" | "average" | "total";
@@ -141,11 +143,22 @@ export default function PayBreakdown({ used }: { used: Payslip[] }) {
                   value={money(l.current, 2)}
                 />
               ))}
-            <KeyValue label="Total this month" value={money(latest.employerPaid.reduce((t, l) => t + l.current, 0), 2)} total />
+            <KeyValue
+              label={
+                <>
+                  Lifestyle Spending Account <em>· not on payslips</em>
+                </>
+              }
+              value={money(LSA_MONTHLY, 2)}
+            />
+            <KeyValue label="Total this month" value={money(latest.employerPaid.reduce((t, l) => t + l.current, 0) + LSA_MONTHLY, 2)} total />
             <KeyValue
               label={<em>Gross plus employer-paid</em>}
-              value={money(latest.current.gross + latest.employerPaid.reduce((t, l) => t + l.current, 0), 2)}
+              value={money(latest.current.gross + latest.employerPaid.reduce((t, l) => t + l.current, 0) + LSA_MONTHLY, 2)}
             />
+            <Link href="/insurance" className="ps-more">
+              What the health, dental and spending account cover →
+            </Link>
           </Card>
 
           <Card title="So far this year" description={`Year-to-date column on ${periodLabel(latest, true)}'s payslip.`}>

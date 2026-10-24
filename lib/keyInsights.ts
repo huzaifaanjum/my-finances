@@ -1,9 +1,10 @@
 // Key insights from every tab, as plain data so the Insights tab can show them in one place.
 // Each source keeps its own wording; duplicates across sources are left out here.
 
+import { payMarginal } from "@/lib/pay";
 import { benefit, COSTS, LSA_MONTHLY, LSA_YEARLY } from "@/lib/benefits";
 import { deltaMoney, money, percent } from "@/lib/format";
-import { COMP, EMPLOYER_HEALTH, OFFER } from "@/lib/offer";
+import { COMP, OFFER } from "@/lib/offer";
 import {
   employerBenefits,
   employerPension,
@@ -15,7 +16,7 @@ import {
   retroDeductions,
   usualNet,
 } from "@/lib/payslips/analysis";
-import { forecast, marginal, marginalFor, type ForecastSettings } from "@/lib/payslips/forecast";
+import { forecast, marginal, type ForecastSettings } from "@/lib/payslips/forecast";
 import type { Payslip } from "@/lib/payslips/types";
 import { SLIDERS } from "@/lib/planner/config";
 
@@ -112,7 +113,7 @@ const shareOf = (v: number) => (v >= 0.95 && v <= 1.05 ? "about all" : `about ${
 export function insuranceInsights(planNet: number): KeyInsight[] {
   const ltd = benefit("ltd");
   const life = benefit("life");
-  const m = marginalFor({ base: OFFER.salary / 12, pension: (OFFER.salary / 12) * OFFER.pensionMax, benefits: EMPLOYER_HEALTH }, new Date().getFullYear());
+  const m = payMarginal(new Date().getFullYear());
   const ltdShare = planNet ? ltd.pays!.amount / planNet : 0;
   const list: Omit<KeyInsight, "topic">[] = [
     {

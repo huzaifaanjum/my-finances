@@ -1,4 +1,5 @@
 // Calculations behind the Insights page. Everything here is pure, so it is easy to check by hand.
+import { LSA_YEARLY } from "@/lib/benefits";
 import { money, percent } from "@/lib/format";
 import { dayLabel } from "./calendar";
 import { EMPLOYER_HEALTH, INCOME_STREAMS, SALARY, TAKE_HOME_PER_GROSS, type ExpenseId, type StreamKey } from "./config";
@@ -226,6 +227,7 @@ export function payPackage(base: number): PackageLine[] {
     { name: "Annual incentive (target 8%)", amount: base * 0.08 },
     { name: "Employer pension match (6%)", amount: base * 0.06 },
     { name: "Employer-paid health and dental", amount: EMPLOYER_HEALTH },
+    { name: "Lifestyle Spending Account", amount: LSA_YEARLY },
   ];
 }
 

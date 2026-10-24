@@ -5,7 +5,7 @@
 import { money } from "@/lib/format";
 import { benefit, COSTS, LSA_YEARLY } from "@/lib/benefits";
 import { EMPLOYER_HEALTH, OFFER } from "@/lib/offer";
-import { marginalFor } from "@/lib/payslips/forecast";
+import { payMarginal } from "@/lib/pay";
 import type { Plan } from "@/lib/planner/projection";
 
 export type Priority = "now" | "soon" | "later";
@@ -80,7 +80,7 @@ export function rrspRoomEstimate(year: number) {
 export function checklist(ctx: RecContext): Step[] {
   const base = OFFER.salary / 12;
   const pension = base * OFFER.pensionMax;
-  const m = marginalFor({ base, pension, benefits: EMPLOYER_HEALTH }, ctx.year + 1);
+  const m = payMarginal(ctx.year + 1);
   const match = OFFER.salary * OFFER.pensionMax;
   const rrsp = rrspRoomEstimate(ctx.year);
   const rentShare = ctx.net ? ctx.rent / ctx.net : 0;

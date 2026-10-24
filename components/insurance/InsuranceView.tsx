@@ -1,5 +1,6 @@
 "use client";
 
+import { payMarginal } from "@/lib/pay";
 import { G, GlossaryScope } from "@/components/glossary/GlossaryText";
 import { usePlan } from "@/components/providers/PlannerProvider";
 import Card from "@/components/ui/Card";
@@ -8,8 +9,6 @@ import SeeAlso from "@/components/ui/SeeAlso";
 import { Legend, Note, SectionHeading } from "@/components/ui/text";
 import { benefit, BENEFITS, COSTS, LSA_CATEGORIES, LSA_IDEAS, LSA_MONTHLY, LSA_YEARLY, PREMIUM_TAX, STATEMENT_DATE, type Benefit } from "@/lib/benefits";
 import { money, percent } from "@/lib/format";
-import { EMPLOYER_HEALTH, OFFER } from "@/lib/offer";
-import { marginalFor } from "@/lib/payslips/forecast";
 
 const GROUPS: { id: Benefit["group"]; title: string; why: string }[] = [
   { id: "income", title: "Income protection", why: "Replaces pay if you can't work." },
@@ -39,7 +38,7 @@ export default function InsuranceView() {
   const std = benefit("std");
   const life = benefit("life");
   const add = benefit("add");
-  const m = marginalFor({ base: OFFER.salary / 12, pension: (OFFER.salary / 12) * OFFER.pensionMax, benefits: EMPLOYER_HEALTH }, new Date().getFullYear());
+  const m = payMarginal(new Date().getFullYear());
   const ltdShare = plan.net ? ltd.pays!.amount / plan.net : 0;
   const paidBars = BENEFITS.filter((b) => b.price > 0);
   const maxPrice = Math.max(...paidBars.map((b) => b.price * (1 + PREMIUM_TAX)));
@@ -230,6 +229,9 @@ export default function InsuranceView() {
       </div>
 
 
+      <SeeAlso href="/payslips" label="Payslips">
+        {`These premiums are the five insurance lines on every payslip (${money(COSTS.youTotal, 2)} a month), and the employer-paid health and dental shows as Quebec-taxable lines`}
+      </SeeAlso>
       <SeeAlso href="/insights" label="Insights">
         Key insights on your coverage: disability vs take-home, the life cover cap, premium tax and the spending account
       </SeeAlso>
