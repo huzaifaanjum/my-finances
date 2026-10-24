@@ -12,12 +12,12 @@ export default function PensionView() {
   const plan = usePlan();
   const start = usePensionStart();
   const r = retirement(plan, start);
-  const { ret_pr, ret_sg, ret_wr } = plan.state.numbers;
+  const { ret_pr } = plan.state.numbers;
   return (
     <div className="mil">
       <PensionKpis r={r} fundReturn={ret_pr} />
       <BreakdownCard r={r} net={plan.net} fundReturn={ret_pr} />
-      <RetirementIncomeCard r={r} net={plan.net} numbers={{ ret_sg, ret_wr }} />
+      <RetirementIncomeCard r={r} net={plan.net} />
       <div className="seealso-row">
         <SeeAlso href="/payslips" label="Payslips">
           {`Contributions and salary come from ${start.source}; upload new payslips to keep this current`}

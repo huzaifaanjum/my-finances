@@ -254,7 +254,7 @@ function RrspRoom() {
 function QppAge() {
   const [qppAge, setQppAge] = useState(65);
   const [oasAge, setOasAge] = useState(65);
-  const QPP65 = 1450;
+  const QPP65 = 1508;
   const OAS65 = 740;
   const months = (qppAge - 65) * 12;
   const qpp = QPP65 * (1 + (months < 0 ? months * 0.006 : months * 0.007));

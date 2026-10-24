@@ -140,7 +140,7 @@ export const MORE_RULES: Rule[] = [
     plain:
       "The Quebec Pension Plan pays a pension based on what you contributed through payroll. Old Age Security is paid to residents with enough years in Canada. QPP can start between 60 and 72: about 0.6% less for each month before 65 and 0.7% more for each month after. OAS starts at 65 and grows 0.6% for each month you delay, up to 70.",
     why: "They are paid for life and rise with inflation, which makes waiting valuable if you are healthy and have other savings to bridge the gap.",
-    example: "A QPP pension of $1,450 a month at 65 is about $930 at 60, or about $2,300 at 72.",
+    example: "A QPP pension of $1,508 a month at 65 (the 2026 maximum) is about $965 at 60, or about $2,395 at 72.",
     you: "Both depend on how many years you contribute and live in Canada. Your statement of participation from Retraite Québec shows your QPP record.",
     demo: "qppAge",
     link: { href: "/pension", label: "Retirement" },

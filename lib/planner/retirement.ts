@@ -2,6 +2,7 @@ import { money } from "@/lib/format";
 import { investmentPlan, projectPension, RETIREMENT_MONTH, type InvestmentPlan, type PensionProjection, type PensionStart } from "./finance";
 import type { Plan } from "./projection";
 import { COLOR } from "@/lib/colors";
+import { RETIREMENT_FACTS } from "@/lib/retirementFacts";
 
 export type Effort = "auto" | "org" | "act";
 
@@ -16,9 +17,9 @@ export interface IncomeSource {
   why: string;
 }
 
-/** Rough 2026 estimates, today's dollars a month. */
-const QPP_MONTHLY = 1450;
-const OAS_MONTHLY = 740;
+/** Today's maximums, in today's dollars a month. Earning above the QPP ceiling for about 39 years gets you close to the QPP maximum. */
+const QPP_MONTHLY = RETIREMENT_FACTS.qppMax65.value;
+const OAS_MONTHLY = RETIREMENT_FACTS.oasMax.value;
 
 export interface Retirement {
   pension: PensionProjection;

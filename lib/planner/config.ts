@@ -2,6 +2,7 @@ import { money, pctLabel } from "@/lib/format";
 import { PAY, takeHomePerGross } from "@/lib/pay";
 import { monthLabel } from "./calendar";
 import { COLOR } from "@/lib/colors";
+import { RETIREMENT_FACTS } from "@/lib/retirementFacts";
 
 export interface SliderDef {
   label: string;
@@ -44,7 +45,7 @@ export const SLIDERS = {
   ret_sg: slider("Yearly salary growth", 0, 6, 0.5, 2.5, pctLabel),
   ret_pr: slider("Pension fund return", 2, 9, 0.5, 5, pctLabel),
   ret_wr: slider("Yearly withdrawal in retirement", 3, 6, 0.5, 4, pctLabel),
-  ret_inf: slider("Inflation", 1, 4, 0.5, 2, pctLabel),
+  ret_inf: slider("Inflation", 1, 5, 0.1, RETIREMENT_FACTS.inflation.value, (v) => `${+v.toFixed(1)}%`),
 
   rs_raise: slider("Raise or promotion at work", 0, 1500, 25, 0),
   rs_free: slider("Freelance or consulting", 0, 3000, 50, 0),
