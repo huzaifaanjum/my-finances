@@ -8,7 +8,7 @@ export default function BenefitsPage() {
   return (
     <PageShell
       title="Benefits"
-      subtitle="Everything Air Canada gives you beyond salary, what each is worth, and a checklist to make sure you use all of it. Ticks are saved to your account."
+      subtitle="What Air Canada gives you beyond salary, and the steps to use all of it. Ticks are saved to your account."
     >
       <BenefitsView />
     </PageShell>

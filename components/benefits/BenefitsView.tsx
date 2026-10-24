@@ -1,22 +1,59 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { G, GlossaryScope } from "@/components/glossary/GlossaryText";
 import SeeAlso from "@/components/ui/SeeAlso";
 import { useKnowledgeProgress } from "@/hooks/useKnowledgeProgress";
-import { BENEFIT_GROUPS, benefitItems, type BenefitGroup, type BenefitStep } from "@/lib/benefitsChecklist";
+import { BENEFIT_GROUPS, benefitItems, type BenefitGroup, type BenefitItem, type BenefitStep } from "@/lib/benefitsChecklist";
 import { money } from "@/lib/format";
 
-type Status = "all" | "todo" | "done";
 const GROUP_ORDER = Object.keys(BENEFIT_GROUPS) as BenefitGroup[];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const DO_NEXT = 5;
 
-/** Every benefit Air Canada gives you, with a checklist to get full use of each. */
+/**
+ * When a step is due, as a sortable date, or null for steps that recur ("Yearly", "Before trips").
+ * "Now" sorts first.
+ */
+function dueBy(when: string | undefined, today: Date): number | null {
+  if (!when) return null;
+  if (/^now$/i.test(when)) return 0;
+  const year = today.getFullYear();
+  if (/year end|dec 31/i.test(when)) return new Date(year, 11, 31).getTime();
+  const m = /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*(?:\s+(\d{4}))?/.exec(when);
+  if (!m) return null;
+  const month = MONTHS.indexOf(m[1]);
+  let y = m[2] ? Number(m[2]) : year;
+  if (!m[2] && new Date(y, month + 1, 0) < today) y++;
+  // "Before Feb 2027" is due at the end of January
+  return /before/i.test(when) ? new Date(y, month, 0).getTime() : new Date(y, month, 1).getTime();
+}
+
+function Step({ step, benefit, done, onChange }: { step: BenefitStep; benefit?: string; done: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <li className={done ? "done" : undefined}>
+      <label>
+        <input type="checkbox" checked={done} onChange={(e) => onChange(e.target.checked)} />
+        <span>
+          <b>
+            <G>{step.title}</G>
+          </b>
+          <small>
+            {benefit && <>{benefit} · </>}
+            <G>{step.body}</G>
+          </small>
+        </span>
+        {step.when && <em>{step.when}</em>}
+      </label>
+    </li>
+  );
+}
+
+/** Every benefit Air Canada gives you: what it is worth, what to do first, and the full checklist per benefit. */
 export default function BenefitsView() {
   const { read, loading, error, toggle } = useKnowledgeProgress();
   const items = useMemo(() => benefitItems(), []);
-  const [group, setGroup] = useState<BenefitGroup | "all">("all");
-  const [status, setStatus] = useState<Status>("all");
 
   const isDone = (s: BenefitStep) => !!read[s.id] || !!s.also?.some((id) => read[id]);
   const setDone = (s: BenefitStep, v: boolean) => {
@@ -26,161 +63,129 @@ export default function BenefitsView() {
 
   const steps = items.flatMap((b) => b.steps);
   const done = steps.filter(isDone).length;
-  const fullyUsed = items.filter((b) => b.steps.every(isDone)).length;
   const yearly = items.reduce((t, b) => t + (b.value && !b.once ? b.value : 0), 0);
   const once = items.reduce((t, b) => t + (b.value && b.once ? b.value : 0), 0);
   // each benefit's value, scaled by the share of its steps still open
-  const unusedValue = items.reduce((t, b) => t + (b.value && !b.once ? (b.value * b.steps.filter((s) => !isDone(s)).length) / b.steps.length : 0), 0);
-  const dueNow = steps.filter((s) => !isDone(s) && /now/i.test(s.when ?? "")).length;
-  const share = steps.length ? done / steps.length : 0;
-  const R = 34;
-  const C = 2 * Math.PI * R;
+  const unclaimed = items.reduce((t, b) => t + (b.value && !b.once ? (b.value * b.steps.filter((s) => !isDone(s)).length) / b.steps.length : 0), 0);
+  const byGroup = GROUP_ORDER.map((g) => ({ g, value: items.filter((b) => b.group === g && !b.once).reduce((t, b) => t + (b.value ?? 0), 0) })).filter((x) => x.value > 0);
+
+  // the open steps with a deadline, soonest first
+  const today = new Date();
+  const timed = items
+    .flatMap((b) => b.steps.map((s) => ({ s, b, due: dueBy(s.when, today) })))
+    .filter((x) => x.due !== null && !isDone(x.s))
+    .sort((a, b) => a.due! - b.due!);
+  const next = timed.slice(0, DO_NEXT);
+
+  const status = (b: BenefitItem) => {
+    const n = b.steps.filter(isDone).length;
+    return { n, all: n === b.steps.length };
+  };
 
   return (
-    <div className="bn">
-      <section className="rs">
-        <div className="rs-ring" role="img" aria-label={`${done} of ${steps.length} steps done`}>
-          <svg viewBox="0 0 84 84" width="84" height="84">
-            <circle cx="42" cy="42" r={R} fill="none" stroke="var(--line)" strokeWidth="8" />
-            <circle cx="42" cy="42" r={R} fill="none" stroke="var(--std)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${C * share} ${C}`} transform="rotate(-90 42 42)" />
-          </svg>
-          <div>
-            <b>{loading ? "…" : Math.round(share * 100)}%</b>
-            <span>used</span>
+    <GlossaryScope>
+      <div className="bf">
+        <section className="bf-sum">
+          <p className="bf-lead">
+            On top of your salary, Air Canada&rsquo;s benefits are worth about <b className="pos">{money(yearly)} a year</b>
+            {once > 0 && <> plus {money(once)} once</>}. You&rsquo;ve done <b>{loading ? "…" : done}</b> of {steps.length} steps to use them
+            {unclaimed >= 1 ? (
+              <>
+                , and about <b className="warn">{money(unclaimed)} a year</b> is still unclaimed.
+              </>
+            ) : (
+              <>. You&rsquo;re using all of it.</>
+            )}
+          </p>
+          <div className="bf-bar" role="img" aria-label={byGroup.map((x) => `${BENEFIT_GROUPS[x.g].title} ${money(x.value)}`).join(", ")}>
+            {byGroup.map((x) => (
+              <i key={x.g} style={{ width: `${(x.value / (yearly || 1)) * 100}%`, background: BENEFIT_GROUPS[x.g].color }} />
+            ))}
           </div>
-        </div>
-        <dl className="rs-stats">
-          <div className="pos">
-            <dt>Worth on top of salary</dt>
-            <dd>
-              {money(yearly)}
-              <small> a year + {money(once)} once</small>
-            </dd>
+          <div className="bf-keys">
+            {byGroup.map((x) => (
+              <span key={x.g}>
+                <i style={{ background: BENEFIT_GROUPS[x.g].color }} />
+                {BENEFIT_GROUPS[x.g].title} <b>{money(x.value)}</b>
+              </span>
+            ))}
           </div>
-          <div>
-            <dt>Steps done</dt>
-            <dd>
-              {done}
-              <small> of {steps.length}</small>
-            </dd>
-          </div>
-          <div className={fullyUsed === items.length ? "pos" : "warn"}>
-            <dt>Benefits fully used</dt>
-            <dd>
-              {fullyUsed}
-              <small> of {items.length}</small>
-            </dd>
-          </div>
-          <div className={unusedValue ? "warn" : "pos"}>
-            <dt>Value still to unlock</dt>
-            <dd>
-              {money(unusedValue)}
-              <small> a year{dueNow ? ` · ${dueNow} to do now` : ""}</small>
-            </dd>
-          </div>
-        </dl>
-      </section>
+        </section>
+        {error && <p className="note">{error}</p>}
 
-      <div className="bn-bar">
-        <div className="ki-topics" role="group" aria-label="Benefit type">
-          <button type="button" aria-pressed={group === "all"} onClick={() => setGroup("all")}>
-            All <em>{items.length}</em>
-          </button>
-          {GROUP_ORDER.map((g) => (
-            <button key={g} type="button" aria-pressed={group === g} onClick={() => setGroup(g)}>
-              <i style={{ background: BENEFIT_GROUPS[g].color }} />
-              {BENEFIT_GROUPS[g].title} <em>{items.filter((b) => b.group === g).length}</em>
-            </button>
-          ))}
-        </div>
-        <div className="ps-seg sm" role="group" aria-label="Show">
-          {(["all", "todo", "done"] as const).map((s) => (
-            <button key={s} type="button" aria-pressed={status === s} onClick={() => setStatus(s)}>
-              {s === "all" ? "All steps" : s === "todo" ? "To do" : "Done"}
-            </button>
-          ))}
-        </div>
-      </div>
-      {error && <p className="note">{error}</p>}
+        <div className="bf-lay">
+          <section className="bf-next" aria-labelledby="bf-next-h">
+            <h2 id="bf-next-h">Do next</h2>
+            {next.length ? (
+              <>
+                <p className="bf-sub">The steps with a deadline, soonest first.</p>
+                <ul className="bf-steps">
+                  {next.map(({ s, b }) => (
+                    <Step key={s.id} step={s} benefit={b.name} done={false} onChange={(v) => setDone(s, v)} />
+                  ))}
+                </ul>
+                {timed.length > next.length && <p className="bf-sub">{timed.length - next.length} more with a deadline in the list.</p>}
+              </>
+            ) : (
+              <p className="bf-sub">Nothing due. The rest are habits for when they come up: trips, claims, enrolment.</p>
+            )}
+          </section>
 
-      <GlossaryScope>
-        {GROUP_ORDER.filter((g) => group === "all" || group === g).map((g) => {
-          const cards = items
-            .filter((b) => b.group === g)
-            .map((b) => ({ b, shown: b.steps.filter((s) => status === "all" || (status === "done") === isDone(s)) }))
-            .filter((x) => x.shown.length);
-          if (!cards.length) return null;
-          return (
-            <section key={g} className="bn-sec">
-              <div className="bn-sh">
-                <h2>
-                  <i style={{ background: BENEFIT_GROUPS[g].color }} />
-                  {BENEFIT_GROUPS[g].title}
-                </h2>
-                <span>{BENEFIT_GROUPS[g].note}</span>
-              </div>
-              <div className="bn-grid">
-                {cards.map(({ b, shown }) => {
-                  const n = b.steps.filter(isDone).length;
-                  const all = n === b.steps.length;
-                  return (
-                    <article key={b.id} className={`bn-card${all ? " all" : ""}`} style={{ ["--c" as string]: BENEFIT_GROUPS[g].color }}>
-                      <header>
-                        <div>
-                          <h3>
-                            <G>{b.name}</G>
-                          </h3>
-                          <div className="bn-val">
-                            {b.value !== undefined && <b>{money(b.value)}</b>}
-                            <span>{b.valueNote}</span>
-                          </div>
+          <div className="bf-list">
+            {GROUP_ORDER.map((g) => {
+              const list = items.filter((b) => b.group === g);
+              const groupDone = list.filter((b) => status(b).all).length;
+              return (
+                <section key={g} className="bf-grp">
+                  <h2>
+                    <i style={{ background: BENEFIT_GROUPS[g].color }} />
+                    {BENEFIT_GROUPS[g].title}
+                    <span>
+                      {groupDone} of {list.length} all set
+                    </span>
+                  </h2>
+                  {list.map((b) => {
+                    const { n, all } = status(b);
+                    return (
+                      <details key={b.id} className={`bf-item${all ? " all" : ""}`}>
+                        <summary>
+                          <span className="bf-name">
+                            <b>{b.name}</b>
+                            <small>
+                              {b.value !== undefined && <>{money(b.value)} </>}
+                              {b.valueNote}
+                            </small>
+                          </span>
+                          <span className={`bf-state${all ? " all" : ""}`}>{all ? "✓ All set" : `${n} of ${b.steps.length}`}</span>
+                        </summary>
+                        <div className="bf-body">
+                          <p>
+                            <G>{b.what}</G>
+                          </p>
+                          <ul className="bf-steps">
+                            {b.steps.map((s) => (
+                              <Step key={s.id} step={s} done={isDone(s)} onChange={(v) => setDone(s, v)} />
+                            ))}
+                          </ul>
+                          {b.link && (
+                            <Link href={b.link.href} className="ps-more">
+                              Details on {b.link.label} →
+                            </Link>
+                          )}
                         </div>
-                        <span className={`bn-count${all ? " all" : ""}`}>{all ? "All set" : `${n}/${b.steps.length}`}</span>
-                      </header>
-                      <div className="bn-prog" aria-hidden="true">
-                        <i style={{ width: `${(n / b.steps.length) * 100}%` }} />
-                      </div>
-                      <p className="bn-what">
-                        <G>{b.what}</G>
-                      </p>
-                      <ul>
-                        {shown.map((s) => {
-                          const d = isDone(s);
-                          return (
-                            <li key={s.id} className={d ? "done" : undefined}>
-                              <label>
-                                <input type="checkbox" checked={d} onChange={(e) => setDone(s, e.target.checked)} />
-                                <span>
-                                  <b>
-                                    <G>{s.title}</G>
-                                  </b>
-                                  {s.when && <em>{s.when}</em>}
-                                  <small>
-                                    <G>{s.body}</G>
-                                  </small>
-                                </span>
-                              </label>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      {b.link && (
-                        <Link href={b.link.href} className="ps-more">
-                          Details on {b.link.label} →
-                        </Link>
-                      )}
-                    </article>
-                  );
-                })}
-              </div>
-            </section>
-          );
-        })}
-      </GlossaryScope>
+                      </details>
+                    );
+                  })}
+                </section>
+              );
+            })}
+          </div>
+        </div>
 
-      <SeeAlso href="/recommendations" label="Action plan">
-        Everything else worth doing: savings habits, debt, tax, investing and big purchases
-      </SeeAlso>
-    </div>
+        <SeeAlso href="/recommendations" label="Action plan">
+          Everything else worth doing: savings habits, debt, tax, investing and big purchases
+        </SeeAlso>
+      </div>
+    </GlossaryScope>
   );
 }
