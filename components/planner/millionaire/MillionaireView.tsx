@@ -25,7 +25,7 @@ export default function MillionaireView() {
         <ReturnsCard plan={plan} invest={invest} />
         <FasterCard plan={plan} invest={invest} />
       </div>
-      <SeeAlso href="/recommendations" label="Recommendations">
+      <SeeAlso href="/recommendations" label="Action plan">
         Which accounts to fill first (FHSA, TFSA, RRSP) and how much tax-sheltered room you have
       </SeeAlso>
     </div>

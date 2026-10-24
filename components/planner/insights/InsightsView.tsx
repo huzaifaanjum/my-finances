@@ -58,7 +58,7 @@ export default function InsightsView() {
           <MilestonesCard />
           <QuickFacts />
         </section>
-        <SeeAlso href="/recommendations" label="Recommendations">
+        <SeeAlso href="/recommendations" label="Action plan">
           What to do about all this: next steps ranked by what they are worth, where to put your money, and your checklist
         </SeeAlso>
       </div>

@@ -93,7 +93,7 @@ export default function PayslipsView() {
           <SeeAlso href="/insights" label="Insights">
             Key insights from your payslips: next deposit, plan vs payslip, tax rate, the late-year bump and more
           </SeeAlso>
-          <SeeAlso href="/recommendations" label="Recommendations">
+          <SeeAlso href="/recommendations" label="Action plan">
             What to do with it: tax savings, the late-year bump, benefits and your payslip checklist
           </SeeAlso>
         </>

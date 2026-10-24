@@ -361,12 +361,6 @@ td.s{color:var(--std)}td.p{color:var(--promo)}
 .nav{position:sticky;top:0;z-index:40;background:rgba(9,9,11,.92);backdrop-filter:blur(8px);box-shadow:inset 0 -1px 0 var(--line)}
 .nav-in{max-width:1500px;margin:0 auto;padding:0 clamp(16px,3vw,40px);display:flex;align-items:stretch;gap:20px;min-height:52px}
 .nav-brand{align-self:center;font-weight:700;letter-spacing:-.02em;color:var(--text);text-decoration:none;white-space:nowrap}
-.nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0;padding:0;list-style:none}
-.nav-links::-webkit-scrollbar{display:none}
-.nav-links a{display:flex;align-items:center;height:100%;padding:0 12px;border-block:2px solid transparent;color:var(--mute);text-decoration:none;font-size:14px;white-space:nowrap}
-.nav-links a:hover{color:var(--text)}
-.nav-links a[aria-current="page"]{color:var(--text);border-bottom-color:var(--std)}
-.nav-links{flex:1;min-width:0}
 .nav-r{align-self:center;display:flex;align-items:center;gap:12px;flex:none}
 .nav-sync{color:var(--mute);font-size:12.5px;white-space:nowrap}
 .nav-sync b{font-weight:500}
@@ -702,8 +696,6 @@ textarea.ps-in{resize:vertical}
 .seealso-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
 .ov-next{margin:-12px 0 24px}
 .mil>.seealso,.ins-wrap>.seealso{margin:0}
-/* twelve tabs: tighten the nav so they fit on a laptop screen; narrower screens scroll it */
-@media (max-width:1500px){.nav-links{gap:0}.nav-links a{padding:0 9px;font-size:13.5px}.nav-in{gap:14px}}
 /* overview */
 .ov-main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;margin-bottom:32px}
 @media (max-width:1000px){.ov-main{grid-template-columns:1fr}}
@@ -890,7 +882,6 @@ textarea.ps-in{resize:vertical}
 .ins-cat h4{margin:0 0 4px;font-size:12.5px;color:var(--std)}
 .ins-cat ul{margin:0;padding-left:16px;display:grid;gap:2px}
 .ins-cat li{font-size:12.5px;color:var(--mute);text-align:left}
-@media (max-width:1360px){.nav-links a{padding:0 6px;font-size:13px}.nav-in{gap:10px}.nav-r{gap:8px}}
 .ins .irow{align-items:start}
 .ins-cov{align-items:start}
 /* each row of Do next cards shares one height; the row grows with its tallest card */
@@ -1001,8 +992,6 @@ textarea.ps-in{resize:vertical}
 .bn-card li.done b{color:var(--mute);text-decoration:line-through}
 .bn-card li.done em{color:var(--mute)}
 .bn-card .ps-more{margin-top:0;justify-self:start}
-/* fourteen tabs in a nav capped at 1500px wide: keep them tight at every width */
-.nav-links a{padding:0 5px;font-size:13px}.nav-in{gap:10px}
 /* insurance: claim limits */
 .cl-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.6fr);gap:12px}
 @media (max-width:900px){.cl-sum{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -1034,3 +1023,34 @@ textarea.ps-in{resize:vertical}
 .cl-in input:focus{outline:none}
 .cl-in input::placeholder{color:var(--none)}
 @media (max-width:420px){.cl-card li{grid-template-columns:minmax(0,1fr) auto}.cl-src{grid-column:2;grid-row:2}}
+/* nav: six items, four of them open a menu of pages */
+.nav-links{display:flex;flex:1;min-width:0;gap:2px;margin:0;padding:0;list-style:none}
+.nav-links>li{position:relative;display:flex}
+.nav-t{display:flex;align-items:center;gap:6px;height:100%;padding:0 12px;border:0;border-block:2px solid transparent;background:none;color:var(--mute);font:inherit;font-size:14px;text-decoration:none;white-space:nowrap;cursor:pointer}
+.nav-t:hover,.nav-g.open .nav-t{color:var(--text)}
+.nav-t.on{color:var(--text);border-bottom-color:var(--std)}
+.nav-t svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.nav-g.open .nav-t svg{transform:rotate(180deg)}
+.nav-here{font-size:12.5px;color:var(--std);font-weight:500}
+.nav-here::before{content:"· ";color:var(--none)}
+.nav-t:focus-visible{outline:2px solid var(--promo);outline-offset:-2px}
+.nav-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:270px;display:grid;gap:2px;padding:6px;background:#121215;border:1px solid #3f3f46;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.55);z-index:50}
+.nav-menu a,.nav-sheet a{display:grid;gap:1px;padding:9px 12px;border-radius:8px;color:var(--text);text-decoration:none}
+.nav-menu a:hover,.nav-sheet a:hover{background:#1c1c20}
+.nav-menu a[aria-current=page],.nav-sheet a[aria-current=page]{background:rgba(52,211,153,.09)}
+.nav-menu a[aria-current=page] b,.nav-sheet a[aria-current=page] b{color:var(--std)}
+.nav-menu b,.nav-sheet b{font-size:14px;font-weight:600}
+.nav-menu span,.nav-sheet span{font-size:12.5px;color:var(--mute)}
+.nav-burger{display:none;align-self:center;align-items:center;gap:8px;background:none;border:1px solid var(--line);border-radius:8px;color:var(--text);font:inherit;font-size:13.5px;padding:6px 12px;cursor:pointer;margin-left:auto}
+.nav-burger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.nav-sheet{display:none}
+@media (prefers-reduced-motion:reduce){.nav-t svg{transition:none}}
+@media (max-width:900px){
+  .nav-links{display:none}
+  .nav-burger{display:inline-flex}
+  .nav-sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 16px;max-height:calc(100dvh - 60px);overflow-y:auto;padding:8px clamp(16px,3vw,40px) 16px;border-top:1px solid var(--line);background:rgba(9,9,11,.98)}
+  .nav-sg{display:grid;gap:2px;align-content:start}
+  .nav-sg h3{margin:10px 12px 2px;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--none)}
+}
+.nav-links>li,.nav-menu,.nav-sheet{text-align:left}
+.nav-menu{min-width:300px}

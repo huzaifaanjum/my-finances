@@ -58,7 +58,7 @@ export function benefitItems(): BenefitItem[] {
       value: match,
       valueNote: "a year from Air Canada",
       what: `You put in 6% of salary and Air Canada adds the same: ${money(match / 12, 2)} a month of free money into your pension.`,
-      link: { href: "/pension", label: "Pension" },
+      link: { href: "/pension", label: "Retirement" },
       steps: [
         { id: "offer-keep-6", title: "Keep contributing the full 6%", body: `Anything less loses part of the match. At 3% you would give up ${money(match / 2)} a year.` },
         {

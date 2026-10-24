@@ -81,7 +81,7 @@ export const RULES: Rule[] = [
     why: "Money you never see in your chequing account is money you do not spend. It also turns saving into a habit that needs no willpower.",
     example:
       "You take home $4,680 a month. An automatic transfer of 20% moves $936 to savings on payday. After one year you have $11,232 saved without making a single decision.",
-    you: "Set the transfer for the day after each Air Canada payday. Start with the amount in your Plan page, and raise it whenever your pay goes up.",
+    you: "Set the transfer for the day after each Air Canada payday. Start with the amount in your Budget page, and raise it whenever your pay goes up.",
     demo: "payFirst",
   },
   {
@@ -211,7 +211,7 @@ export const RULES: Rule[] = [
     why: "A short loan with a big down payment saves interest, protects you from owing more than the car is worth, and leaves room to keep saving.",
     example:
       "A $30,000 car with $6,000 down and a 4-year loan at 7.5% costs about $580 a month. Add $250 for insurance and gas and you are at about $830, just over 10% of $7,917 gross income.",
-    you: "Use the Goals page for your own numbers. A cheaper or used car, or a larger down payment, is the fastest way to pass the 10% test.",
+    you: "Use the Home & car page for your own numbers. A cheaper or used car, or a larger down payment, is the fastest way to pass the 10% test.",
     demo: "car",
   },
   {

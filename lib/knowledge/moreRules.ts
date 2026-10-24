@@ -78,7 +78,7 @@ export const MORE_RULES: Rule[] = [
     example: "Open in 2026 and contribute nothing: in 2027 you can put in $16,000. Open in 2027 instead and you can only put in $8,000.",
     you: "Open one before December 31 even if you can't fund it yet. Each $1,000 you put in later saves about $360 of tax.",
     demo: "fhsa",
-    link: { href: "/recommendations", label: "Recommendations" },
+    link: { href: "/recommendations", label: "Action plan" },
   },
   {
     id: "inflation",
@@ -91,7 +91,7 @@ export const MORE_RULES: Rule[] = [
     example: "$1,000,000 in 36 years at 2% inflation buys what about $490,000 buys today.",
     you: "The Pension and Payslips tabs can show amounts in today's dollars. Use that view when you compare with your current spending.",
     demo: "inflation",
-    link: { href: "/pension", label: "Pension" },
+    link: { href: "/pension", label: "Retirement" },
   },
   {
     id: "stay-invested",
@@ -117,7 +117,7 @@ export const MORE_RULES: Rule[] = [
     example: `On $95,000, 6% each is $475 a month from you and $475 from Air Canada, ${money(match * 2)} a year. At 5% a year for 36 years, with 2.5% yearly raises, that grows to about $1.6 million by 65.`,
     you: "Keep contributing the full 6% and pick a low-fee growth or target-date fund on the Manulife site instead of leaving it in the default.",
     demo: "match",
-    link: { href: "/pension", label: "Pension" },
+    link: { href: "/pension", label: "Retirement" },
   },
   {
     id: "pension-adjustment",
@@ -130,7 +130,7 @@ export const MORE_RULES: Rule[] = [
     example: "Salary $95,000: 18% is $17,100. The pension adjustment is 12% of salary, $11,400. New RRSP room: about $5,700 a year.",
     you: "Your 2027 room is smaller still, since 2026 was a part year. Check the exact number on your Notice of Assessment after filing.",
     demo: "rrspRoom",
-    link: { href: "/recommendations", label: "Recommendations" },
+    link: { href: "/recommendations", label: "Action plan" },
   },
   {
     id: "qpp-oas",
@@ -143,7 +143,7 @@ export const MORE_RULES: Rule[] = [
     example: "A QPP pension of $1,450 a month at 65 is about $930 at 60, or about $2,300 at 72.",
     you: "Both depend on how many years you contribute and live in Canada. Your statement of participation from Retraite Québec shows your QPP record.",
     demo: "qppAge",
-    link: { href: "/pension", label: "Pension" },
+    link: { href: "/pension", label: "Retirement" },
   },
   {
     id: "four-percent",
@@ -154,9 +154,9 @@ export const MORE_RULES: Rule[] = [
       "A common rule of thumb for retirement: take out about 4% of your savings in the first year, then adjust for inflation. Historically that has lasted at least 30 years for a balanced portfolio. Flip it to find your target: yearly spending times 25.",
     why: "It turns a big, abstract balance into a monthly income you can compare with what you live on, and gives a simple savings target.",
     example: "$1,000,000 at 4% is $40,000 a year, about $3,333 a month. To spend $60,000 a year you need about $1.5 million.",
-    you: "The Pension tab uses this rule to turn your DC pot into a monthly income at 65, alongside QPP and OAS.",
+    you: "The Retirement tab uses this rule to turn your DC pot into a monthly income at 65, alongside QPP and OAS.",
     demo: "fourPercent",
-    link: { href: "/pension", label: "Pension" },
+    link: { href: "/pension", label: "Retirement" },
   },
 
   // benefits and insurance
@@ -246,7 +246,7 @@ export const MORE_RULES: Rule[] = [
     why: "Rent is usually your biggest expense. Knowing the rules lets you push back on an unreasonable increase instead of accepting it or moving.",
     example: "A notice raising $2,075 rent by 8% is $166 a month, $1,992 a year. If you refuse, the TAL sets the increase from the building's actual costs, which can be lower than what was asked.",
     you: "Watch the mail from January to March. Your rent is 44% of take-home, so this is your biggest lever on the budget.",
-    link: { href: "/recommendations", label: "Recommendations" },
+    link: { href: "/recommendations", label: "Action plan" },
   },
 
   // habits and paperwork
@@ -260,6 +260,6 @@ export const MORE_RULES: Rule[] = [
     why: "Without them, the law decides, and family may need a court process that is slow and costly. Beneficiaries named on insurance and pension plans skip the will entirely, so keep both up to date.",
     example: "A notary can prepare a will and a protection mandate together, often for a few hundred dollars.",
     you: "Start with beneficiaries on your life insurance and DC pension on the Manulife site; that is free and takes minutes.",
-    link: { href: "/recommendations", label: "Recommendations" },
+    link: { href: "/recommendations", label: "Action plan" },
   },
 ];

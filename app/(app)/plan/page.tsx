@@ -3,13 +3,13 @@ import PageShell from "@/components/layout/PageShell";
 import PlanFacts from "@/components/planner/plan/PlanFacts";
 import PlanView from "@/components/planner/plan/PlanView";
 
-export const metadata: Metadata = { title: "Plan" };
+export const metadata: Metadata = { title: "Budget" };
 
 export default function PlanPage() {
   return (
     <PageShell
-      title="Plan"
-      subtitle="Adjust income and expenses and watch your projection move. The dashed line is where you stood before."
+      title="Budget"
+      subtitle="Your income and expenses. Adjust them and watch your projection move. The dashed line is where you stood before."
       facts={<PlanFacts />}
       assumptions
     >

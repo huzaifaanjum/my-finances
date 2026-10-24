@@ -22,7 +22,7 @@ export default async function GoalPage({ params }: Props) {
   const goal = findGoal((await params).id);
   if (!goal) notFound();
   return (
-    <PageShell title={goal.name} subtitle={goal.subtitle} back={{ href: "/goals", label: "Goals" }}>
+    <PageShell title={goal.name} subtitle={goal.subtitle} back={{ href: "/goals", label: "Home & car" }}>
       {goal.id === "house" ? <HouseGoal /> : <CarGoal />}
     </PageShell>
   );

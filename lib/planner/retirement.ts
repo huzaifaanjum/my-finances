@@ -54,7 +54,7 @@ export function retirement(plan: Plan, start?: PensionStart): Retirement {
       nominal: (own * wr) / 12,
       color: "var(--std)",
       effort: "act",
-      why: `Only exists if you invest about ${money(invest.monthly)} a month yourself, every month until 65, as on the Millionaire page. Skip it and this line is $0.`,
+      why: `Only exists if you invest about ${money(invest.monthly)} a month yourself, every month until 65, as on the Investing page. Skip it and this line is $0.`,
     },
     {
       name: "Quebec Pension Plan (QPP)",

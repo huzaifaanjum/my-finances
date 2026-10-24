@@ -4,12 +4,12 @@ import { nextActions } from "@/components/planner/insights/NextActionsCard";
 import { usePlan } from "@/components/providers/PlannerProvider";
 import SeeAlso from "@/components/ui/SeeAlso";
 
-/** The single most valuable step right now; the rest live on the Recommendations tab. */
+/** The single most valuable step right now; the rest live on the Action plan tab. */
 export default function NextStep() {
   const top = nextActions(usePlan())[0];
   return (
     <div className="ov-next">
-      <SeeAlso href="/recommendations" label="All recommendations">
+      <SeeAlso href="/recommendations" label="Action plan">
         {top ? (
           <>
             <em>Top next step</em> {top.title}

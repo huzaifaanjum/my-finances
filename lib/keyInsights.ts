@@ -36,7 +36,7 @@ export interface KeyInsight {
 
 export const TOPICS: Record<Topic, { title: string; href: string; color: string }> = {
   payslips: { title: "Payslips", href: "/payslips", color: "var(--scotia)" },
-  offer: { title: "My offer", href: "/offer", color: "var(--promo)" },
+  offer: { title: "Job offer", href: "/offer", color: "var(--promo)" },
   insurance: { title: "Insurance", href: "/insurance", color: "#f472b6" },
 };
 

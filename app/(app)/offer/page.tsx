@@ -3,12 +3,12 @@ import PageShell from "@/components/layout/PageShell";
 import OfferSummary from "@/components/offer/OfferSummary";
 import SeeAlso from "@/components/ui/SeeAlso";
 
-export const metadata: Metadata = { title: "My offer" };
+export const metadata: Metadata = { title: "Job offer" };
 
 export default function OfferPage() {
   return (
     <PageShell
-      title="My offer"
+      title="Job offer"
       subtitle="Your Air Canada offer from August 3, 2026: what it adds up to and how your pay is put together."
     >
       <div className="off">

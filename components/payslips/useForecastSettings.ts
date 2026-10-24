@@ -9,7 +9,7 @@ const SETTINGS_KEY = "ps_forecast";
 
 /**
  * Forecast settings. Raise and pension return are the planner's own (saved to your account), so the
- * Pension tab and this forecast always agree; the incentive % is remembered on this device.
+ * Retirement tab and this forecast always agree; the incentive % is remembered on this device.
  */
 export function useForecastSettings(): [ForecastSettings, (s: ForecastSettings) => void] {
   const { state, setNumbers } = usePlanner();

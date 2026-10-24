@@ -178,7 +178,7 @@ export default function BenefitsView() {
         })}
       </GlossaryScope>
 
-      <SeeAlso href="/recommendations" label="Recommendations">
+      <SeeAlso href="/recommendations" label="Action plan">
         Everything else worth doing: savings habits, debt, tax, investing and big purchases
       </SeeAlso>
     </div>

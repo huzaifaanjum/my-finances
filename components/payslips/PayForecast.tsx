@@ -252,7 +252,7 @@ export default function PayForecast({ latest, settings, onSettings, pensionSoFar
           )}
         </Card>
 
-        <Card title="Assumptions" description="Raise and pension return are shared with the Pension tab, so both always agree.">
+        <Card title="Assumptions" description="Raise and pension return are shared with the Retirement tab, so both always agree.">
           <div className="stack">
             <RangeControl
               label="Raise each January"
