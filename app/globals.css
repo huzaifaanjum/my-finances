@@ -191,7 +191,7 @@ table.t2 tr.sel td{color:var(--std);font-weight:600}
 .itr{margin-bottom:14px}.itr .lrow span:first-child{color:var(--mute)}.itr.on .lrow span{color:var(--text)}
 .itr .tag{font-style:normal;margin-left:6px;border-color:var(--text);color:var(--text)}
 .istk{position:relative;display:flex;gap:2px;height:14px;border-radius:4px;background:var(--line);margin-bottom:4px}
-.istk i{display:block;height:100%}.istk i:first-child{border-radius:4px 0 0 4px}
+.istk i{display:block;height:100%}
 .istk s{position:absolute;top:-5px;bottom:-5px;width:2px;margin-left:-1px;background:var(--text);box-shadow:0 0 0 2px #09090b}
 .isum{margin:14px 0 20px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--c);border-radius:8px;font-size:13.5px;color:var(--mute)}
 .isum b{color:var(--c)}
@@ -1338,3 +1338,6 @@ button.bd-need:hover{border-color:var(--mute)}
 .bf-next .bf-steps label{grid-template-columns:18px minmax(0,1fr)}
 .bf-next .bf-steps em{grid-column:2;padding-top:0}
 .bf-next .bf-steps small{text-align:left}
+/* stacked bars: the first and last segments take the bar's rounded ends, so a bar that stops short still ends round */
+:is(.stackbar,.istk,.bb-bar,.bf-bar,.ps-lbar,.cs-bar)>i:first-of-type{border-top-left-radius:inherit;border-bottom-left-radius:inherit}
+:is(.stackbar,.istk,.bb-bar,.bf-bar,.ps-lbar,.cs-bar)>i:last-of-type{border-top-right-radius:inherit;border-bottom-right-radius:inherit}
