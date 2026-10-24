@@ -1,9 +1,10 @@
 // Converts between PlannerState and the shape stored in MongoDB.
 // The stored shape predates the React rewrite: `v` is keyed by the old input ids, so existing saves keep loading.
-import { isoDate, planDay } from "./calendar";
+import { isoDate, planDay, todayIso } from "./calendar";
 import { EXPENSE_GROUPS, FLAGS, HORIZONS, SLIDERS, type FlagKey, type SliderKey } from "./config";
 import { defaultExpenses, incentiveItem, nextId, ONE_TIME_MONTHS, signingItems } from "./defaults";
-import type { IncomeTag, OneTimeItem, PlannerState, RecurringExpense, RecurringIncome } from "./types";
+import { stepOn } from "./projection";
+import type { IncomeTag, OneTimeItem, PayStep, PlannerState, RecurringExpense, RecurringIncome } from "./types";
 
 /** Saves before version 2 kept expenses as fixed sliders, the bonuses as numbers and one-time items by month. */
 const VERSION = 2;
@@ -41,6 +42,8 @@ interface SavedExpense {
 export interface SavedState {
   ver?: number;
   v: Record<string, string | number | boolean>;
+  /** pay steps */
+  py?: { id: number; a: number; d: string }[];
   ri?: SavedIncome[];
   re?: SavedExpense[];
   oo: SavedItem[];
@@ -63,6 +66,7 @@ export function toSaved(s: PlannerState): SavedState {
   return {
     ver: VERSION,
     v,
+    py: s.pay.map((p) => ({ id: p.id, a: p.amount, d: p.date })),
     ri: s.income.map((o) => ({ id: o.id, n: o.name, a: o.amount, ev: o.every, m: o.month, ...(o.tag && { t: o.tag }) })),
     re: s.expenses.map((e) => ({ id: e.id, n: e.name, a: e.amount, ev: e.every, g: e.group, nd: e.need })),
     oo: s.oneTime.income.map(out),
@@ -99,6 +103,15 @@ function readItems(raw: unknown): OneTimeItem[] {
   });
 }
 
+function readPay(raw: unknown): PayStep[] | null {
+  if (!Array.isArray(raw) || !raw.length) return null;
+  return raw.map((p: { id?: unknown; a?: unknown; d?: unknown }, k) => ({
+    id: Number(p.id) || k + 1,
+    amount: amountOf(p.a),
+    date: typeof p.d === "string" && ISO.test(p.d) ? p.d : isoDate(0, 1),
+  }));
+}
+
 function readIncome(raw: unknown): RecurringIncome[] | null {
   if (!Array.isArray(raw)) return null;
   return raw.map((o: Partial<SavedIncome>) => ({
@@ -131,6 +144,7 @@ export function fromSaved(raw: unknown, base: PlannerState): PlannerState {
   const next: PlannerState = {
     numbers: { ...base.numbers },
     flags: { ...base.flags },
+    pay: base.pay.map((p) => ({ ...p })),
     income: base.income.map((o) => ({ ...o })),
     expenses: base.expenses.map((e) => ({ ...e })),
     oneTime: { income: readItems(saved.oo), expense: readItems(saved.ox) },
@@ -151,6 +165,10 @@ export function fromSaved(raw: unknown, base: PlannerState): PlannerState {
     const n = readNumber(v[k]);
     if (n !== null) next.numbers[k] = Math.max(0, n);
   });
+
+  // saves without pay steps had one take-home figure
+  next.pay = readPay(saved.py) ?? [{ id: 1, amount: next.numbers.net, date: isoDate(0, 1) }];
+  next.numbers.net = stepOn(next.pay, todayIso())?.amount ?? next.numbers.net;
 
   if (saved.ver === VERSION) {
     next.income = readIncome(saved.ri) ?? next.income;

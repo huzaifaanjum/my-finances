@@ -58,3 +58,15 @@ export function longDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   return `${MONTH_NAMES[m - 1]} ${d}, ${y}`;
 }
+
+/** Today as "2026-10-24". */
+export function todayIso(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** Plan-month index of an ISO date, not clamped: negative before the plan starts. */
+export function isoPlanIndex(iso: string): number {
+  const [y, m] = iso.split("-").map(Number);
+  return planIndex(y, m - 1);
+}

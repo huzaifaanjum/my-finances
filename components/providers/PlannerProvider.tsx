@@ -3,15 +3,19 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { useCloudSync, type SyncStatus } from "@/hooks/useCloudSync";
 import type { FlagKey, NumericKey } from "@/lib/planner/config";
-import { isoDate, planDay } from "@/lib/planner/calendar";
+import { isoDate, planDay, todayIso } from "@/lib/planner/calendar";
 import { createDefaultState, nextId, ONE_TIME_DEFAULTS, ONE_TIME_MONTHS } from "@/lib/planner/defaults";
-import { buildPlan, type Plan } from "@/lib/planner/projection";
-import type { OneTimeItem, OneTimeKind, PlannerState, RecurringExpense, RecurringIncome } from "@/lib/planner/types";
+import { buildPlan, currentStep, type Plan } from "@/lib/planner/projection";
+import type { OneTimeItem, OneTimeKind, PayStep, PlannerState, RecurringExpense, RecurringIncome } from "@/lib/planner/types";
 
 interface PlannerActions {
   setNumber: (key: NumericKey, value: number) => void;
   setNumbers: (values: Partial<Record<NumericKey, number>>) => void;
   setFlag: (key: FlagKey, value: boolean) => void;
+  /** a new take-home pay from a date on (default today), starting at today's amount */
+  addPay: (step?: Partial<Omit<PayStep, "id">>) => void;
+  updatePay: (id: number, patch: Partial<Omit<PayStep, "id">>) => void;
+  removePay: (id: number) => void;
   /** a blank row, or a preset such as the incentive */
   addIncome: (preset?: Omit<RecurringIncome, "id">) => void;
   updateIncome: (id: number, patch: Partial<Omit<RecurringIncome, "id">>) => void;
@@ -35,6 +39,20 @@ interface PlannerContextValue extends PlannerActions {
   ready: boolean;
 }
 
+/** numbers.net always mirrors the pay step in force today. */
+function syncNet(s: PlannerState): PlannerState {
+  const step = currentStep(s);
+  return step && step.amount !== s.numbers.net ? { ...s, numbers: { ...s.numbers, net: step.amount } } : s;
+}
+
+/** Setting "net" edits today's pay step. */
+function withNumbers(s: PlannerState, values: Partial<Record<NumericKey, number>>): PlannerState {
+  const next = { ...s, numbers: { ...s.numbers, ...values } };
+  if (values.net === undefined) return next;
+  const id = currentStep(s)?.id;
+  return { ...next, pay: s.pay.map((p) => (p.id === id ? { ...p, amount: values.net! } : p)) };
+}
+
 const PlannerContext = createContext<PlannerContextValue | null>(null);
 
 /** Holds the planner numbers for every page, so they survive navigation, and keeps them synced to the cloud. */
@@ -49,8 +67,12 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
 
   const actions = useMemo<PlannerActions>(
     () => ({
-      setNumber: (key, value) => edit((s) => ({ ...s, numbers: { ...s.numbers, [key]: value } })),
-      setNumbers: (values) => edit((s) => ({ ...s, numbers: { ...s.numbers, ...values } })),
+      setNumber: (key, value) => edit((s) => withNumbers(s, { [key]: value })),
+      setNumbers: (values) => edit((s) => withNumbers(s, values)),
+      addPay: (step) =>
+        edit((s) => syncNet({ ...s, pay: [...s.pay, { amount: s.numbers.net, date: todayIso(), ...step, id: nextId(s.pay) }] })),
+      updatePay: (id, patch) => edit((s) => syncNet({ ...s, pay: s.pay.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
+      removePay: (id) => edit((s) => (s.pay.length > 1 ? syncNet({ ...s, pay: s.pay.filter((p) => p.id !== id) }) : s)),
       setFlag: (key, value) => edit((s) => ({ ...s, flags: { ...s.flags, [key]: value } })),
       addIncome: (preset) =>
         edit((s) => ({ ...s, income: [...s.income, { name: "", amount: 0, every: 1, month: 0, ...preset, id: nextId(s.income) }] })),

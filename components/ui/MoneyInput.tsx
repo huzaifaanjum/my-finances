@@ -36,9 +36,12 @@ export default function MoneyInput({ value, onChange, max = 1_000_000, step = 10
         aria-label={label}
         value={focused ? text : Number(value).toLocaleString("en-CA")}
         disabled={disabled}
-        onFocus={() => {
+        onFocus={(e) => {
           setFocused(true);
           setText(String(value));
+          // the text changes from "4,740" to "4740" on focus; select it after that so typing replaces it
+          const el = e.currentTarget;
+          requestAnimationFrame(() => el.select());
         }}
         onBlur={() => {
           setFocused(false);

@@ -16,6 +16,14 @@ export interface OneTimeItem {
   tag?: IncomeTag;
 }
 
+/** Take-home pay from a date on; a new step replaces the one before it. */
+export interface PayStep {
+  id: number;
+  amount: number;
+  /** "2027-01-01"; paydays on or after this date get the new pay */
+  date: string;
+}
+
 /** Money that arrives every month, or once a year in a set month, on payday. */
 export interface RecurringIncome {
   id: number;
@@ -45,7 +53,9 @@ export interface RecurringExpense {
 export interface PlannerState {
   numbers: Record<NumericKey, number>;
   flags: Record<FlagKey, boolean>;
-  /** extra income on top of take-home pay (numbers.net) */
+  /** take-home pay over time, oldest first; numbers.net mirrors the step in force today */
+  pay: PayStep[];
+  /** extra income on top of take-home pay */
   income: RecurringIncome[];
   expenses: RecurringExpense[];
   oneTime: Record<OneTimeKind, OneTimeItem[]>;

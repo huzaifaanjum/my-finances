@@ -2,7 +2,7 @@
 // the balance and how many months of costs it covers. Month 0 (this month) is the starting point.
 
 import { monthDate } from "./calendar";
-import { bonusAt, type Plan } from "./projection";
+import { bonusAt, monthlyExtra, payAt, type Plan } from "./projection";
 
 export interface LedgerEvent {
   label: string;
@@ -56,7 +56,7 @@ const MILESTONES = (exp: number): [string, number][] =>
 
 /** One row per plan month. */
 export function monthlyLedger(plan: Plan): LedgerRow[] {
-  const { rows, exp, net, state, days } = plan;
+  const { rows, exp, state, days } = plan;
   const lowByMonth = new Map<number, number>();
   for (const d of days) lowByMonth.set(d.i, Math.min(lowByMonth.get(d.i) ?? Infinity, d.bal));
   const items = (kind: "income" | "expense", i: number) => state.oneTime[kind].filter((o) => o.month === i);
@@ -67,13 +67,15 @@ export function monthlyLedger(plan: Plan): LedgerRow[] {
     const bonus = bonusAt(state, r.i);
     const oneIn = items("income", r.i).reduce((t, o) => t + o.amount, 0);
     const oneOut = items("expense", r.i).reduce((t, o) => t + o.amount, 0);
-    const pay = start ? 0 : net;
+    const pay = start ? 0 : payAt(state, r.i) + monthlyExtra(state);
     const extraIn = start ? 0 : bonus + oneIn;
     const expenses = start ? 0 : exp.total;
     const extraOut = oneOut;
     const prev = k === 0 ? r.balance - r.deposit : rows[k - 1].balance;
 
     const events: LedgerEvent[] = [];
+    const change = r.i > 0 ? payAt(state, r.i) - payAt(state, r.i - 1) : 0;
+    if (change) events.push({ label: change > 0 ? "Raise" : "Pay change", kind: "income" });
     const month = monthDate(r.i).getMonth();
     for (const o of state.income)
       if (o.every === 12 && o.month === month && o.amount > 0) events.push({ label: o.name || "Yearly income", kind: "bonus" });

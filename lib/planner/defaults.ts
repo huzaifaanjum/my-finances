@@ -39,6 +39,7 @@ export function createDefaultState(): PlannerState {
   return {
     numbers: { ...sliders, ...OTHER_NUMBERS } as Record<NumericKey, number>,
     flags: { ...FLAGS },
+    pay: [{ id: 1, amount: sliders.net, date: isoDate(0, 1) }],
     income: [],
     expenses: defaultExpenses(),
     oneTime: {

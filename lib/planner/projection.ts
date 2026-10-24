@@ -1,7 +1,7 @@
 import { horizonLabel } from "./config";
-import { daysInPlanMonth, monthDate, monthLabel, planDay } from "./calendar";
+import { daysInPlanMonth, isoPlanIndex, monthDate, monthLabel, planDay, todayIso } from "./calendar";
 import { ONE_TIME_MONTHS } from "./defaults";
-import type { DayPoint, IncomeTag, MonthRow, OneTimeItem, PlannerState, RecurringExpense } from "./types";
+import type { DayPoint, IncomeTag, MonthRow, OneTimeItem, PayStep, PlannerState, RecurringExpense } from "./types";
 
 export interface Category {
   /** built-in lines keep ids like "rent"; ones you add get new ids */
@@ -39,6 +39,25 @@ export function summarizeExpenses(expenses: RecurringExpense[]): ExpenseSummary 
 /** Plan month and day a one-time item lands on. */
 export const landsOn = (o: OneTimeItem) => planDay(o.date, ONE_TIME_MONTHS - 1);
 
+/** Pay steps oldest first. */
+export const sortedPay = (pay: PayStep[]) => [...pay].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+
+/** The step in force on an ISO date (the earliest one if every step is later). */
+export function stepOn(pay: PayStep[], iso: string): PayStep | undefined {
+  const list = sortedPay(pay);
+  return list.filter((p) => p.date <= iso).pop() ?? list[0];
+}
+
+/** The pay step in force today. */
+export const currentStep = (s: PlannerState) => stepOn(s.pay, todayIso());
+
+/** Take-home pay on plan month i's payday. */
+export function payAt(s: PlannerState, i: number): number {
+  const list = sortedPay(s.pay);
+  const step = list.filter((p) => isoPlanIndex(p.date) <= i).pop() ?? list[0];
+  return step?.amount ?? s.numbers.net;
+}
+
 /** Monthly recurring income on top of take-home pay. */
 export const monthlyExtra = (s: PlannerState) => s.income.reduce((t, o) => t + (o.every === 1 ? o.amount : 0), 0);
 
@@ -68,7 +87,8 @@ export function project(s: PlannerState, months: number, monthlyDeposit: number)
   const rows: MonthRow[] = [];
   let balance = s.numbers.start + s.numbers.lump + oneTimeNet(s, 0);
   for (let i = 0; i < months; i++) {
-    const base = i === 0 ? 0 : monthlyDeposit;
+    // monthlyDeposit is at today's pay; months on a different pay step move with it
+    const base = i === 0 ? 0 : monthlyDeposit + payAt(s, i) - s.numbers.net;
     const extra = bonusAt(s, i) + (i ? oneTimeNet(s, i) : 0);
     const deposit = base + extra;
     balance += deposit;
@@ -91,7 +111,7 @@ export function dailyBalance(s: PlannerState, exp: ExpenseSummary, months: numbe
   };
   s.oneTime.income.forEach((o) => add(o, 1));
   s.oneTime.expense.forEach((o) => add(o, -1));
-  const pay = s.numbers.net + monthlyExtra(s);
+  const extraPay = monthlyExtra(s);
 
   let bal = exp.total + s.numbers.start + s.numbers.lump;
   for (let i = 0; i < months; i++) {
@@ -103,7 +123,7 @@ export function dailyBalance(s: PlannerState, exp: ExpenseSummary, months: numbe
       bal += onDay.get(`${i}-${d}`) ?? 0;
       if (d === dim) {
         pts.push({ bal, i, d, pay: false });
-        bal += pay + bonus;
+        bal += payAt(s, i) + extraPay + bonus;
       }
       pts.push({ bal, i, d, pay: d === dim });
     }
@@ -147,7 +167,7 @@ export interface Plan {
 }
 
 export function buildPlan(state: PlannerState): Plan {
-  // take-home plus any other monthly income
+  // today's take-home plus any other monthly income
   const net = state.numbers.net + monthlyExtra(state);
   const months = state.numbers.horizon;
   const exp = summarizeExpenses(state.expenses);
