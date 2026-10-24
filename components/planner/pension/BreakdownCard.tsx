@@ -7,6 +7,7 @@ import { money, percent } from "@/lib/format";
 import { RETIREMENT_MONTH } from "@/lib/planner/finance";
 import type { Retirement } from "@/lib/planner/retirement";
 import BreakdownRow, { EffortTag } from "./BreakdownRow";
+import { COLOR } from "@/lib/colors";
 
 /** How the pension pot and the retirement income add up, and which parts need you to act. */
 export default function BreakdownCard({ r, net, fundReturn }: { r: Retirement; net: number; fundReturn: number }) {
@@ -30,17 +31,17 @@ export default function BreakdownCard({ r, net, fundReturn }: { r: Retirement; n
         variant="thick"
         style={{ margin: "12px 0 4px" }}
         segments={[
-          { width: (mine / pot) * 100, color: "var(--scotia)" },
-          { width: (match / pot) * 100, color: "var(--mix)" },
-          { width: (growth / pot) * 100, color: "var(--std)" },
+          { width: (mine / pot) * 100, color: COLOR.pension },
+          { width: (match / pot) * 100, color: COLOR.employer },
+          { width: (growth / pot) * 100, color: COLOR.extra },
         ]}
       />
       <Legend
         style={{ margin: "6px 0 8px" }}
         items={[
-          { label: `You ${percent(mine / pot)}`, color: "var(--scotia)" },
-          { label: `Air Canada ${percent(match / pot)}`, color: "var(--mix)" },
-          { label: `Growth ${percent(growth / pot)}`, color: "var(--std)" },
+          { label: `You ${percent(mine / pot)}`, color: COLOR.pension },
+          { label: `Air Canada ${percent(match / pot)}`, color: COLOR.employer },
+          { label: `Growth ${percent(growth / pot)}`, color: COLOR.extra },
         ]}
       />
       <BreakdownRow

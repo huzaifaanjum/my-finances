@@ -10,6 +10,7 @@ import { dayLabel, monthDate } from "@/lib/planner/calendar";
 import { PAY } from "@/lib/pay";
 import { monthlyLedger } from "@/lib/planner/cashflow";
 import { taggedAt, yearlyAt } from "@/lib/planner/projection";
+import { COLOR } from "@/lib/colors";
 
 /** Ranges that make sense month by month. */
 const MONTHLY_HORIZONS = [3, 6, 12, 24, 36, 60] as const;
@@ -101,17 +102,17 @@ export default function CashFlowSummary() {
   const bonusText = [signingOn && pay.signing > 0 && `${money(pay.signing)} signing bonus`, incentiveOn && pay.incentive > 0 && `${money(pay.incentive)} incentive`].filter(Boolean);
 
   const grossParts: Part[] = [
-    { key: "tax", label: "Income tax", value: pay.incomeTax, color: "var(--scotia)", detail: `federal ${money(pay.federalTax)}, Quebec ${money(pay.quebecTax)}` },
-    { key: "plans", label: "Government plans", value: pay.govPlans, color: "var(--mix)", detail: `QPP ${money(pay.qpp)}, EI ${money(pay.ei)}, QPIP ${money(pay.qpip)}` },
-    { key: "pension", label: "Your pension", value: pay.pension, color: "var(--promo)", detail: `+ ${money(pay.match)} from Air Canada` },
-    { key: "ins", label: "Insurance", value: pay.insurance, color: "#f472b6", detail: "disability, life, dental, AD&D" },
-    { key: "net", label: "Take-home", value: pay.net, color: "var(--std)" },
+    { key: "tax", label: "Income tax", value: pay.incomeTax, color: COLOR.tax, detail: `federal ${money(pay.federalTax)}, Quebec ${money(pay.quebecTax)}` },
+    { key: "plans", label: "Government plans", value: pay.govPlans, color: COLOR.gov, detail: `QPP ${money(pay.qpp)}, EI ${money(pay.ei)}, QPIP ${money(pay.qpip)}` },
+    { key: "pension", label: "Your pension", value: pay.pension, color: COLOR.pension, detail: `+ ${money(pay.match)} from Air Canada` },
+    { key: "ins", label: "Insurance", value: pay.insurance, color: COLOR.insurance, detail: "disability, life, dental, AD&D" },
+    { key: "net", label: "Take-home", value: pay.net, color: COLOR.keep },
   ];
   const budgetParts: Part[] = [
-    { key: "exp", label: "Expenses", value: expenses, color: "#52525b" },
-    { key: "one", label: "One-time costs", value: oneOff, color: "var(--neg)" },
-    { key: "pay", label: "Saved from pay", value: Math.max(0, savedFromPay), color: "var(--std)" },
-    { key: "bonus", label: "Saved from bonuses", value: bonusIn, color: "#2dd4bf" },
+    { key: "exp", label: "Expenses", value: expenses, color: COLOR.subs },
+    { key: "one", label: "One-time costs", value: oneOff, color: COLOR.wants },
+    { key: "pay", label: "Saved from pay", value: Math.max(0, savedFromPay), color: COLOR.keep },
+    { key: "bonus", label: "Saved from bonuses", value: bonusIn, color: COLOR.extra },
   ];
 
   return (

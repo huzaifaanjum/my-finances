@@ -10,6 +10,7 @@ import ClaimLimits from "./ClaimLimits";
 import { Legend, Note, SectionHeading } from "@/components/ui/text";
 import { benefit, BENEFITS, COSTS, LSA_CATEGORIES, LSA_IDEAS, LSA_MONTHLY, LSA_YEARLY, PREMIUM_TAX, STATEMENT_DATE, type Benefit } from "@/lib/benefits";
 import { money, percent } from "@/lib/format";
+import { COLOR } from "@/lib/colors";
 
 const GROUPS: { id: Benefit["group"]; title: string; why: string }[] = [
   { id: "income", title: "Income protection", why: "Replaces pay if you can't work." },
@@ -18,8 +19,8 @@ const GROUPS: { id: Benefit["group"]; title: string; why: string }[] = [
   { id: "accounts", title: "Spending accounts", why: "Money to claim against receipts." },
 ];
 
-const YOU = "var(--scotia)";
-const EMPLOYER = "var(--std)";
+const YOU = COLOR.subs;
+const EMPLOYER = COLOR.employer;
 const TAX = "#71717a";
 
 const r2 = (v: number) => Math.round(v * 100) / 100;

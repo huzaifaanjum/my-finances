@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import { money, percent } from "@/lib/format";
 import { groupLedger, ledgerCsv, monthlyLedger, type Grouping, type LedgerRow } from "@/lib/planner/cashflow";
 import { monthDate } from "@/lib/planner/calendar";
+import { COLOR } from "@/lib/colors";
 
 type Filter = "all" | "bonus" | "tight";
 
@@ -26,7 +27,7 @@ function signed(v: number) {
 function Bar({ value, max, color, neg }: { value: number; max: number; color: string; neg?: boolean }) {
   return (
     <span className="cf-bar" aria-hidden="true">
-      <i style={{ width: `${Math.min(100, (Math.abs(value) / (max || 1)) * 100)}%`, background: neg ? "var(--neg)" : color }} />
+      <i style={{ width: `${Math.min(100, (Math.abs(value) / (max || 1)) * 100)}%`, background: neg ? COLOR.bad : color }} />
     </span>
   );
 }
@@ -178,12 +179,12 @@ export default function MonthTable({ focus }: { focus?: { i: number; n: number }
                     <td>{r.start ? "–" : money(r.spending)}</td>
                     <td className="cf-num">
                       <span className={r.saved < 0 ? "neg" : "pos"}>{r.start ? "–" : money(r.saved)}</span>
-                      {!r.start && <Bar value={r.saved} max={savedMax} color={r.extraIn > 0 ? "var(--promo)" : "var(--std)"} neg={r.saved < 0} />}
+                      {!r.start && <Bar value={r.saved} max={savedMax} color={r.extraIn > 0 ? COLOR.extra : COLOR.keep} neg={r.saved < 0} />}
                     </td>
                     <td className={r.start ? undefined : r.rate >= 0.2 ? "pos" : r.rate < 0 ? "neg" : "warn"}>{r.start ? "–" : percent(r.rate)}</td>
                     <td className="cf-num">
                       <span className={r.balance < 0 ? "neg" : undefined}>{money(r.balance)}</span>
-                      <Bar value={r.balance} max={balMax} color="var(--scotia)" neg={r.balance < 0} />
+                      <Bar value={r.balance} max={balMax} color={COLOR.keep} neg={r.balance < 0} />
                     </td>
                     <td className={r.cover >= 3 ? "pos" : r.cover >= 1 ? undefined : "warn"}>{Math.max(0, r.cover).toFixed(1)} mo</td>
                     <td className="cf-next">
@@ -192,7 +193,7 @@ export default function MonthTable({ focus }: { focus?: { i: number; n: number }
                           <span>
                             {r.next.name} <em>{percent(r.next.progress)}</em>
                           </span>
-                          <Bar value={r.next.progress} max={1} color="var(--mix)" />
+                          <Bar value={r.next.progress} max={1} color={COLOR.keep} />
                         </>
                       ) : (
                         <span className="pos">All reached</span>

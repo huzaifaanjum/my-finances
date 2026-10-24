@@ -6,6 +6,7 @@ import { duration } from "@/lib/format";
 import { monthLabel } from "@/lib/planner/calendar";
 import { simulateInvesting, type InvestmentPlan } from "@/lib/planner/finance";
 import type { Plan } from "@/lib/planner/projection";
+import { COLOR } from "@/lib/colors";
 
 const HORIZON = 600;
 
@@ -23,7 +24,7 @@ export default function ReturnsCard({ plan, invest }: { plan: Plan; invest: Inve
           label={`${r}% a year`}
           value={hit === null ? "50+ yrs" : duration(hit)}
           aside={hit === null ? "–" : monthLabel(hit)}
-          bar={{ value: (hit ?? HORIZON) / longest, color: r === ret ? "var(--std)" : "var(--scotia)" }}
+          bar={{ value: (hit ?? HORIZON) / longest, color: r === ret ? COLOR.keep : COLOR.wants }}
         />
       ))}
       <Note>Shorter bars are better. 0% is like keeping it all in a regular savings account.</Note>

@@ -1,15 +1,16 @@
 // Turns payslip lines into "where the money goes" groups and a few derived numbers.
 
 import type { LineGroup, PayLine, Payslip, PayslipData } from "./types";
+import { COLOR } from "@/lib/colors";
 
 export type Bucket = "takeHome" | "incomeTax" | "govPlans" | "pension" | "insurance" | "other";
 
 export const BUCKETS: Record<Bucket, { label: string; color: string; who: string }> = {
-  takeHome: { label: "Take-home", color: "var(--std)", who: "You, now" },
-  incomeTax: { label: "Income tax", color: "var(--scotia)", who: "Canada and Quebec" },
-  govPlans: { label: "Government plans", color: "var(--mix)", who: "QPP, EI and QPIP" },
-  pension: { label: "Your pension", color: "var(--promo)", who: "You, at retirement" },
-  insurance: { label: "Insurance", color: "#f472b6", who: "Disability, life and dental cover" },
+  takeHome: { label: "Take-home", color: COLOR.keep, who: "You, now" },
+  incomeTax: { label: "Income tax", color: COLOR.tax, who: "Canada and Quebec" },
+  govPlans: { label: "Government plans", color: COLOR.gov, who: "QPP, EI and QPIP" },
+  pension: { label: "Your pension", color: COLOR.pension, who: "You, at retirement" },
+  insurance: { label: "Insurance", color: COLOR.insurance, who: "Disability, life and dental cover" },
   other: { label: "Other deductions", color: "#a1a1aa", who: "Everything else" },
 };
 

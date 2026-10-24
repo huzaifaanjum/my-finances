@@ -52,10 +52,10 @@ function Payslip() {
       <Bar
         parts={[
           { w: y.net, color: C.std, label: `Take-home ${money(m(y.net))}` },
-          { w: y.tax, color: C.scotia, label: `Income tax ${money(m(y.tax))}` },
-          { w: y.pension, color: C.promo, label: `Pension ${money(m(y.pension))}` },
-          { w: y.plans, color: C.mix, label: `QPP, EI, QPIP ${money(m(y.plans))}` },
-          { w: y.insurance, color: "#f472b6", label: `Insurance ${money(m(y.insurance))}` },
+          { w: y.tax, color: C.tax, label: `Income tax ${money(m(y.tax))}` },
+          { w: y.pension, color: C.pension, label: `Pension ${money(m(y.pension))}` },
+          { w: y.plans, color: C.gov, label: `QPP, EI, QPIP ${money(m(y.plans))}` },
+          { w: y.insurance, color: C.ins, label: `Insurance ${money(m(y.insurance))}` },
         ]}
       />
       <Stats>
@@ -238,7 +238,7 @@ function RrspRoom() {
       <Slider label="Pension contributions, you + employer" value={dc} onChange={setDc} min={0} max={18} format={(v) => `${v}% of salary`} />
       <Bar
         parts={[
-          { w: pa, color: C.promo, label: `Pension adjustment ${money(pa)}` },
+          { w: pa, color: C.pension, label: `Pension adjustment ${money(pa)}` },
           { w: room, color: C.std, label: `RRSP room left ${money(room)}` },
         ]}
       />

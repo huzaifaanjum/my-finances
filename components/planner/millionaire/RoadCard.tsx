@@ -7,6 +7,7 @@ import { compactMoney, duration, money, percent } from "@/lib/format";
 import { monthLabel, planIndex } from "@/lib/planner/calendar";
 import type { InvestmentPlan } from "@/lib/planner/finance";
 import type { Plan } from "@/lib/planner/projection";
+import { COLOR } from "@/lib/colors";
 
 const SHARES = [0.1, 0.25, 0.5, 0.75];
 const BIRTH_YEAR = 1997;
@@ -117,7 +118,7 @@ function road(width: number, rows: number, rowGap: number, pad: number) {
   return { d, at, height: pad * 2 + (rows - 1) * rowGap };
 }
 
-const COLORS: Record<Kind, string> = { start: "var(--text)", milestone: "var(--std)", checkpoint: "var(--promo)", finish: "var(--std)" };
+const COLORS: Record<Kind, string> = { start: "var(--text)", milestone: COLOR.keep, checkpoint: COLOR.extra, finish: COLOR.keep };
 
 export default function RoadCard({ plan, invest }: { plan: Plan; invest: InvestmentPlan }) {
   const [ref, width] = useElementWidth<HTMLDivElement>(1100);
@@ -205,7 +206,7 @@ export default function RoadCard({ plan, invest }: { plan: Plan; invest: Investm
       <Legend
         items={[
           { label: "Milestone: an amount you pass", color: "var(--std)", kind: "dot" },
-          { label: "Checkpoint: a turning point or birthday", color: "var(--promo)", kind: "dot" },
+          { label: "Checkpoint: a turning point or birthday", color: COLOR.extra, kind: "dot" },
         ]}
       />
     </Card>

@@ -9,8 +9,9 @@ import { GroupHeader, KeyValue, Legend, Note } from "@/components/ui/text";
 import { money, percent } from "@/lib/format";
 import { INCOME_STREAMS, SLIDERS, STREAM_COLORS } from "@/lib/planner/config";
 import { automaticIncome, incomeTarget } from "@/lib/planner/insights";
+import { COLOR } from "@/lib/colors";
 
-const NOW_COLOR = "#52525b";
+const NOW_COLOR = COLOR.keep;
 
 /** Sliders for extra income, stacked against the income target. */
 export default function IncomeStreamsCard() {
@@ -21,7 +22,7 @@ export default function IncomeStreamsCard() {
 
   const parts = [
     ...INCOME_STREAMS.map((s) => ({ title: SLIDERS[s.key].label, amount: state.numbers[s.key], color: STREAM_COLORS[s.kind] })),
-    ...auto.map((a) => ({ title: a.name, amount: a.monthly, color: "var(--std)" })),
+    ...auto.map((a) => ({ title: a.name, amount: a.monthly, color: COLOR.extra })),
   ].filter((p) => p.amount > 0);
   const total = net + parts.reduce((t, p) => t + p.amount, 0);
   const max = Math.max(target, total) * 1.02;
@@ -42,7 +43,7 @@ export default function IncomeStreamsCard() {
           { label: "Work", color: STREAM_COLORS.work },
           { label: "Side income", color: STREAM_COLORS.side },
           { label: "Housing", color: STREAM_COLORS.housing },
-          { label: "Automatic", color: "var(--std)" },
+          { label: "Automatic", color: COLOR.extra },
           { label: "Target", kind: "tick" },
         ]}
       />
@@ -75,7 +76,7 @@ export default function IncomeStreamsCard() {
           key={a.name}
           label={
             <>
-              <i className="sw" style={{ background: "var(--std)" }} />
+              <i className="sw" style={{ background: COLOR.extra }} />
               {a.name} <em>· {a.detail}</em>
             </>
           }

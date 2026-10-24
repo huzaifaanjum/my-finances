@@ -8,6 +8,7 @@ import { LegendRow } from "@/components/ui/text";
 import { money, percent } from "@/lib/format";
 import { EXPENSE_GROUPS } from "@/lib/planner/config";
 import { savingsMilestones } from "@/lib/planner/milestones";
+import { COLOR } from "@/lib/colors";
 
 /** Spending by group, and the five biggest categories. */
 export function MoneyMixCard() {
@@ -56,7 +57,7 @@ export function MilestonesCard() {
               {!m.name.startsWith("$") && <em style={{ color: "var(--mute)", fontStyle: "normal" }}> ({money(m.amount)})</em>}
             </b>
             <span>{eta}</span>
-            <ProgressBar value={plan.last.balance / m.amount} color={done ? "var(--std)" : "var(--scotia)"} />
+            <ProgressBar value={plan.last.balance / m.amount} color={COLOR.keep} />
           </div>
         );
       })}

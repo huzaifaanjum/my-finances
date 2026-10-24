@@ -6,6 +6,7 @@ import { money } from "@/lib/format";
 import { OFFER } from "@/lib/offer";
 import { payMarginal } from "@/lib/pay";
 import type { Plan } from "@/lib/planner/projection";
+import { COLOR } from "@/lib/colors";
 
 export type Priority = "now" | "soon" | "later";
 export type AreaId = "habits" | "debt" | "tax" | "invest" | "home" | "protect" | "payslips";
@@ -27,12 +28,12 @@ export interface Step {
 }
 
 export const AREAS: Record<AreaId, { title: string; color: string }> = {
-  habits: { title: "Savings habits", color: "var(--std)" },
-  debt: { title: "Banking, debt and credit", color: "var(--neg)" },
-  tax: { title: "Tax", color: "var(--scotia)" },
-  invest: { title: "Pension and investing", color: "var(--promo)" },
-  home: { title: "Home and big purchases", color: "var(--mix)" },
-  protect: { title: "Insurance and estate", color: "#f472b6" },
+  habits: { title: "Savings habits", color: COLOR.keep },
+  debt: { title: "Banking, debt and credit", color: COLOR.bad },
+  tax: { title: "Tax", color: COLOR.tax },
+  invest: { title: "Pension and investing", color: COLOR.pension },
+  home: { title: "Home and big purchases", color: COLOR.needs },
+  protect: { title: "Insurance and estate", color: COLOR.insurance },
   payslips: { title: "Your payslips", color: "#a1a1aa" },
 };
 

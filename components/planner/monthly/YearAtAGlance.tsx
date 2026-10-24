@@ -6,14 +6,15 @@ import Card from "@/components/ui/Card";
 import { compactMoney, money, percent } from "@/lib/format";
 import { MONTH_NAMES, monthDate, planIndex } from "@/lib/planner/calendar";
 import { monthlyLedger, type LedgerRow } from "@/lib/planner/cashflow";
+import { COLOR } from "@/lib/colors";
 
 type Metric = "saved" | "balance" | "rate" | "cover";
 
 const METRICS: Record<Metric, { label: string; color: string; describe: string }> = {
-  saved: { label: "Saved", color: "var(--std)", describe: "what you add each month" },
-  balance: { label: "Balance", color: "var(--scotia)", describe: "savings at the end of each month" },
-  rate: { label: "Savings rate", color: "var(--mix)", describe: "share of money in that you keep; 20% is the guideline" },
-  cover: { label: "Months covered", color: "var(--promo)", describe: "how many months of expenses the balance would pay" },
+  saved: { label: "Saved", color: COLOR.keep, describe: "what you add each month" },
+  balance: { label: "Balance", color: COLOR.keep, describe: "savings at the end of each month" },
+  rate: { label: "Savings rate", color: COLOR.keep, describe: "share of money in that you keep; 20% is the guideline" },
+  cover: { label: "Months covered", color: COLOR.keep, describe: "how many months of expenses the balance would pay" },
 };
 
 const TIGHT = 500;
@@ -78,7 +79,7 @@ export default function YearAtAGlance({ selected: sel, onPick }: { selected: num
       tone: tightest.lowest < 0 ? "neg" : tightest.lowest < TIGHT ? "warn" : undefined,
     },
     ...bonusMonths.flatMap((r) =>
-      r.events.filter((e) => e.kind === "bonus").map((e) => ({ i: r.i, kind: "bonus" as const, title: e.label, month: r.label, value: `+${money(r.extraIn)}`, tone: "warn" })),
+      r.events.filter((e) => e.kind === "bonus").map((e) => ({ i: r.i, kind: "bonus" as const, title: e.label, month: r.label, value: `+${money(r.extraIn)}`, tone: "extra" })),
     ),
     ...milestoneMonths.map((m) => ({ i: m.r.i, kind: "milestone" as const, title: m.name, month: m.r.label, value: "reached", tone: undefined })),
   ].sort((a, b) => a.i - b.i || ORDER.indexOf(a.kind) - ORDER.indexOf(b.kind));

@@ -6,6 +6,7 @@ import { money, percent } from "@/lib/format";
 import type { InvestmentPlan } from "@/lib/planner/finance";
 import type { Plan } from "@/lib/planner/projection";
 import MillionaireChart from "./MillionaireChart";
+import { COLOR } from "@/lib/colors";
 
 const HORIZON = 600;
 
@@ -25,8 +26,8 @@ export default function ChartCard({ plan, invest }: { plan: Plan; invest: Invest
       <MillionaireChart sim={invest.sim} target={target} />
       <Legend
         items={[
-          { label: "What you put in", color: "var(--scotia)" },
-          { label: "Growth from returns", color: "var(--std)" },
+          { label: "What you put in", color: COLOR.keep },
+          { label: "Growth from returns", color: COLOR.extra },
           { label: "Target", kind: "dash" },
           { label: "Milestone", kind: "dot", color: "var(--text)" },
         ]}

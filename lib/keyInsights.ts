@@ -19,6 +19,7 @@ import {
 import { forecast, marginal, type ForecastSettings } from "@/lib/payslips/forecast";
 import type { Payslip } from "@/lib/payslips/types";
 import { SLIDERS } from "@/lib/planner/config";
+import { COLOR } from "@/lib/colors";
 
 export type Topic = "payslips" | "offer" | "insurance";
 export type Tone = "good" | "watch" | "info";
@@ -35,9 +36,9 @@ export interface KeyInsight {
 }
 
 export const TOPICS: Record<Topic, { title: string; href: string; color: string }> = {
-  payslips: { title: "Payslips", href: "/payslips", color: "var(--scotia)" },
-  offer: { title: "Job offer", href: "/offer", color: "var(--promo)" },
-  insurance: { title: "Insurance", href: "/insurance", color: "#f472b6" },
+  payslips: { title: "Payslips", href: "/payslips", color: COLOR.keep },
+  offer: { title: "Job offer", href: "/offer", color: COLOR.extra },
+  insurance: { title: "Insurance", href: "/insurance", color: COLOR.insurance },
 };
 
 /** What the offer letter means for your money and your job. */

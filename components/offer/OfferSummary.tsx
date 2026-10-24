@@ -3,6 +3,7 @@ import Card from "@/components/ui/Card";
 import { KeyValue, LegendRow, Note, SectionHeading } from "@/components/ui/text";
 import { money, percent } from "@/lib/format";
 import { COMP, OFFER } from "@/lib/offer";
+import { COLOR } from "@/lib/colors";
 
 const { salary } = OFFER;
 const { aip, signing, match, health, lsa, yearOne } = COMP;
@@ -10,12 +11,12 @@ const aipMax = salary * OFFER.aipMax;
 const weekly = salary / 52;
 
 const PACKAGE = [
-  { label: "Base salary", value: salary, color: "var(--std)" },
-  { label: `Annual incentive at target (${percent(OFFER.aipTarget)})`, value: aip, color: "var(--promo)" },
-  { label: "Pension match (6%)", value: match, color: "var(--scotia)" },
-  { label: "Signing bonus, first year only", value: signing, color: "var(--mix)" },
-  { label: "Employer-paid health and dental", value: health, color: "#f472b6" },
-  { label: "Lifestyle Spending Account", value: lsa, color: "#2dd4bf" },
+  { label: "Base salary", value: salary, color: COLOR.keep },
+  { label: `Annual incentive at target (${percent(OFFER.aipTarget)})`, value: aip, color: COLOR.extra },
+  { label: "Pension match (6%)", value: match, color: COLOR.pension },
+  { label: "Signing bonus, first year only", value: signing, color: COLOR.extra },
+  { label: "Employer-paid health and dental", value: health, color: COLOR.insurance },
+  { label: "Lifestyle Spending Account", value: lsa, color: COLOR.employer },
 ];
 
 const FACTS = [

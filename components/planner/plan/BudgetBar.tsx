@@ -2,6 +2,7 @@
 
 import { usePlan } from "@/components/providers/PlannerProvider";
 import { money, percent } from "@/lib/format";
+import { COLOR } from "@/lib/colors";
 
 /** Your month in one bar: take-home split into fixed costs, subscriptions, day-to-day spending and what is left. The 50/30/20 check sits under Expenses. */
 export default function BudgetBar() {
@@ -9,10 +10,10 @@ export default function BudgetBar() {
   const over = left < 0;
   const base = over ? exp.total : net || 1;
   const parts = [
-    { label: "Fixed", value: exp.groups[0] ?? 0, color: "var(--scotia)" },
-    { label: "Subscriptions", value: exp.groups[1] ?? 0, color: "var(--mix)" },
-    { label: "Day-to-day", value: exp.groups[2] ?? 0, color: "var(--promo)" },
-    { label: over ? "Over budget" : "Left over", value: Math.abs(left), color: over ? "var(--neg)" : "var(--std)" },
+    { label: "Fixed", value: exp.groups[0] ?? 0, color: COLOR.needs },
+    { label: "Subscriptions", value: exp.groups[1] ?? 0, color: COLOR.subs },
+    { label: "Day-to-day", value: exp.groups[2] ?? 0, color: COLOR.wants },
+    { label: over ? "Over budget" : "Left over", value: Math.abs(left), color: over ? COLOR.bad : COLOR.keep },
   ];
   return (
     <section className="bb">

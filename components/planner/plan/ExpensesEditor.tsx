@@ -6,11 +6,12 @@ import MoneyInput from "@/components/ui/MoneyInput";
 import { money, percent } from "@/lib/format";
 import { EXPENSE_GROUPS } from "@/lib/planner/config";
 import type { RecurringExpense } from "@/lib/planner/types";
+import { EXPENSE_GROUP_COLORS } from "@/lib/colors";
 import { SubHead } from "./IncomeEditor";
 import OneTimeList, { RemoveButton } from "./OneTimeList";
 
 /** Same colours as the budget bar above. */
-const GROUP_COLORS = ["var(--scotia)", "var(--mix)", "var(--promo)"];
+const GROUP_COLORS = EXPENSE_GROUP_COLORS;
 const GROUP_TITLES = ["Fixed bills", "Subscriptions", "Day-to-day spending"];
 const ADD = ["+ Add a bill", "+ Add a subscription", "+ Add a spending category"];
 const PLACEHOLDER = ["Title, e.g. insurance", "Title, e.g. Netflix", "Title, e.g. gym"];

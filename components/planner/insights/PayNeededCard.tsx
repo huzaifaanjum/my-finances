@@ -7,8 +7,10 @@ import { Legend, LegendRow, Note } from "@/components/ui/text";
 import { money, percent } from "@/lib/format";
 import { SALARY } from "@/lib/planner/config";
 import { incomeTarget, payPackage, yearsOfRaises, type PackageLine } from "@/lib/planner/insights";
+import { COLOR } from "@/lib/colors";
 
-const COLORS = ["var(--text)", "var(--promo)", "var(--scotia)", "var(--mix)"];
+// salary, incentive, pension match, health and dental, LSA
+const COLORS = [COLOR.keep, COLOR.extra, COLOR.pension, COLOR.insurance, COLOR.employer];
 const sum = (lines: PackageLine[]) => lines.reduce((t, l) => t + l.amount, 0);
 const shortName = (name: string) => name.replace(/ \(.*\)/, "");
 

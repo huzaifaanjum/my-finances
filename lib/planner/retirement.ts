@@ -1,6 +1,7 @@
 import { money } from "@/lib/format";
 import { investmentPlan, projectPension, RETIREMENT_MONTH, type InvestmentPlan, type PensionProjection, type PensionStart } from "./finance";
 import type { Plan } from "./projection";
+import { COLOR } from "@/lib/colors";
 
 export type Effort = "auto" | "org" | "act";
 
@@ -44,7 +45,7 @@ export function retirement(plan: Plan, start?: PensionStart): Retirement {
       name: "Air Canada pension",
       today: (pension.real * wr) / 12,
       nominal: (pension.pot * wr) / 12,
-      color: "var(--scotia)",
+      color: COLOR.pension,
       effort: "auto",
       why: `Paid from the pot above at ${ret_wr}% a year. Automatic once you set up withdrawals at retirement.`,
     },
@@ -52,7 +53,7 @@ export function retirement(plan: Plan, start?: PensionStart): Retirement {
       name: "Your own investments",
       today: ((own / inflation) * wr) / 12,
       nominal: (own * wr) / 12,
-      color: "var(--std)",
+      color: COLOR.keep,
       effort: "act",
       why: `Only exists if you invest about ${money(invest.monthly)} a month yourself, every month until 65, as on the Investing page. Skip it and this line is $0.`,
     },
@@ -60,7 +61,7 @@ export function retirement(plan: Plan, start?: PensionStart): Retirement {
       name: "Quebec Pension Plan (QPP)",
       today: QPP_MONTHLY,
       nominal: QPP_MONTHLY * inflation,
-      color: "var(--mix)",
+      color: COLOR.gov,
       effort: "auto",
       why: "Already deducted from every paycheque. Apply when you retire; it pays more if you wait past 65.",
     },
@@ -68,7 +69,7 @@ export function retirement(plan: Plan, start?: PensionStart): Retirement {
       name: "Old Age Security (OAS)",
       today: OAS_MONTHLY,
       nominal: OAS_MONTHLY * inflation,
-      color: "var(--promo)",
+      color: COLOR.gov2,
       effort: "auto",
       why: "Paid by the government with 40 years in Canada after age 18. Usually starts automatically at 65; it shrinks if your retirement income is high.",
     },

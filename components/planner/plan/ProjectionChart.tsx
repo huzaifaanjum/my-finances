@@ -6,6 +6,7 @@ import { Legend } from "@/components/ui/text";
 import { compactMoney, deltaMoney, money } from "@/lib/format";
 import { axisMonthLabel } from "@/lib/planner/calendar";
 import type { MonthRow } from "@/lib/planner/types";
+import { COLOR } from "@/lib/colors";
 
 const FRAME: Frame = { width: 640, height: 260, left: 56, right: 12, top: 12, bottom: 28 };
 
@@ -48,7 +49,7 @@ export default function ProjectionChart({ rows, before, changed }: { rows: Month
         onPointerLeave={() => setHover(null)}
       >
         <YGrid frame={FRAME} values={fiveTicks(min, max)} y={Y} format={compactMoney} />
-        {min < 0 && <line x1={FRAME.left} x2={FRAME.width - FRAME.right} y1={Y(0)} y2={Y(0)} stroke="#f87171" strokeDasharray="4 4" />}
+        {min < 0 && <line x1={FRAME.left} x2={FRAME.width - FRAME.right} y1={Y(0)} y2={Y(0)} stroke={COLOR.bad} strokeDasharray="4 4" />}
         {rows.map((r, i) =>
           i % step === 0 || i === n - 1 ? (
             <XLabel key={r.i} x={X(i)} frame={FRAME}>

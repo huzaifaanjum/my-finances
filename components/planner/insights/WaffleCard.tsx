@@ -4,6 +4,7 @@ import { G } from "@/components/glossary/GlossaryText";
 import { usePlan } from "@/components/providers/PlannerProvider";
 import Card from "@/components/ui/Card";
 import { money, percent } from "@/lib/format";
+import { COLOR } from "@/lib/colors";
 
 interface Part {
   name: "Needs" | "Wants" | "Savings";
@@ -36,9 +37,9 @@ export default function WaffleCard() {
   const over = left < 0;
   const nt = net || 1;
   const parts: Part[] = [
-    { name: "Needs", amount: needs, color: "var(--scotia)", guideline: 0.5, covers: "rent, bills, groceries, transit, health" },
-    { name: "Wants", amount: wants, color: "var(--promo)", guideline: 0.3, covers: "subscriptions, eating out, shopping, other" },
-    { name: "Savings", amount: Math.max(0, left), color: "var(--std)", guideline: 0.2, covers: "what is left over" },
+    { name: "Needs", amount: needs, color: COLOR.needs, guideline: 0.5, covers: "rent, bills, groceries, transit, health" },
+    { name: "Wants", amount: wants, color: COLOR.wants, guideline: 0.3, covers: "subscriptions, eating out, shopping, other" },
+    { name: "Savings", amount: Math.max(0, left), color: COLOR.keep, guideline: 0.2, covers: "what is left over" },
   ];
   const counts = squareCounts(parts.map((p) => p.amount), over ? exp.total : nt);
   const description = over

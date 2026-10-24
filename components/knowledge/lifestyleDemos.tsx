@@ -19,9 +19,9 @@ function FunBudget() {
       <Slider label="Saved first" value={save} onChange={setSave} min={0} max={40} format={(v) => `${v}%`} />
       <Bar
         parts={[
-          { w: needs, color: C.scotia, label: `Needs ${money(needs)}` },
+          { w: needs, color: C.needs, label: `Needs ${money(needs)}` },
           { w: saved, color: C.std, label: `Savings ${money(saved)}` },
-          { w: Math.max(0, fun), color: C.promo, label: `Fun ${money(Math.max(0, fun))}` },
+          { w: Math.max(0, fun), color: C.wants, label: `Fun ${money(Math.max(0, fun))}` },
         ]}
       />
       {fun > 0 ? (

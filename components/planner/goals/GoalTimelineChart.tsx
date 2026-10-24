@@ -5,6 +5,7 @@ import { Crosshair, fiveTicks, linePath, plotHeight, plotWidth, viewBoxX, XLabel
 import { Legend } from "@/components/ui/text";
 import { compactMoney, money } from "@/lib/format";
 import { monthLabel } from "@/lib/planner/calendar";
+import { COLOR } from "@/lib/colors";
 
 const FRAME: Frame = { width: 760, height: 320, left: 56, right: 14, top: 14, bottom: 28 };
 
@@ -71,16 +72,16 @@ export default function GoalTimelineChart({ without, withLoan, target, targetLab
         onPointerLeave={() => setHover(null)}
       >
         <YGrid frame={FRAME} values={fiveTicks(min, max)} y={Y} format={compactMoney} />
-        {min < 0 && <line x1={FRAME.left} x2={FRAME.width - FRAME.right} y1={Y(0)} y2={Y(0)} stroke="#f87171" strokeDasharray="4 4" />}
+        {min < 0 && <line x1={FRAME.left} x2={FRAME.width - FRAME.right} y1={Y(0)} y2={Y(0)} stroke={COLOR.bad} strokeDasharray="4 4" />}
         {ticks.map((t) => (
           <XLabel key={t} x={X(t)} frame={FRAME}>
             {t === 0 ? "Now" : `+${t / 12} yr`}
           </XLabel>
         ))}
         <line x1={FRAME.left} x2={X(buy)} y1={Y(target)} y2={Y(target)} stroke="#fafafa" strokeDasharray="5 4" opacity="0.7" />
-        <line x1={X(buy)} x2={X(buy)} y1={FRAME.top} y2={FRAME.top + ph} stroke="var(--promo)" strokeDasharray="3 3" />
+        <line x1={X(buy)} x2={X(buy)} y1={FRAME.top} y2={FRAME.top + ph} stroke={COLOR.warn} strokeDasharray="3 3" />
         <path d={loan(balances)} fill="none" stroke="#fafafa" strokeWidth="1.75" strokeLinejoin="round" opacity="0.85" />
-        {faster && <path d={loan(faster)} fill="none" stroke="var(--scotia)" strokeWidth="2" strokeLinejoin="round" />}
+        {faster && <path d={loan(faster)} fill="none" stroke={COLOR.needs} strokeWidth="2" strokeLinejoin="round" />}
         <path d={series(without, buy)} fill="none" stroke="var(--std)" strokeWidth="1.75" strokeDasharray="5 4" opacity="0.6" />
         <path d={series(withLoan)} fill="none" stroke="var(--std)" strokeWidth="2.5" strokeLinejoin="round" />
         {hover !== null && <Crosshair x={X(m)} y={Y(at(withLoan, m))} top={FRAME.top} bottom={FRAME.top + ph} />}
@@ -92,7 +93,7 @@ export default function GoalTimelineChart({ without, withLoan, target, targetLab
           { label: targetLabel, kind: "dash" },
           { label: "You buy", kind: "tick", color: "var(--promo)" },
           { label: "Loan balance", color: "var(--text)" },
-          ...(faster ? [{ label: "Loan with your extra payment", color: "var(--scotia)" }] : []),
+          ...(faster ? [{ label: "Loan with your extra payment", color: COLOR.needs }] : []),
         ]}
       />
     </div>

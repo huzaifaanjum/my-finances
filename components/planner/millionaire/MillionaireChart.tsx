@@ -8,6 +8,7 @@ import { useElementSize } from "@/hooks/useElementWidth";
 import { compactMoney, money } from "@/lib/format";
 import { monthLabel, PLAN_START_YEAR } from "@/lib/planner/calendar";
 import type { Simulation } from "@/lib/planner/finance";
+import { COLOR } from "@/lib/colors";
 
 const MILESTONES = [0.1, 0.25, 0.5, 0.75, 1];
 
@@ -60,9 +61,9 @@ export default function MillionaireChart({ sim, target }: { sim: Simulation; tar
             {y === 0 ? "Now" : PLAN_START_YEAR + y}
           </XLabel>
         ))}
-        <path d={`${area((m) => sim.bal[m])} ${base}`} fill="var(--std)" fillOpacity=".35" />
-        <path d={`${area((m) => Math.min(sim.inn[m], sim.bal[m]))} ${base}`} fill="var(--scotia)" fillOpacity=".45" />
-        <path d={area((m) => sim.bal[m])} fill="none" stroke="var(--std)" strokeWidth="2" />
+        <path d={`${area((m) => sim.bal[m])} ${base}`} fill={COLOR.extra} fillOpacity=".35" />
+        <path d={`${area((m) => Math.min(sim.inn[m], sim.bal[m]))} ${base}`} fill={COLOR.keep} fillOpacity=".45" />
+        <path d={area((m) => sim.bal[m])} fill="none" stroke={COLOR.extra} strokeWidth="2" />
         <line x1={frame.left} x2={frame.width - frame.right} y1={Y(target)} y2={Y(target)} stroke="#fafafa" strokeOpacity=".7" strokeDasharray="4 4" />
         {stops.map(({ x, m }) => (
           <g key={x}>
@@ -79,8 +80,8 @@ export default function MillionaireChart({ sim, target }: { sim: Simulation; tar
       {hover && (
         <FloatingTip point={hover}>
           <TipTitle>{monthLabel(hover.m)}</TipTitle>
-          <TipRow label="You put in" value={sim.inn[hover.m]} color="var(--scotia)" />
-          <TipRow label="Growth" value={sim.bal[hover.m] - sim.inn[hover.m]} color="var(--std)" />
+          <TipRow label="You put in" value={sim.inn[hover.m]} color={COLOR.keep} />
+          <TipRow label="Growth" value={sim.bal[hover.m] - sim.inn[hover.m]} color={COLOR.extra} />
           <TipRow label="Balance" value={sim.bal[hover.m]} total />
         </FloatingTip>
       )}

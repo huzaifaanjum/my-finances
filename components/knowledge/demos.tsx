@@ -37,8 +37,8 @@ function Budget() {
       <Slider label="Wants" value={wants} onChange={setWants} min={0} max={60} format={(v) => `${v}%`} />
       <Bar
         parts={[
-          { w: needs, color: C.scotia, label: `Needs ${money((net * needs) / 100)}` },
-          { w: wants, color: C.promo, label: `Wants ${money((net * wants) / 100)}` },
+          { w: needs, color: C.needs, label: `Needs ${money((net * needs) / 100)}` },
+          { w: wants, color: C.wants, label: `Wants ${money((net * wants) / 100)}` },
           { w: save, color: C.std, label: `Savings ${money((net * save) / 100)}` },
         ]}
       />
@@ -170,8 +170,8 @@ function Compound() {
       <Slider label="Yearly return" value={r} onChange={setR} min={0} max={10} step={0.5} format={(v) => `${num(v, 1)}%`} />
       <Bar
         parts={[
-          { w: paid, color: C.scotia, label: `You paid in ${money(paid)}` },
-          { w: total - paid, color: C.std, label: `Growth ${money(total - paid)}` },
+          { w: paid, color: C.std, label: `You paid in ${money(paid)}` },
+          { w: total - paid, color: C.extra, label: `Growth ${money(total - paid)}` },
         ]}
       />
       <Stats>

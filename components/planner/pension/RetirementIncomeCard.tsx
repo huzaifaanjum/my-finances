@@ -8,6 +8,7 @@ import { duration, money } from "@/lib/format";
 import { monthLabel } from "@/lib/planner/calendar";
 import { RETIREMENT_MONTH } from "@/lib/planner/finance";
 import type { Retirement } from "@/lib/planner/retirement";
+import { COLOR } from "@/lib/colors";
 
 const AGES = [35, 45, 55, 65];
 /** Age at the start of the plan, October 2026 (born July 1997). */
@@ -73,7 +74,7 @@ export default function RetirementIncomeCard({ r, net, numbers }: { r: Retiremen
             </>
           }
           value={money(a.value)}
-          bar={{ value: a.value / maxAge, color: "var(--scotia)" }}
+          bar={{ value: a.value / maxAge, color: COLOR.pension }}
         />
       ))}
       <Note style={{ marginTop: 12 }}>

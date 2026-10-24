@@ -1,6 +1,7 @@
 import { money, pctLabel } from "@/lib/format";
 import { PAY, takeHomePerGross } from "@/lib/pay";
 import { monthLabel } from "./calendar";
+import { COLOR } from "@/lib/colors";
 
 export interface SliderDef {
   label: string;
@@ -117,7 +118,7 @@ const item = (id: ExpenseId, label: string, initial: number, max: number, step: 
 export const EXPENSE_GROUPS: ExpenseGroup[] = [
   {
     title: "Fixed expenses",
-    color: "var(--std)",
+    color: COLOR.needs,
     items: [
       item("rent", "Rent", 2075, 4000, 25, true),
       item("electricity", "Electricity", 45, 400, 5, true),
@@ -128,7 +129,7 @@ export const EXPENSE_GROUPS: ExpenseGroup[] = [
   },
   {
     title: "Subscriptions",
-    color: "var(--scotia)",
+    color: COLOR.subs,
     items: [
       item("icloud", "Apple iCloud", 15, 50, 1),
       item("music1", "Apple Music (person 1)", 7, 30, 1),
@@ -141,7 +142,7 @@ export const EXPENSE_GROUPS: ExpenseGroup[] = [
   },
   {
     title: "Variable expenses",
-    color: "var(--promo)",
+    color: COLOR.wants,
     note: "Estimates to start with: replace them with what you really spend.",
     items: [
       item("groceries", "Groceries", 450, 1200, 10, true),
@@ -160,9 +161,10 @@ export type StreamKind = "work" | "side" | "housing";
 export type StreamKey = "rs_raise" | "rs_free" | "rs_side" | "rs_dig" | "rs_room";
 
 export const STREAM_COLORS: Record<StreamKind, string> = {
-  work: "var(--scotia)",
-  side: "var(--mix)",
-  housing: "var(--promo)",
+  // all extra income; the list labels tell them apart
+  work: COLOR.extra,
+  side: COLOR.extra,
+  housing: COLOR.extra,
 };
 
 export const INCOME_STREAMS: { key: StreamKey; kind: StreamKind; hint: string }[] = [

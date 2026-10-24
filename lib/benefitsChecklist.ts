@@ -6,14 +6,15 @@ import { benefit, BENEFITS, LSA_YEARLY, PREMIUM_TAX } from "@/lib/benefits";
 import { money } from "@/lib/format";
 import { OFFER } from "@/lib/offer";
 import { PAY } from "@/lib/pay";
+import { COLOR } from "@/lib/colors";
 
 export type BenefitGroup = "money" | "health" | "protection" | "perks";
 
 export const BENEFIT_GROUPS: Record<BenefitGroup, { title: string; color: string; note: string }> = {
-  money: { title: "Pay and savings", color: "var(--promo)", note: "Pension match, incentive, bonuses and share plans" },
-  health: { title: "Health and wellness", color: "var(--std)", note: "Health, drugs, dental and the spending account" },
-  protection: { title: "Protection", color: "var(--scotia)", note: "Disability, life and accident cover" },
-  perks: { title: "Travel, time off and perks", color: "#f472b6", note: "Flights, points, vacation and extras" },
+  money: { title: "Pay and savings", color: COLOR.keep, note: "Pension match, incentive, bonuses and share plans" },
+  health: { title: "Health and wellness", color: COLOR.insurance, note: "Health, drugs, dental and the spending account" },
+  protection: { title: "Protection", color: COLOR.employer, note: "Disability, life and accident cover" },
+  perks: { title: "Travel, time off and perks", color: COLOR.extra, note: "Flights, points, vacation and extras" },
 };
 
 export interface BenefitStep {

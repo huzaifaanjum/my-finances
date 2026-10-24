@@ -5,6 +5,7 @@ import { axisMonthLabel, dayLabel, monthDate } from "@/lib/planner/calendar";
 import { Note } from "@/components/ui/text";
 import { money } from "@/lib/format";
 import type { Plan } from "@/lib/planner/projection";
+import { COLOR } from "@/lib/colors";
 
 const FRAME: Frame = { width: 640, height: 280, left: 56, right: 12, top: 12, bottom: 28 };
 
@@ -32,7 +33,7 @@ export default function CashBalanceChart({ plan, compact }: { plan: Plan; compac
       {!compact && <div className="ct">Cash balance</div>}
       <svg viewBox={`0 0 ${FRAME.width} ${FRAME.height}`} role="img" aria-label="Savings balance chart">
         <YGrid frame={FRAME} values={fiveTicks(min, max)} y={Y} />
-        {min < 0 && <line x1={FRAME.left} x2={FRAME.width - FRAME.right} y1={Y(0)} y2={Y(0)} stroke="#f87171" strokeDasharray="4 4" />}
+        {min < 0 && <line x1={FRAME.left} x2={FRAME.width - FRAME.right} y1={Y(0)} y2={Y(0)} stroke={COLOR.bad} strokeDasharray="4 4" />}
         {days.map((p, k) =>
           p.d === 1 && p.i % step === 0 ? (
             <XLabel key={k} x={X(k)} frame={FRAME}>

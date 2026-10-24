@@ -109,5 +109,6 @@ export function Verdict({ tone, children }: { tone: "good" | "warn" | "bad"; chi
   return <p className={`${s.verdict} ${s[tone]}`}>{children}</p>;
 }
 
-export const C = { std: "#34d399", promo: "#fbbf24", neg: "#f87171", scotia: "#60a5fa", mix: "#c4b5fd", none: "#52525b" };
+// same meanings as lib/colors.ts
+export const C = { std: "#34d399", promo: "#fbbf24", neg: "#f87171", scotia: "#60a5fa", mix: "#c4b5fd", none: "#52525b", extra: "#a7f3d0", tax: "#60a5fa", gov: "#e9d5ff", pension: "#fb923c", ins: "#f472b6", needs: "#d4d4d8", wants: "#71717a" };
 export { s };

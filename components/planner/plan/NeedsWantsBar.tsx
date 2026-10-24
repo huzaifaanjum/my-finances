@@ -2,6 +2,7 @@
 
 import { usePlan } from "@/components/providers/PlannerProvider";
 import { money, percent } from "@/lib/format";
+import { COLOR } from "@/lib/colors";
 
 interface Part {
   key: "needs" | "wants" | "savings";
@@ -14,9 +15,9 @@ interface Part {
 }
 
 const PARTS: Part[] = [
-  { key: "needs", label: "Needs", color: "var(--scotia)", ideal: 0.5, more: false },
-  { key: "wants", label: "Wants", color: "var(--promo)", ideal: 0.3, more: false },
-  { key: "savings", label: "Savings", color: "var(--std)", ideal: 0.2, more: true },
+  { key: "needs", label: "Needs", color: COLOR.needs, ideal: 0.5, more: false },
+  { key: "wants", label: "Wants", color: COLOR.wants, ideal: 0.3, more: false },
+  { key: "savings", label: "Savings", color: COLOR.keep, ideal: 0.2, more: true },
 ];
 
 const signed = (v: number, fmt: (n: number) => string) => `${v > 0 ? "+" : v < 0 ? "−" : "±"}${fmt(Math.abs(v))}`;
