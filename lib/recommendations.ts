@@ -65,6 +65,8 @@ export function recContext(plan: Plan): RecContext {
 /** Typical credit card and savings rates, for rough yearly values. */
 const CARD_APR = 0.2099;
 const HISA_RATE = 0.025;
+/** 2026 RRSP dollar limit; room is 18% of last year's earnings up to this. */
+export const RRSP_MAX = 33_810;
 
 /** RRSP room for next year: 18% of this year's earnings minus the pension adjustment (your DC contributions, both sides). */
 export function rrspRoomEstimate(year: number) {
@@ -72,7 +74,7 @@ export function rrspRoomEstimate(year: number) {
   const share = year === started.getFullYear() ? (new Date(year, 11, 31).getTime() - started.getTime()) / (365 * 864e5) : 1;
   const earned = OFFER.salary * share;
   const pa = earned * OFFER.pensionMax * 2;
-  return { forYear: year + 1, room: Math.max(0, Math.min(earned * 0.18, 32_490) - pa), pa, earned };
+  return { forYear: year + 1, room: Math.max(0, Math.min(earned * 0.18, RRSP_MAX) - pa), pa, earned };
 }
 
 export function checklist(ctx: RecContext): Step[] {
@@ -192,7 +194,7 @@ export function checklist(ctx: RecContext): Step[] {
       area: "tax",
       priority: "later",
       title: "Know that your RRSP room is small",
-      body: `Your DC pension counts against RRSP room (the pension adjustment). For ${rrsp.forYear} expect about ${money(rrsp.room)} of new room, then about ${money(Math.min(OFFER.salary * 0.18, 32_490) - OFFER.salary * OFFER.pensionMax * 2)} a year after that. Check the exact figure on your Notice of Assessment before contributing.`,
+      body: `Your DC pension counts against RRSP room (the pension adjustment). For ${rrsp.forYear} expect about ${money(rrsp.room)} of new room, then about ${money(Math.min(OFFER.salary * 0.18, RRSP_MAX) - OFFER.salary * OFFER.pensionMax * 2)} a year after that. Check the exact figure on your Notice of Assessment before contributing.`,
       when: "After filing",
     },
     {

@@ -1,3 +1,6 @@
+import { LIFESTYLE_RULES } from "./lifestyleRules";
+import { MORE_RULES } from "./moreRules";
+
 export type DemoKey =
   | "payFirst"
   | "budget"
@@ -12,7 +15,28 @@ export type DemoKey =
   | "car"
   | "home"
   | "lifestyle"
-  | "taxes";
+  | "taxes"
+  | "payslip"
+  | "marginal"
+  | "payrollMax"
+  | "raise"
+  | "disability"
+  | "lifeNeed"
+  | "lsa"
+  | "match"
+  | "rrspRoom"
+  | "qppAge"
+  | "fourPercent"
+  | "fhsa"
+  | "inflation"
+  | "sinkingFund"
+  | "points"
+  | "fxFees"
+  | "subscriptions"
+  | "funBudget"
+  | "smallSpends"
+  | "rewards"
+  | "bills";
 
 export interface Rule {
   id: string;
@@ -28,14 +52,21 @@ export interface Rule {
   example: string;
   /** how it applies to you right now */
   you: string;
-  demo: DemoKey;
+  /** an interactive calculator, when one helps */
+  demo?: DemoKey;
+  /** the tab where this shows up in your own numbers */
+  link?: { href: string; label: string };
 }
 
 export const GROUPS = [
   "Start here",
+  "Your pay",
   "Debt and credit",
   "Grow your money",
+  "Retirement",
+  "Benefits and insurance",
   "Big purchases",
+  "Travel, fun and subscriptions",
   "Habits and paperwork",
 ] as const;
 
@@ -222,4 +253,6 @@ export const RULES: Rule[] = [
     you: "Keep every tax slip (T4, T2202 for tuition, RRSP receipts) and file on time every year. Tuition credits you earned can lower your tax.",
     demo: "taxes",
   },
+  ...MORE_RULES,
+  ...LIFESTYLE_RULES,
 ];

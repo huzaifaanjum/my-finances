@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { Rule } from "@/lib/knowledge/rules";
 import { DemoFor } from "./demos";
 import s from "./knowledge.module.css";
@@ -40,10 +41,15 @@ export default function RuleItem({ rule, isRead, onToggle }: { rule: Rule; isRea
         <Block title="Example" className={s.ex}>
           {rule.example}
         </Block>
-        <DemoFor name={rule.demo} />
+        {rule.demo && <DemoFor name={rule.demo} />}
         <Block title="For you" className={s.you}>
           {rule.you}
         </Block>
+        {rule.link && (
+          <Link href={rule.link.href} className={s.link}>
+            See it in your numbers: {rule.link.label} →
+          </Link>
+        )}
         <button type="button" className={`${s.btn} ${isRead ? s.btnGhost : ""}`} onClick={() => onToggle(!isRead)}>
           {isRead ? "Mark as not read" : "Mark as read"}
         </button>

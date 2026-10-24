@@ -2,6 +2,8 @@
 
 import { useState, type ReactElement } from "react";
 import type { DemoKey } from "@/lib/knowledge/rules";
+import { LIFESTYLE_DEMOS } from "./lifestyleDemos";
+import { MORE_DEMOS } from "./moreDemos";
 import { C, Bar, Demo, Note, Slider, Stat, Stats, Verdict, fvMonthly, loanPayment, money, neededMonthly, num, s } from "./ui";
 
 function PayFirst() {
@@ -356,7 +358,9 @@ function Taxes() {
   );
 }
 
-const DEMOS: Record<DemoKey, () => ReactElement> = {
+const DEMOS: Partial<Record<DemoKey, () => ReactElement>> = {
+  ...MORE_DEMOS,
+  ...LIFESTYLE_DEMOS,
   payFirst: PayFirst,
   budget: Budget,
   emergency: Emergency,
@@ -375,5 +379,5 @@ const DEMOS: Record<DemoKey, () => ReactElement> = {
 
 export function DemoFor({ name }: { name: DemoKey }) {
   const D = DEMOS[name];
-  return <D />;
+  return D ? <D /> : null;
 }

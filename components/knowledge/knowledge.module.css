@@ -54,3 +54,5 @@
 .foot{margin-top:28px;color:var(--mute);font-size:12.5px;max-width:70ch}
 .skel{display:grid;gap:10px}
 @media (max-width:600px){.body{padding-left:16px}.title{font-size:28px}}
+.link{display:inline-block;justify-self:start;margin:2px 0 12px;font-size:13.5px;color:var(--std);text-decoration:none}
+.link:hover{text-decoration:underline}
