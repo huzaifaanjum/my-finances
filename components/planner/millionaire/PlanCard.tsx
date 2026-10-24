@@ -9,7 +9,7 @@ import type { Plan } from "@/lib/planner/projection";
 
 export default function PlanCard({ plan, invest }: { plan: Plan; invest: InvestmentPlan }) {
   return (
-    <Card title="Your plan" description="Target, return and raises are shared with the Goals card on the Budget page.">
+    <Card title="Your plan" description="Your target, the return you expect and how fast what you invest grows.">
       <PlannerSlider k="target" label="Target" />
       <PlannerSlider k="ret" label="Yearly investment return" />
       <PlannerSlider k="rais" label="Yearly increase in what you invest" />

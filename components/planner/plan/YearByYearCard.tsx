@@ -27,7 +27,7 @@ export default function YearByYearCard() {
           />
         );
       })}
-      <Note>Assumes today&apos;s pay and spending stay the same and no raises.</Note>
+      <Note>Assumes today&apos;s spending stays the same and pay changes only where you added a new pay.</Note>
     </Card>
   );
 }

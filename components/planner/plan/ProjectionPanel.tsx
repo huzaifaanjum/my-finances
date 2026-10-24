@@ -31,7 +31,7 @@ interface Props {
   onKeep: () => void;
 }
 
-/** Live projection that follows every slider on the page. */
+/** Live projection that follows every amount on the page. */
 export default function ProjectionPanel({ plan, before, changed, onUndo, onKeep }: Props) {
   const fiveYears = plan.far[59].balance;
   const emergency = plan.eta(plan.exp.total * 3);
@@ -49,7 +49,7 @@ export default function ProjectionPanel({ plan, before, changed, onUndo, onKeep 
       <div className="pj-tiles">
         <Tile label="Left over each month" value={signedMoney(plan.left)} delta={plan.left - before.left} note={`${percent(plan.rate)} of take-home`} />
         <Tile label={`Saved by ${plan.last.label}`} value={money(plan.last.balance)} delta={plan.last.balance - before.last.balance} />
-        <Tile label="Saved in 5 years" value={money(fiveYears)} delta={fiveYears - before.far[59].balance} note="no raises, no returns" />
+        <Tile label="Saved in 5 years" value={money(fiveYears)} delta={fiveYears - before.far[59].balance} note={plan.state.pay.length > 1 ? "with your pay changes, no returns" : "no raises, no returns"} />
         <Tile label="3-month emergency fund" value={emergency} note={etaChange(emergency, emergencyWas)} />
         <Tile label="First $100k" value={hundredK} note={etaChange(hundredK, hundredKWas)} />
         <Tile
@@ -63,7 +63,7 @@ export default function ProjectionPanel({ plan, before, changed, onUndo, onKeep 
       <ProjectionChart rows={plan.rows} before={before.rows} changed={changed} />
 
       <div className="pj-act">
-        <span>{changed ? "Compared with the plan you opened this page with." : "Move any slider and the projection updates here."}</span>
+        <span>{changed ? "Compared with the plan you opened this page with." : "Change any amount and the projection updates here."}</span>
         {changed && (
           <>
             <button type="button" className="add" onClick={onUndo}>

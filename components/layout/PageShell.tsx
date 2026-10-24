@@ -11,9 +11,9 @@ import DashboardSkeleton from "./DashboardSkeleton";
 const NOTES = [
   "Estimates only, not financial advice. Bonuses are net amounts.",
   "Take-home, tax rates, pension and insurance come from your October 2026 payslip and your Manulife coverage summary; the Payslips tab uses your latest uploaded payslip.",
-  "Per your offer letter, the two $2,500 (gross) signing payments arrive in February and August 2027 (6 and 12 months after your Aug 17 start), about $1,400 each after tax; the annual incentive arrives each March (the first, prorated, about $1,550 after tax).",
-  "Pay lands on the last banking day of the month, shown as the last day of the month in the chart.",
-  "The plan keeps pay flat. EI and QPP stop being withheld late each year once their maximums are reached, so real deposits rise in the last months; the Payslips forecast shows that.",
+  "Per your offer letter, the two $2,500 (gross) signing payments arrive in February and August 2027 (6 and 12 months after your Aug 17 start), about $1,400 each after tax; the annual incentive arrives each March (the first, prorated, about $1,550 after tax). In Budget they are income items you can change or remove.",
+  "Pay lands on the last banking day of the month, shown as the last day of the month in the chart. One-time items land on their own date.",
+  "Pay only changes when you add a new pay in Budget; no raises are assumed. EI and QPP stop being withheld late each year once their maximums are reached, so real deposits rise in the last months; the Payslips forecast shows that.",
 ];
 
 const NOTES_TIP = (
