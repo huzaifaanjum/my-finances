@@ -72,54 +72,6 @@ export default function InsuranceView() {
     },
   ];
 
-  const insights: { title: string; value: string; body: string; tone?: "good" | "watch" }[] = [
-    {
-      title: "Disability cover matches your take-home",
-      value: `${money(ltd.pays!.amount)} a month`,
-      body: `Long-term disability pays 60% of gross, but because you pay the premiums yourself the benefit is generally tax-free. That is ${shareOf(ltdShare)} of the ${money(plan.net)} take-home in your plan, the most valuable cover you have.`,
-      tone: "good",
-    },
-    {
-      title: `Air Canada pays ${money(COSTS.employerTotal * 12)} a year`,
-      value: `${money(COSTS.employerTotal, 2)} a month`,
-      body: `${money(COSTS.flex, 2)} of flex dollars (all of extended health and drugs, part of dental) plus ${money(COSTS.employerTaxable - COSTS.flex, 2)} premium tax, and ${money(LSA_MONTHLY, 2)} into your Lifestyle Spending Account.`,
-      tone: "good",
-    },
-    {
-      title: "Quebec adds 9% to every premium",
-      value: `${money(COSTS.tax, 2)} a month`,
-      body: `Manulife's price for what you pay is ${money(COSTS.you, 2)}; Quebec's insurance premium tax brings it to the ${money(COSTS.youTotal, 2)} on your payslip, ${money(COSTS.tax * 12)} a year.`,
-    },
-    {
-      title: "You asked for more life cover than you get",
-      value: `${money(life.pays!.amount)} cap`,
-      body: "You chose 30× monthly earnings ($237,600), but basic life stops at $160,000. Manulife says what you pay is based on what you asked for until it is approved, so check your next statement to be sure you only pay for $160,000.",
-      tone: "watch",
-    },
-    {
-      title: "Life cover is about 1.7× your salary",
-      value: `${(life.pays!.amount / OFFER.salary).toFixed(1)}× salary`,
-      body: "Plenty if nobody depends on your income. If a partner or children ever do, the usual guide is 5 to 10× salary; that is when optional life becomes worth buying.",
-    },
-    {
-      title: "$500 a year to claim",
-      value: `${money(LSA_YEARLY)} a year`,
-      body: `Air Canada puts ${money(LSA_MONTHLY, 2)} a month into your Lifestyle Spending Account. Claims are a taxable benefit, so $500 is worth about ${money(LSA_YEARLY * (1 - m.rate))} after tax, still free money for a gym, gear or a course.`,
-      tone: "watch",
-    },
-    {
-      title: "Health premiums are taxed in Quebec",
-      value: `≈ ${money(COSTS.employerTaxable * m.qcRate)} a month`,
-      body: `The ${money(COSTS.employerTaxable, 2)} a month Air Canada pays for health and dental counts as income for Quebec tax. Using the coverage is how you get that back.`,
-    },
-    {
-      title: "No critical illness or extra life cover",
-      value: "Not needed yet",
-      body: "Disability insurance already replaces income if you fall ill. Critical illness and optional life are worth a look only once someone depends on you.",
-      tone: "good",
-    },
-  ];
-
   return (
     <div className="ins">
       <KpiGrid className="ins-kpis">
@@ -277,23 +229,10 @@ export default function InsuranceView() {
         </Card>
       </div>
 
-      <section className="ins-sec">
-        <SectionHeading title="Key insights">What your coverage means for your money.</SectionHeading>
-        <GlossaryScope>
-          <div className="off-ins">
-            {insights.map((i) => (
-              <div key={i.title} className={`off-in ${i.tone ?? ""}`}>
-                <span>{i.title}</span>
-                <b>{i.value}</b>
-                <p>
-                  <G>{i.body}</G>
-                </p>
-              </div>
-            ))}
-          </div>
-        </GlossaryScope>
-      </section>
 
+      <SeeAlso href="/insights" label="Insights">
+        Key insights on your coverage: disability vs take-home, the life cover cap, premium tax and the spending account
+      </SeeAlso>
       <SeeAlso href="/recommendations" label="Recommendations">
         What to do: claim the spending account, name beneficiaries, review life cover and use your health plans
       </SeeAlso>

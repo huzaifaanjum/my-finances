@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { periodLabel } from "@/lib/payslips/analysis";
-import type { ForecastSettings } from "@/lib/payslips/forecast";
 import { ParseError } from "@/lib/payslips/parse";
 import { readPayslip } from "@/lib/payslips/pdf";
 import { emptyPayslip, type PayslipData } from "@/lib/payslips/types";
-import { OFFER } from "@/lib/offer";
 import PayBreakdown from "./PayBreakdown";
 import PayForecast from "./PayForecast";
-import PayInsights from "./PayInsights";
 import PayslipEditor, { type EditRequest, type EditTarget } from "./PayslipEditor";
 import PayslipManager from "./PayslipManager";
 import PayslipViewer from "./PayslipViewer";
@@ -19,45 +16,15 @@ import SourcesStrip from "./SourcesStrip";
 import VaultBar from "./VaultBar";
 import VaultGate from "./VaultGate";
 import { MAX_FILE_BYTES, useVault } from "./PayslipVault";
+import { useForecastSettings } from "./useForecastSettings";
 import { usePensionStart } from "./usePensionStart";
-import { usePlanner } from "@/components/providers/PlannerProvider";
 
-const SETTINGS_KEY = "ps_forecast";
 let nextUid = 0;
 const queued = (t: EditRequest): EditTarget => ({ ...t, uid: ++nextUid });
-/**
- * Forecast settings. Raise and pension return are the planner's own (saved to your account), so the
- * Pension tab and this forecast always agree; the incentive % is remembered on this device.
- */
-function useSettings(): [ForecastSettings, (s: ForecastSettings) => void] {
-  const { state, setNumbers } = usePlanner();
-  const [bonus, setBonus] = useState<number>(OFFER.aipTarget);
-  useEffect(() => {
-    try {
-      const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? "{}") as Partial<ForecastSettings>;
-      if (typeof raw.bonus === "number") setBonus(raw.bonus);
-    } catch {
-      /* storage blocked */
-    }
-  }, []);
-  const settings: ForecastSettings = { raise: state.numbers.ret_sg / 100, growth: state.numbers.ret_pr / 100, bonus };
-  const save = (next: ForecastSettings) => {
-    if (next.raise !== settings.raise || next.growth !== settings.growth) setNumbers({ ret_sg: next.raise * 100, ret_pr: next.growth * 100 });
-    if (next.bonus !== bonus) {
-      setBonus(next.bonus);
-      try {
-        localStorage.setItem(SETTINGS_KEY, JSON.stringify({ bonus: next.bonus }));
-      } catch {
-        /* storage blocked */
-      }
-    }
-  };
-  return [settings, save];
-}
 
 export default function PayslipsView() {
   const vault = useVault();
-  const [settings, setSettings] = useSettings();
+  const [settings, setSettings] = useForecastSettings();
   const pensionStart = usePensionStart();
   const pensionSoFar = pensionStart.mine + pensionStart.match;
   const [viewing, setViewing] = useState<string | null>(null);
@@ -123,7 +90,9 @@ export default function PayslipsView() {
           <PaySummary used={used} latest={latest.data} />
           <PayBreakdown used={used} />
           <PayForecast latest={latest.data} settings={settings} onSettings={setSettings} pensionSoFar={pensionSoFar} />
-          <PayInsights used={used} settings={settings} pensionSoFar={pensionSoFar} />
+          <SeeAlso href="/insights" label="Insights">
+            Key insights from your payslips: next deposit, plan vs payslip, tax rate, the late-year bump and more
+          </SeeAlso>
           <SeeAlso href="/recommendations" label="Recommendations">
             What to do with it: tax savings, the late-year bump, benefits and your payslip checklist
           </SeeAlso>

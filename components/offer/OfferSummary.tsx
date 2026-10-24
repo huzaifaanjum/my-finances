@@ -25,68 +25,7 @@ const FACTS = [
   { k: "Paid", v: "Monthly, last banking day" },
 ];
 
-interface Insight {
-  title: string;
-  value: string;
-  body: string;
-  tone?: "good" | "watch";
-}
-
-const INSIGHTS: Insight[] = [
-  {
-    title: "You get the full pension match",
-    value: `${money(match * 2)} a year`,
-    body: `You put in 6% of salary, the most allowed, and Air Canada matches it, so ${money(match)} of free money a year goes into your DC pension. Dropping to 3% would raise take-home but cut the match in half.`,
-    tone: "good",
-  },
-  {
-    title: "Probation ends Feb 17, 2027",
-    value: "6 months",
-    body: "Until then your manager can extend probation or end your job, and the severance terms below do not apply yet.",
-    tone: "watch",
-  },
-  {
-    title: "The signing bonus has conditions",
-    value: `2 × ${money(OFFER.signing[0].amount)}`,
-    body: "Paid after 6 months (Feb 2027) and 12 months (Aug 2027), only if you are still employed then. It is taxed like salary, so expect roughly 55 to 60% of it in your account.",
-    tone: "watch",
-  },
-  {
-    title: "The incentive is not guaranteed",
-    value: `${money(aip)} to ${money(aipMax)}`,
-    body: "Target is 8% of salary and the maximum is 16%, depending on company, department and personal results. Air Canada can change the plan at any time, so plan around the target, not the maximum.",
-  },
-  {
-    title: "Severance grows with every year",
-    value: `${money(weekly * 3)} to start`,
-    body: `After probation: 3 weeks of base pay plus 3 weeks per year of service, up to 60 weeks. A week of base pay is ${money(weekly)}, so after 5 years it would be 18 weeks, about ${money(weekly * 18)}.`,
-  },
-  {
-    title: "Quebec taxes your health benefits",
-    value: `${money(health)} a year`,
-    body: "The health and dental premiums Air Canada pays count as income for Quebec tax (not federal). You pay a little Quebec tax on money you never see, which is normal in Quebec.",
-  },
-  {
-    title: "Time off",
-    value: `${OFFER.vacationWeeks} weeks + ${OFFER.catchUpDays} days`,
-    body: "Three weeks of vacation a year plus five catch-up days, both prorated for 2026 because you started in August.",
-    tone: "good",
-  },
-  {
-    title: "Perks with a cash value",
-    value: `${(OFFER.aeroplanPoints / 1000).toFixed(0)}k Aeroplan a year`,
-    body: "Points arrive each January, starting 2027. Travel privileges start after 28 weeks (Mar 1, 2027). The ESOP matches part of what you put into Air Canada shares, and a Group RRSP and TFSA are open to you.",
-    tone: "good",
-  },
-  {
-    title: "Fine print worth knowing",
-    value: "Arbitration",
-    body: "Disputes go to private arbitration in Quebec and you give up class actions. Keeping your work permit valid is your job; if it lapses, employment ends without notice or pay.",
-    tone: "watch",
-  },
-];
-
-/** The offer at a glance: who, what it pays in total, and what to take away from it. */
+/** The offer at a glance: who it is with and what it pays in total. Its takeaways are on the Insights tab. */
 export default function OfferSummary() {
   return (
     <div className="off-sec">
@@ -123,18 +62,6 @@ export default function OfferSummary() {
         </Card>
       </div>
 
-      <div>
-        <SectionHeading title="Key takeaways">What the offer letter means for your money and your job, in plain terms.</SectionHeading>
-        <div className="off-ins">
-          {INSIGHTS.map((i) => (
-            <div key={i.title} className={`off-in ${i.tone ?? ""}`}>
-              <span>{i.title}</span>
-              <b>{i.value}</b>
-              <p>{i.body}</p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
