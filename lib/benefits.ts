@@ -212,3 +212,102 @@ export const LSA_IDEAS: { what: string; why: string }[] = [
   { what: "A new mattress", why: "Listed under healthcare expenses." },
   { what: "Electric toothbrush or water flosser", why: "Small dental extras add up." },
 ];
+
+/* ---------- how much you can claim ---------- */
+
+export type LimitKind = "money" | "percent" | "count";
+
+export interface ClaimLimit {
+  /** saved under this id when you enter it yourself */
+  id: string;
+  label: string;
+  kind: LimitKind;
+  /** "a month", "a year", "per 24 months", "weeks", ... */
+  per: string;
+  /** from your Manulife statement; absent means it's in the booklet, not the statement */
+  known?: number;
+  hint?: string;
+}
+
+export interface ClaimGroup {
+  benefit: BenefitId;
+  title: string;
+  limits: ClaimLimit[];
+}
+
+/**
+ * The most each benefit pays. Amounts with `known` come straight from your Oct 13, 2026 statement;
+ * the rest are plan-booklet limits the statement doesn't list, entered once from the Manulife app.
+ */
+export const CLAIM_LIMITS: ClaimGroup[] = [
+  {
+    benefit: "ltd",
+    title: "Long-term disability",
+    limits: [
+      { id: "ltd-monthly", label: "Monthly benefit", kind: "money", per: "a month, tax-free", known: 4_751 },
+      { id: "ltd-age", label: "Pays until age", kind: "count", per: "years old", hint: "Often 65; check the booklet" },
+    ],
+  },
+  {
+    benefit: "std",
+    title: "Short-term disability",
+    limits: [
+      { id: "std-weekly", label: "Weekly benefit", kind: "money", per: "a week, tax-free", known: 1_097 },
+      { id: "std-weeks", label: "Maximum length", kind: "count", per: "weeks" },
+      { id: "std-wait", label: "Waiting period", kind: "count", per: "days before it starts" },
+    ],
+  },
+  {
+    benefit: "health",
+    title: "Extended health",
+    limits: [
+      { id: "eh-massage", label: "Massage therapy", kind: "money", per: "a year" },
+      { id: "eh-physio", label: "Physiotherapy", kind: "money", per: "a year" },
+      { id: "eh-chiro", label: "Chiropractor", kind: "money", per: "a year" },
+      { id: "eh-psych", label: "Psychologist or social worker", kind: "money", per: "a year" },
+      { id: "eh-reimb", label: "Reimbursement rate", kind: "percent", per: "of eligible costs" },
+      { id: "eh-eye-exam", label: "Eye exam", kind: "money", per: "per 24 months" },
+      { id: "eh-glasses", label: "Glasses or contacts", kind: "money", per: "per 24 months" },
+      { id: "eh-hearing", label: "Hearing aids", kind: "money", per: "per 5 years" },
+      { id: "eh-travel", label: "Emergency medical abroad", kind: "money", per: "lifetime maximum" },
+      { id: "eh-travel-days", label: "Days covered per trip", kind: "count", per: "days" },
+    ],
+  },
+  {
+    benefit: "drugs",
+    title: "Prescription drugs",
+    limits: [
+      { id: "drug-reimb", label: "Reimbursement rate", kind: "percent", per: "of each prescription" },
+      { id: "drug-max", label: "Yearly maximum", kind: "money", per: "a year", hint: "Many plans have none" },
+    ],
+  },
+  {
+    benefit: "dental",
+    title: "Dental",
+    limits: [
+      { id: "dent-basic", label: "Basic care (cleanings, fillings)", kind: "percent", per: "covered" },
+      { id: "dent-major", label: "Major care (crowns, bridges)", kind: "percent", per: "covered" },
+      { id: "dent-max", label: "Yearly maximum", kind: "money", per: "a year" },
+      { id: "dent-recall", label: "Cleanings and checkups", kind: "count", per: "months between visits" },
+      { id: "dent-ortho", label: "Orthodontics", kind: "money", per: "lifetime" },
+    ],
+  },
+  {
+    benefit: "life",
+    title: "Life and accident",
+    limits: [
+      { id: "life-basic", label: "Basic life", kind: "money", per: "paid once", known: 160_000 },
+      { id: "life-add", label: "Accidental death & dismemberment", kind: "money", per: "paid once, on top, for accidents", known: 200_000 },
+      { id: "life-optional", label: "Optional life", kind: "money", per: "not taken", known: 0 },
+      { id: "life-ci", label: "Critical illness", kind: "money", per: "not taken", known: 0 },
+    ],
+  },
+  {
+    benefit: "lsa",
+    title: "Spending accounts",
+    limits: [
+      { id: "lsa-year", label: "Lifestyle Spending Account", kind: "money", per: "a year", known: LSA_YEARLY },
+      { id: "hsa-year", label: "Health Spending Account", kind: "money", per: "a year, no flex dollars put in", known: 0 },
+    ],
+  },
+];

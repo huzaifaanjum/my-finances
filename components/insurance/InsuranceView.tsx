@@ -6,6 +6,7 @@ import { usePlan } from "@/components/providers/PlannerProvider";
 import Card from "@/components/ui/Card";
 import { Kpi, KpiGrid } from "@/components/ui/Kpi";
 import SeeAlso from "@/components/ui/SeeAlso";
+import ClaimLimits from "./ClaimLimits";
 import { Legend, Note, SectionHeading } from "@/components/ui/text";
 import { benefit, BENEFITS, COSTS, LSA_CATEGORIES, LSA_IDEAS, LSA_MONTHLY, LSA_YEARLY, PREMIUM_TAX, STATEMENT_DATE, type Benefit } from "@/lib/benefits";
 import { money, percent } from "@/lib/format";
@@ -153,6 +154,8 @@ export default function InsuranceView() {
           ))}
         </div>
       </section>
+
+      <ClaimLimits />
 
       <div className="irow">
         <Card title="Who pays for what" description="Monthly price of each benefit, split between you, Air Canada and Quebec's 9% premium tax.">
