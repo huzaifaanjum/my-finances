@@ -18,7 +18,13 @@ function client(): Promise<MongoClient> {
  * One small collection holds every document:
  *   _id "main"      -> { state, updatedAt }   planner numbers
  *   _id "knowledge" -> { read: { [ruleId]: timestamp } }   checklist progress
+ *   _id "payslip-vault" -> { salt, iterations, wrapped, authHash, ... }   payslip password check
  */
 export async function stateCollection(): Promise<Collection<Document>> {
   return (await client()).db("planner").collection("state");
+}
+
+/** One document per payslip: { _id, data, file?, createdAt, updatedAt }, all encrypted in the browser. */
+export async function payslipCollection(): Promise<Collection<Document>> {
+  return (await client()).db("planner").collection("payslips");
 }
