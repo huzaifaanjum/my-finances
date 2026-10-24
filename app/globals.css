@@ -1302,3 +1302,20 @@ button.bd-need:hover{border-color:var(--mute)}
 .ph-tag{flex:1;font-size:12px;color:var(--mute)}
 .ph-row.now .ph-tag{color:var(--std);font-weight:600}
 .ph-row.was .mi input,.ph-row.was .ot-date{color:var(--mute)}
+/* budget: biggest levers */
+.lv{list-style:none;margin:0;padding:0;display:grid}
+.lv li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:14px;padding:11px 0;border-top:1px solid #1d1d21}
+.lv li:first-child{border-top:0;padding-top:2px}
+.lv-main{display:grid;gap:3px;min-width:0}
+.lv-main b{font-size:13.5px;font-weight:500;line-height:1.35}
+.lv-main small{font-size:12px;color:var(--mute)}
+.lv-bar{display:block;height:3px;border-radius:2px;background:#1d1d21;margin-top:4px;overflow:hidden}
+.lv-bar i{display:block;height:100%;background:var(--std);border-radius:2px}
+.lv-gain{display:grid;text-align:right;font-variant-numeric:tabular-nums}
+.lv-gain b{font-size:15px;font-weight:600;color:var(--std)}
+.lv-gain small{font-size:11.5px;color:var(--mute)}
+.lv-btn{flex:none;min-width:78px;background:none;border:1px solid var(--line);border-radius:8px;color:var(--text);font:inherit;font-size:12.5px;padding:6px 10px;cursor:pointer}
+.lv-btn:hover{border-color:var(--mute)}
+.lv li.on .lv-btn{border-color:var(--std);color:var(--std)}
+.lv li.on .lv-main b::after{content:" · in your plan";font-weight:400;color:var(--std);font-size:12px}
+@media (max-width:520px){.lv li{grid-template-columns:minmax(0,1fr) auto}.lv-btn{grid-column:1/-1;justify-self:start}}

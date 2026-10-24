@@ -8,10 +8,9 @@ import type { PlannerState } from "@/lib/planner/types";
 import BudgetBar from "./BudgetBar";
 import ExpensesEditor from "./ExpensesEditor";
 import IncomeEditor from "./IncomeEditor";
+import LeversCard from "./LeversCard";
 import NeedsWantsBar from "./NeedsWantsBar";
 import ProjectionPanel from "./ProjectionPanel";
-import WhatIfCard from "./WhatIfCard";
-import YearByYearCard from "./YearByYearCard";
 
 /** The chart range is a view setting, not a change to the plan. */
 const withHorizon = (s: PlannerState, horizon: number): PlannerState => ({ ...s, numbers: { ...s.numbers, horizon } });
@@ -51,8 +50,7 @@ export default function PlanView() {
           onUndo={() => replaceState(withHorizon(start, horizon))}
           onKeep={() => setStart(state)}
         />
-        <WhatIfCard />
-        <YearByYearCard />
+        <LeversCard start={start} />
       </div>
 
       <div className="pl-strip" aria-hidden="true">
