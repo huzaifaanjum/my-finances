@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { usePlan } from "@/components/providers/PlannerProvider";
 import Card from "@/components/ui/Card";
 import { money, percent } from "@/lib/format";
@@ -32,11 +32,25 @@ function Bar({ value, max, color, neg }: { value: number; max: number; color: st
 }
 
 /** Every month (or quarter or year): money in, money out, what was saved, the tightest day and the balance. */
-export default function MonthTable() {
+export default function MonthTable({ focus }: { focus?: { i: number; n: number } | null }) {
   const plan = usePlan();
   const [by, setBy] = useState<Grouping>("month");
   const [filter, setFilter] = useState<Filter>("all");
   const [open, setOpen] = useState<number | null>(null);
+  const wrap = useRef<HTMLDivElement>(null);
+
+  // a month picked on the calendar opens here, in the monthly view
+  useEffect(() => {
+    if (!focus) return;
+    setBy("month");
+    setFilter("all");
+    setOpen(focus.i);
+    requestAnimationFrame(() => {
+      const row = wrap.current?.querySelector<HTMLElement>(`[data-i="${focus.i}"]`);
+      row?.scrollIntoView({ behavior: "smooth", block: "center" });
+      row?.focus({ preventScroll: true });
+    });
+  }, [focus]);
 
   const monthly = useMemo(() => monthlyLedger(plan), [plan]);
   const rows = useMemo(() => groupLedger(monthly, by, plan.exp.total), [monthly, by, plan.exp.total]);
@@ -71,9 +85,9 @@ export default function MonthTable() {
       header={
         <div className="ps-head">
           <div>
-            <h3>Cash flow ledger</h3>
+            <h3>Ledger</h3>
             <p className="d">
-              Money in, money out and what is left, {by === "month" ? "month by month" : by === "quarter" ? "by quarter" : "by year"}. Tap a row for the details.
+              Every {by === "month" ? "month" : by}: money in, money out, what you saved and where the balance ends. Tap a row for the full breakdown.
             </p>
           </div>
           <div className="ps-row">
@@ -91,36 +105,6 @@ export default function MonthTable() {
         </div>
       }
     >
-      <div className="cf-sum">
-        <div>
-          <span>Money in</span>
-          <b>{money(income)}</b>
-          <small>
-            {money(totals.pay)} pay + {money(totals.extraIn)} bonuses and one-time
-          </small>
-        </div>
-        <div>
-          <span>Money out</span>
-          <b>{money(totals.spending)}</b>
-          <small>expenses and one-time costs</small>
-        </div>
-        <div className="pos">
-          <span>Saved</span>
-          <b>{money(totals.saved)}</b>
-          <small>{income ? `${percent(totals.saved / income)} of what came in` : ""}</small>
-        </div>
-        <div className={plan.low.bal < 0 ? "neg" : plan.low.bal < TIGHT ? "warn" : "pos"}>
-          <span>Tightest day</span>
-          <b>{money(plan.low.bal)}</b>
-          <small>{tightCount ? `${tightCount} ${by === "month" ? "month" : by}${tightCount === 1 ? "" : "s"} under ${money(TIGHT)}` : "never under $500"}</small>
-        </div>
-        <div>
-          <span>Ending balance</span>
-          <b>{money(last.balance)}</b>
-          <small>{last.cover.toFixed(1)} months of expenses covered</small>
-        </div>
-      </div>
-
       <div className="cf-filters" role="group" aria-label="Show">
         {(
           [
@@ -135,7 +119,7 @@ export default function MonthTable() {
         ))}
       </div>
 
-      <div className="cf-scroll">
+      <div className="cf-scroll" ref={wrap}>
         <table className="cf-t">
           <thead>
             <tr>
@@ -176,6 +160,7 @@ export default function MonthTable() {
                     tabIndex={0}
                     onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setOpen(isOpen ? null : r.i))}
                     aria-expanded={isOpen}
+                    data-i={r.i}
                   >
                     <td className="cf-m">
                       <b>{r.label}</b>
@@ -257,7 +242,7 @@ export default function MonthTable() {
 }
 
 /** The breakdown under a row: where the money came from and went, and what happened. */
-function Detail({ r }: { r: LedgerRow }) {
+export function Detail({ r }: { r: LedgerRow }) {
   if (r.start) {
     return (
       <div className="cf-d">

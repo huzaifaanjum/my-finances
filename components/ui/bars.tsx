@@ -40,14 +40,3 @@ export function SegmentBar({
     </div>
   );
 }
-
-/** Two-part mini bar used in the monthly table. Widths are fractions. */
-export function MiniBar({ parts }: { parts: { value: number; color: string }[] }) {
-  return (
-    <div className="mini">
-      {parts.map((p, i) => (
-        <i key={i} style={{ width: `${p.value * 100}%`, background: p.color }} />
-      ))}
-    </div>
-  );
-}

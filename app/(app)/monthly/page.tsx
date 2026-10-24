@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Cash flow" };
 
 export default function MonthlyPage() {
   return (
-    <PageShell title="Cash flow" subtitle="What you save each month, where it comes from, and how your balance builds.">
+    <PageShell title="Cash flow" subtitle="Money in, money out and what you keep: the totals for the range you pick, the shape of the year, then every month in detail.">
       <MonthlyView />
     </PageShell>
   );

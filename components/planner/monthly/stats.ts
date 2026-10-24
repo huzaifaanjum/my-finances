@@ -12,8 +12,3 @@ export function monthlyStats(rows: MonthRow[]) {
     bonusMonths: rows.filter((r) => r.extra > 0).length,
   };
 }
-
-/** How many labels fit along the x axis. */
-export function labelStep(count: number, plotWidth: number): number {
-  return Math.max(1, Math.ceil(count / Math.max(2, Math.floor(plotWidth / (count <= 12 ? 34 : 52)))));
-}
