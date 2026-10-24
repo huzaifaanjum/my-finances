@@ -1,24 +1,56 @@
 // Converts between PlannerState and the shape stored in MongoDB.
 // The stored shape predates the React rewrite: `v` is keyed by the old input ids, so existing saves keep loading.
+import { isoDate, planDay } from "./calendar";
 import { EXPENSE_GROUPS, FLAGS, HORIZONS, SLIDERS, type FlagKey, type SliderKey } from "./config";
-import { ONE_TIME_MONTHS } from "./defaults";
-import type { OneTimeItem, PlannerState } from "./types";
+import { defaultExpenses, incentiveItem, nextId, ONE_TIME_MONTHS, signingItems } from "./defaults";
+import type { IncomeTag, OneTimeItem, PlannerState, RecurringExpense, RecurringIncome } from "./types";
+
+/** Saves before version 2 kept expenses as fixed sliders, the bonuses as numbers and one-time items by month. */
+const VERSION = 2;
 
 interface SavedItem {
   id: number;
   n: string;
   a: number;
+  /** ISO date (version 2) */
+  d?: string;
+  /** plan month (version 1) */
+  m?: number;
+  t?: IncomeTag;
+  on?: boolean;
+}
+
+interface SavedIncome {
+  id: number;
+  n: string;
+  a: number;
+  ev: 1 | 12;
   m: number;
-  on: boolean;
+  t?: IncomeTag;
+}
+
+interface SavedExpense {
+  id: string;
+  n: string;
+  a: number;
+  ev: number;
+  g: number;
+  nd: boolean;
 }
 
 export interface SavedState {
+  ver?: number;
   v: Record<string, string | number | boolean>;
+  ri?: SavedIncome[];
+  re?: SavedExpense[];
   oo: SavedItem[];
   ox: SavedItem[];
 }
 
 const expenseKey = (g: number, i: number) => `e${g}_${i}`;
+const MAX_AMOUNT = 10_000_000;
+const amountOf = (raw: unknown) => Math.min(MAX_AMOUNT, Math.max(0, Number(raw) || 0));
+const tagOf = (raw: unknown): IncomeTag | undefined => (raw === "signing" || raw === "incentive" ? raw : undefined);
 
 export function toSaved(s: PlannerState): SavedState {
   const v: SavedState["v"] = {};
@@ -27,9 +59,15 @@ export function toSaved(s: PlannerState): SavedState {
   v.hz = s.numbers.horizon;
   v.tfsa = s.numbers.tfsa;
   v.fhsa = s.numbers.fhsa;
-  s.expenses.forEach((g, gi) => g.forEach((amt, ii) => (v[expenseKey(gi, ii)] = amt)));
-  const out = (o: OneTimeItem): SavedItem => ({ id: o.id, n: o.name, a: o.amount, m: o.month, on: o.on });
-  return { v, oo: s.oneTime.income.map(out), ox: s.oneTime.expense.map(out) };
+  const out = (o: OneTimeItem): SavedItem => ({ id: o.id, n: o.name, a: o.amount, d: o.date, m: o.month, ...(o.tag && { t: o.tag }) });
+  return {
+    ver: VERSION,
+    v,
+    ri: s.income.map((o) => ({ id: o.id, n: o.name, a: o.amount, ev: o.every, m: o.month, ...(o.tag && { t: o.tag }) })),
+    re: s.expenses.map((e) => ({ id: e.id, n: e.name, a: e.amount, ev: e.every, g: e.group, nd: e.need })),
+    oo: s.oneTime.income.map(out),
+    ox: s.oneTime.expense.map(out),
+  };
 }
 
 /** Snap to the slider's step and range, the way a browser range input would. */
@@ -44,25 +82,57 @@ function readNumber(raw: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+const ISO = /^\d{4}-\d{2}-\d{2}$/;
+
+/** A one-time item; version 1 items only had a month, so they land on its payday (the 1st for "now"). */
 function readItems(raw: unknown): OneTimeItem[] {
   if (!Array.isArray(raw)) return [];
-  return raw.map((o: Partial<SavedItem>) => ({
+  return raw.map((o: Partial<SavedItem>) => {
+    let date: string;
+    if (typeof o.d === "string" && ISO.test(o.d)) date = o.d;
+    else {
+      const m = Math.max(0, Math.min(ONE_TIME_MONTHS - 1, Number(o.m) || 0));
+      date = m ? isoDate(m) : isoDate(0, 1);
+    }
+    const { i } = planDay(date, ONE_TIME_MONTHS - 1);
+    return { id: Number(o.id) || 0, name: String(o.n ?? ""), amount: amountOf(o.a), date, month: i, ...(tagOf(o.t) && { tag: tagOf(o.t) }) };
+  });
+}
+
+function readIncome(raw: unknown): RecurringIncome[] | null {
+  if (!Array.isArray(raw)) return null;
+  return raw.map((o: Partial<SavedIncome>) => ({
     id: Number(o.id) || 0,
     name: String(o.n ?? ""),
-    amount: Math.max(0, Number(o.a) || 0),
-    month: Math.max(0, Math.min(ONE_TIME_MONTHS - 1, Number(o.m) || 0)),
-    on: !!o.on,
+    amount: amountOf(o.a),
+    every: o.ev === 12 ? 12 : 1,
+    month: Math.max(0, Math.min(11, Math.round(Number(o.m) || 0))),
+    ...(tagOf(o.t) && { tag: tagOf(o.t) }),
+  }));
+}
+
+function readExpenses(raw: unknown): RecurringExpense[] | null {
+  if (!Array.isArray(raw)) return null;
+  return raw.map((e: Partial<SavedExpense>, k) => ({
+    id: String(e.id ?? `x${k}`),
+    name: String(e.n ?? ""),
+    amount: amountOf(e.a),
+    every: Math.max(1, Math.min(12, Math.round(Number(e.ev) || 1))),
+    group: Math.max(0, Math.min(EXPENSE_GROUPS.length - 1, Math.round(Number(e.g) || 0))),
+    need: !!e.nd,
   }));
 }
 
 /** Applies a saved copy on top of `base`. Unknown or invalid values keep the base value. */
 export function fromSaved(raw: unknown, base: PlannerState): PlannerState {
-  const saved = (raw ?? {}) as Partial<SavedState>;
+  if (!raw || typeof raw !== "object") return base;
+  const saved = raw as Partial<SavedState>;
   const v = saved.v ?? {};
   const next: PlannerState = {
     numbers: { ...base.numbers },
     flags: { ...base.flags },
-    expenses: base.expenses.map((g) => [...g]),
+    income: base.income.map((o) => ({ ...o })),
+    expenses: base.expenses.map((e) => ({ ...e })),
     oneTime: { income: readItems(saved.oo), expense: readItems(saved.ox) },
   };
 
@@ -82,11 +152,24 @@ export function fromSaved(raw: unknown, base: PlannerState): PlannerState {
     if (n !== null) next.numbers[k] = Math.max(0, n);
   });
 
+  if (saved.ver === VERSION) {
+    next.income = readIncome(saved.ri) ?? next.income;
+    next.expenses = readExpenses(saved.re) ?? next.expenses;
+    return next;
+  }
+
+  // version 1: expense sliders, the signing bonus and incentive as numbers
+  next.expenses = defaultExpenses();
+  let k = 0;
   EXPENSE_GROUPS.forEach((g, gi) =>
-    g.items.forEach((it, ii) => {
+    g.items.forEach((_, ii) => {
       const n = readNumber(v[expenseKey(gi, ii)]);
-      if (n !== null) next.expenses[gi][ii] = clampToSlider(n, 0, it.max, it.step);
+      if (n !== null) next.expenses[k].amount = Math.max(0, n);
+      k++;
     }),
   );
+  next.income = next.flags.aip ? [incentiveItem(next.numbers.aipAmt, 1)] : [];
+  if (next.numbers.sign > 0) next.oneTime.income.push(...signingItems(next.numbers.sign, nextId(next.oneTime.income)));
   return next;
 }
+

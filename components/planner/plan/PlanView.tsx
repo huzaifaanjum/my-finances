@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { usePlanner } from "@/components/providers/PlannerProvider";
-import { PlannerCheckbox, PlannerSlider } from "@/components/planner/shared/controls";
 import { deltaMoney, money } from "@/lib/format";
 import { buildPlan } from "@/lib/planner/projection";
 import type { PlannerState } from "@/lib/planner/types";
+import BudgetBar from "./BudgetBar";
 import ExpensesEditor from "./ExpensesEditor";
-import OneTimeList from "./OneTimeList";
+import IncomeEditor from "./IncomeEditor";
+import NeedsWantsBar from "./NeedsWantsBar";
 import ProjectionPanel from "./ProjectionPanel";
 import WhatIfCard from "./WhatIfCard";
 import YearByYearCard from "./YearByYearCard";
@@ -28,23 +29,17 @@ export default function PlanView() {
   return (
     <div className="planlay">
       <div className="pl-in">
+        <BudgetBar />
+
         <section>
           <h2>Income</h2>
-          <div className="stack">
-            <PlannerSlider k="net" />
-            <PlannerSlider k="start" />
-            <PlannerSlider k="lump" />
-            <PlannerSlider k="sign" />
-            <PlannerSlider k="aipAmt" />
-            <PlannerCheckbox k="aip" label="Include the annual incentive bonus" />
-            <OneTimeList kind="income" />
-          </div>
+          <IncomeEditor />
         </section>
 
-        <section className="exp-col">
+        <section>
           <h2>Expenses</h2>
+          <NeedsWantsBar />
           <ExpensesEditor />
-          <OneTimeList kind="expense" />
         </section>
       </div>
 

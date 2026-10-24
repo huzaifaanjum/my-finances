@@ -2,7 +2,7 @@
 import { LSA_YEARLY } from "@/lib/benefits";
 import { money, percent } from "@/lib/format";
 import { dayLabel } from "./calendar";
-import { EMPLOYER_HEALTH, INCOME_STREAMS, SALARY, TAKE_HOME_PER_GROSS, type ExpenseId, type StreamKey } from "./config";
+import { EMPLOYER_HEALTH, INCOME_STREAMS, SALARY, TAKE_HOME_PER_GROSS, type StreamKey } from "./config";
 import type { Plan } from "./projection";
 
 /** Month index when savings cover 3 months of costs (-1 if never), and the share of savings that comes from bonuses. */
@@ -13,7 +13,7 @@ export function safetyNet(plan: Plan) {
   };
 }
 
-const spentOn = (plan: Plan, ids: ExpenseId[]) =>
+const spentOn = (plan: Plan, ids: string[]) =>
   plan.exp.categories.filter((c) => ids.includes(c.id)).reduce((t, c) => t + c.monthly, 0);
 
 /* ---------- health check ---------- */

@@ -7,7 +7,9 @@ import { usePlan } from "@/components/providers/PlannerProvider";
 import { money, percent } from "@/lib/format";
 import { basePayFor } from "@/lib/payslips/basePay";
 import { dayLabel, monthDate } from "@/lib/planner/calendar";
+import { PAY } from "@/lib/pay";
 import { monthlyLedger } from "@/lib/planner/cashflow";
+import { taggedAt, yearlyAt } from "@/lib/planner/projection";
 
 /** Ranges that make sense month by month. */
 const MONTHLY_HORIZONS = [3, 6, 12, 24, 36, 60] as const;
@@ -60,8 +62,10 @@ export default function CashFlowSummary() {
   const ref = useReferencePayslip();
 
   // bonuses on switches, starting from what your plan includes
-  const [signingOn, setSigningOn] = useState(state.numbers.sign > 0);
-  const [incentiveOn, setIncentiveOn] = useState(state.flags.aip);
+  const planSigning = state.oneTime.income.some((o) => o.tag === "signing" && o.amount > 0);
+  const planIncentive = state.income.some((o) => o.tag === "incentive" && o.amount > 0);
+  const [signingOn, setSigningOn] = useState(planSigning);
+  const [incentiveOn, setIncentiveOn] = useState(planIncentive);
 
   // every payday in the range: one per month, the starting month included
   const paydays = useMemo(() => ledger.map((r) => ({ year: monthDate(r.i).getFullYear(), month: monthDate(r.i).getMonth() })), [ledger]);
@@ -69,9 +73,13 @@ export default function CashFlowSummary() {
 
   // the budget's months (the starting month holds what you have now)
   const takeHome = flows.reduce((t, r) => t + r.pay, 0);
-  const signingNet = flows.filter((r) => r.i === 4 || r.i === 10).length * state.numbers.sign;
-  const incentiveNet = flows.filter((r) => r.i % 12 === 5).length * state.numbers.aipAmt;
-  const oneTimeIn = flows.reduce((t, r) => t + state.oneTime.income.filter((o) => o.on && o.month === r.i).reduce((a, o) => a + o.amount, 0), 0);
+  const signingNet = flows.reduce((t, r) => t + taggedAt(state, r.i, "signing"), 0);
+  // not in the plan: what the first incentive would add each March
+  const incentiveNet = planIncentive
+    ? flows.reduce((t, r) => t + yearlyAt(state, r.i, "incentive"), 0)
+    : flows.filter((r) => monthDate(r.i).getMonth() === 2).length * PAY.firstAipNet;
+  // one-time and yearly income other than the bonuses
+  const oneTimeIn = flows.reduce((t, r) => t + r.extraIn, 0) - signingNet - (planIncentive ? incentiveNet : 0);
   const expenses = flows.reduce((t, r) => t + r.expenses, 0);
   const oneOff = flows.reduce((t, r) => t + r.extraOut, 0);
   const bonusIn = (signingOn ? signingNet : 0) + (incentiveOn ? incentiveNet : 0);
@@ -81,7 +89,7 @@ export default function CashFlowSummary() {
   const rate = income ? saved / income : 0;
 
   // the ledger follows your plan; adjust its end for any bonus switched differently here
-  const planBonus = signingNet + (state.flags.aip ? incentiveNet : 0);
+  const planBonus = signingNet + (planIncentive ? incentiveNet : 0);
   const shift = bonusIn - planBonus;
   const first = ledger[0];
   const last = ledger[ledger.length - 1];
@@ -165,13 +173,13 @@ export default function CashFlowSummary() {
           <Bar parts={budgetParts} total={income} guide />
           <p className="cs-note">
             Money in: {money(takeHome)} take-home
-            {oneTimeIn > 0 && ` + ${money(oneTimeIn)} one-time`}
+            {oneTimeIn > 0 && ` + ${money(oneTimeIn)} other income`}
             {bonusIn > 0 && ` + ${money(bonusIn)} bonuses after tax`}. You keep{" "}
             <b className={rate >= GUIDE ? "pos" : "warn"}>
               {money(saved)} ({percent(rate)})
             </b>
             {rate >= GUIDE ? ", above the 20% guideline." : ", below the 20% guideline."}
-            {!state.flags.aip && incentiveOn && " The incentive is on here only; switch it on in Budget to plan with it."}
+            {!planIncentive && incentiveOn && " The incentive is on here only; add it to your recurring income in Budget to plan with it."}
           </p>
         </div>
 

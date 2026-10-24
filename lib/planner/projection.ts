@@ -1,9 +1,11 @@
-import { EXPENSE_GROUPS, horizonLabel, type ExpenseId } from "./config";
-import { daysInPlanMonth, monthDate, monthLabel } from "./calendar";
-import type { DayPoint, MonthRow, PlannerState } from "./types";
+import { horizonLabel } from "./config";
+import { daysInPlanMonth, monthDate, monthLabel, planDay } from "./calendar";
+import { ONE_TIME_MONTHS } from "./defaults";
+import type { DayPoint, IncomeTag, MonthRow, OneTimeItem, PlannerState, RecurringExpense } from "./types";
 
 export interface Category {
-  id: ExpenseId;
+  /** built-in lines keep ids like "rent"; ones you add get new ids */
+  id: string;
   name: string;
   monthly: number;
   group: number;
@@ -21,30 +23,43 @@ export interface ExpenseSummary {
   categories: Category[];
 }
 
-export function summarizeExpenses(expenses: number[][]): ExpenseSummary {
-  const categories: Category[] = [];
-  const groups = EXPENSE_GROUPS.map((g, gi) =>
-    g.items.reduce((sum, it, ii) => {
-      const monthly = (expenses[gi]?.[ii] ?? 0) / it.every;
-      categories.push({ id: it.id, name: it.name, monthly, group: gi, need: it.need });
-      return sum + monthly;
-    }, 0),
-  );
+export const GROUP_COUNT = 3;
+
+export function summarizeExpenses(expenses: RecurringExpense[]): ExpenseSummary {
+  const groups = Array.from({ length: GROUP_COUNT }, () => 0);
+  const categories: Category[] = expenses.map((e) => {
+    const monthly = e.amount / (e.every || 1);
+    groups[e.group] += monthly;
+    return { id: e.id, name: e.name, monthly, group: e.group, need: e.need };
+  });
   const fixed = groups[0] + groups[1];
   return { total: fixed + groups[2], groups, fixed, variable: groups[2], categories };
 }
 
-/** Signing payments arrive in Feb and Aug 2027; the incentive each March when switched on. */
+/** Plan month and day a one-time item lands on. */
+export const landsOn = (o: OneTimeItem) => planDay(o.date, ONE_TIME_MONTHS - 1);
+
+/** Monthly recurring income on top of take-home pay. */
+export const monthlyExtra = (s: PlannerState) => s.income.reduce((t, o) => t + (o.every === 1 ? o.amount : 0), 0);
+
+/** Yearly recurring income landing in plan month i (optionally only one tag). */
+export function yearlyAt(s: PlannerState, i: number, tag?: IncomeTag): number {
+  const month = monthDate(i).getMonth();
+  return s.income.reduce((t, o) => t + (o.every === 12 && o.month === month && (!tag || o.tag === tag) ? o.amount : 0), 0);
+}
+
+/** One-time income with a tag (the signing bonus) in plan month i. */
+export const taggedAt = (s: PlannerState, i: number, tag: IncomeTag) =>
+  s.oneTime.income.reduce((t, o) => t + (o.month === i && o.tag === tag ? o.amount : 0), 0);
+
+/** Yearly income in month i: the incentive and anything else you pay yourself once a year. */
 export function bonusAt(s: PlannerState, i: number): number {
-  const sign = i === 4 || i === 10 ? s.numbers.sign : 0;
-  const aip = i % 12 === 5 && s.flags.aip ? s.numbers.aipAmt : 0;
-  return sign + aip;
+  return yearlyAt(s, i);
 }
 
 /** One-time payments minus one-time expenses that land in month i. */
 export function oneTimeNet(s: PlannerState, i: number): number {
-  const sum = (list: PlannerState["oneTime"]["income"]) =>
-    list.reduce((t, o) => t + (o.on && o.month === i ? o.amount : 0), 0);
+  const sum = (list: OneTimeItem[]) => list.reduce((t, o) => t + (o.month === i ? o.amount : 0), 0);
   return sum(s.oneTime.income) - sum(s.oneTime.expense);
 }
 
@@ -68,16 +83,27 @@ export function project(s: PlannerState, months: number, monthlyDeposit: number)
  */
 export function dailyBalance(s: PlannerState, exp: ExpenseSummary, months: number): DayPoint[] {
   const pts: DayPoint[] = [];
-  let bal = exp.total + s.numbers.start + s.numbers.lump + oneTimeNet(s, 0);
+  // one-time money lands on its own date
+  const onDay = new Map<string, number>();
+  const add = (o: OneTimeItem, sign: number) => {
+    const { i, d } = landsOn(o);
+    onDay.set(`${i}-${d}`, (onDay.get(`${i}-${d}`) ?? 0) + sign * o.amount);
+  };
+  s.oneTime.income.forEach((o) => add(o, 1));
+  s.oneTime.expense.forEach((o) => add(o, -1));
+  const pay = s.numbers.net + monthlyExtra(s);
+
+  let bal = exp.total + s.numbers.start + s.numbers.lump;
   for (let i = 0; i < months; i++) {
     const dim = daysInPlanMonth(i);
     const bonus = bonusAt(s, i);
     for (let d = 1; d <= dim; d++) {
       if (d === 1) bal -= exp.fixed;
       bal -= exp.variable / dim;
+      bal += onDay.get(`${i}-${d}`) ?? 0;
       if (d === dim) {
         pts.push({ bal, i, d, pay: false });
-        bal += s.numbers.net + bonus + (i ? oneTimeNet(s, i) : 0);
+        bal += pay + bonus;
       }
       pts.push({ bal, i, d, pay: d === dim });
     }
@@ -121,7 +147,8 @@ export interface Plan {
 }
 
 export function buildPlan(state: PlannerState): Plan {
-  const net = state.numbers.net;
+  // take-home plus any other monthly income
+  const net = state.numbers.net + monthlyExtra(state);
   const months = state.numbers.horizon;
   const exp = summarizeExpenses(state.expenses);
   const left = net - exp.total;

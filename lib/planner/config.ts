@@ -120,7 +120,7 @@ export const EXPENSE_GROUPS: ExpenseGroup[] = [
     color: "var(--std)",
     items: [
       item("rent", "Rent", 2075, 4000, 25, true),
-      item("electricity", "Electricity (bill every 2 months)", 90, 400, 5, true, 2, "Electricity"),
+      item("electricity", "Electricity", 45, 400, 5, true),
       item("phone", "Phone", 135, 300, 5, true),
       item("transit", "Opus Metro pass", 160, 300, 5, true),
       item("wifi", "Wi-Fi", 50, 150, 5, true),
@@ -142,7 +142,7 @@ export const EXPENSE_GROUPS: ExpenseGroup[] = [
   {
     title: "Variable expenses",
     color: "var(--promo)",
-    note: "These amounts are placeholders. Move the sliders to your real spending.",
+    note: "Estimates to start with: replace them with what you really spend.",
     items: [
       item("groceries", "Groceries", 450, 1200, 10, true),
       item("eatingOut", "Eating out", 150, 800, 10),

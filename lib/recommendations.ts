@@ -56,7 +56,7 @@ export interface RecContext {
 }
 
 export function recContext(plan: Plan): RecContext {
-  const card = plan.state.oneTime.expense.filter((o) => o.on && /credit|card/i.test(o.name)).reduce((t, o) => t + o.amount, 0);
+  const card = plan.state.oneTime.expense.filter((o) => /credit|card/i.test(o.name)).reduce((t, o) => t + o.amount, 0);
   return { year: new Date().getFullYear(), cardDebt: card, rent: plan.rent, net: plan.net, safetyNet: plan.exp.total * 3, subs: plan.exp.groups[1] ?? 0 };
 }
 

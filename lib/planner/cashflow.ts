@@ -59,12 +59,11 @@ export function monthlyLedger(plan: Plan): LedgerRow[] {
   const { rows, exp, net, state, days } = plan;
   const lowByMonth = new Map<number, number>();
   for (const d of days) lowByMonth.set(d.i, Math.min(lowByMonth.get(d.i) ?? Infinity, d.bal));
-  const items = (kind: "income" | "expense", i: number) => state.oneTime[kind].filter((o) => o.on && o.month === i);
+  const items = (kind: "income" | "expense", i: number) => state.oneTime[kind].filter((o) => o.month === i);
   const milestones = MILESTONES(exp.total);
 
   return rows.map((r, k) => {
     const start = r.i === 0;
-    const sign = r.i === 4 || r.i === 10 ? state.numbers.sign : 0;
     const bonus = bonusAt(state, r.i);
     const oneIn = items("income", r.i).reduce((t, o) => t + o.amount, 0);
     const oneOut = items("expense", r.i).reduce((t, o) => t + o.amount, 0);
@@ -75,9 +74,11 @@ export function monthlyLedger(plan: Plan): LedgerRow[] {
     const prev = k === 0 ? r.balance - r.deposit : rows[k - 1].balance;
 
     const events: LedgerEvent[] = [];
-    if (sign) events.push({ label: "Signing bonus", kind: "bonus" });
-    if (bonus - sign > 0) events.push({ label: "Incentive", kind: "bonus" });
-    for (const o of items("income", r.i)) events.push({ label: o.name || "One-time income", kind: "income" });
+    const month = monthDate(r.i).getMonth();
+    for (const o of state.income)
+      if (o.every === 12 && o.month === month && o.amount > 0) events.push({ label: o.name || "Yearly income", kind: "bonus" });
+    for (const o of items("income", r.i))
+      events.push({ label: o.tag === "signing" ? "Signing bonus" : o.name || "One-time income", kind: o.tag ? "bonus" : "income" });
     for (const o of items("expense", r.i)) events.push({ label: o.name || "One-time expense", kind: "expense" });
     for (const [name, v] of milestones) if (prev < v && r.balance >= v) events.push({ label: name, kind: "milestone" });
 
