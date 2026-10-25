@@ -5,6 +5,7 @@ import { G, GlossaryScope } from "@/components/glossary/GlossaryText";
 import { COLOR } from "@/lib/colors";
 import { money, percent } from "@/lib/format";
 import { COMP, OFFER } from "@/lib/offer";
+import JobCompare from "./JobCompare";
 
 const DAY = 864e5;
 const START = new Date(`${OFFER.start}T00:00:00`);
@@ -212,6 +213,8 @@ export default function OfferView() {
             </ol>
           </section>
         </div>
+
+        <JobCompare />
 
         <section className="jo-rate" aria-label="Base salary broken down">
           <h2>{money(salary)} a year is</h2>
