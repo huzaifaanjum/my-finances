@@ -5,7 +5,7 @@ import { useState } from "react";
 import { usePlanner } from "@/components/providers/PlannerProvider";
 import { ProgressBar } from "@/components/ui/bars";
 import { money, percent } from "@/lib/format";
-import { templateOf } from "@/lib/planner/goalTemplates";
+import { GOAL_TEMPLATES, templateOf } from "@/lib/planner/goalTemplates";
 import { goalHref, summarizeGoal } from "@/lib/planner/goals";
 import AddGoalDialog from "./AddGoalDialog";
 
@@ -72,7 +72,7 @@ export default function GoalsView() {
         })}
         <button type="button" className="goal-card goal-new" onClick={() => setAdding(true)}>
           <b>+ Add saving goal</b>
-          <span>Home, car, trip, wedding, ring, baby, moving, pet, course, laptop, emergency fund or anything else</span>
+          <span>Pick from {GOAL_TEMPLATES.length} templates: home, car, trip, wedding, PS5, TV, health, FHSA and more, or your own</span>
         </button>
       </div>
 

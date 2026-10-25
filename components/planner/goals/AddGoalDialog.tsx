@@ -7,9 +7,12 @@ import { GOAL_TEMPLATES } from "@/lib/planner/goalTemplates";
 import { goalHref, newGoal } from "@/lib/planner/goals";
 
 const GROUPS: { title: string; kinds: string[] }[] = [
-  { title: "Big purchases", kinds: ["house", "car"] },
+  { title: "Big purchases", kinds: ["house", "car", "furniture", "bike", "tires"] },
+  { title: "Electronics", kinds: ["tech", "tablet", "headphones", "watch", "tv", "soundbar", "ps5", "xbox", "switch2", "handheld", "gamingpc", "vr", "gopro", "camera", "drone"] },
   { title: "Life events", kinds: ["wedding", "ring", "baby", "moving", "pet"] },
-  { title: "Plans and things", kinds: ["trip", "education", "tech", "emergency"] },
+  { title: "Travel and time off", kinds: ["trip", "visit", "holidays", "sabbatical"] },
+  { title: "Health and wellbeing", kinds: ["health", "glasses", "fitness"] },
+  { title: "Money and safety", kinds: ["emergency", "account", "education"] },
   { title: "Anything else", kinds: ["custom"] },
 ];
 
