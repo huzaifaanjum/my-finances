@@ -10,6 +10,7 @@ import { money, percent } from "@/lib/format";
 import { payMarginal } from "@/lib/pay";
 import { useEffect, useState } from "react";
 import { GOV_NAME, latestTuitionCarry, paymentsLeft, type FiledReturn } from "@/lib/taxHistory";
+import TaxPlan from "./TaxPlan";
 import { airCanadaSlip, claimValue, estimateReturn, flexSlip, NO_CLAIMS, SLIP_FIELDS, type Claims, type Slip } from "@/lib/tax2026";
 
 /** Things you can claim, in the order most likely to matter for you. */
@@ -96,7 +97,7 @@ export default function TaxView() {
   useEffect(() => {
     try {
       const v = localStorage.getItem("tx_tab");
-      if (v === "fed" || v === "qc" || v === "overview") setTabState(v);
+      if (v === "fed" || v === "qc" || v === "overview" || v === "plan") setTabState(v);
     } catch {}
   }, []);
   const setTab = (v: Tab) => {
@@ -106,6 +107,7 @@ export default function TaxView() {
     } catch {}
   };
   const r = estimateReturn(slips, claims);
+  const qcValue = r.refund - estimateReturn(slips, { ...claims, qcTuitionCarry: 0 }).refund;
   const fromClaims = r.refund - base.refund;
   const withheld = r.fedWithheld + r.qcWithheld;
   const owed = r.fedTax + r.qcTax;
@@ -133,6 +135,10 @@ export default function TaxView() {
           <button type="button" role="tab" aria-selected={tab === "qc"} onClick={() => setTab("qc")}>
             Quebec
             <small>Revenu Québec · {yearsLabel(state.taxHistory, "qc")}</small>
+          </button>
+          <button type="button" role="tab" aria-selected={tab === "plan"} onClick={() => setTab("plan")}>
+            Your plan
+            <small>steps to get the most back</small>
           </button>
         </div>
 
@@ -500,6 +506,24 @@ export default function TaxView() {
         </section>
 
           </>
+        ) : tab === "plan" ? (
+          <TaxPlan
+            n={{
+              now: r.refund,
+              qcCarryValue: qcValue,
+              qcCarryAmount: claims.qcTuitionCarry,
+              fedCarryAmount: claims.fedTuitionCarry,
+              fedCarryValue: carryValue - qcValue,
+              fhsaValue: estimateReturn(slips, { ...claims, fhsa: claims.fhsa + 8_000 }).refund - r.refund,
+              best: best.refund,
+              rrspRoom,
+              tfsaRoom,
+              hasFhsa,
+              ctcLimit: claims.ctcLimit,
+              paymentsLeft: leftTotal,
+              pastRefunds: state.taxHistory.reduce((x, h) => x + h.refund, 0),
+            }}
+          />
         ) : (
           <GovReturns key={tab} gov={tab} history={state.taxHistory} />
         )}
@@ -522,7 +546,7 @@ export default function TaxView() {
   );
 }
 
-type Tab = "overview" | "fed" | "qc";
+type Tab = "overview" | "plan" | "fed" | "qc";
 
 const yearsLabel = (history: FiledReturn[], gov: "fed" | "qc") => {
   const ys = history.filter((r) => r.gov === gov).map((r) => r.year);
