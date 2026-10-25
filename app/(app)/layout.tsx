@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import GlossaryProvider from "@/components/glossary/GlossaryProvider";
+import MobileGestures from "@/components/layout/MobileGestures";
 import Nav from "@/components/layout/Nav";
 import { PayslipVaultProvider } from "@/components/payslips/PayslipVault";
 import { PlannerProvider } from "@/components/providers/PlannerProvider";
@@ -11,6 +12,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <PayslipVaultProvider>
         <GlossaryProvider>
           <Nav />
+          <MobileGestures />
           {children}
         </GlossaryProvider>
       </PayslipVaultProvider>

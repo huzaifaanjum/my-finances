@@ -67,13 +67,62 @@ export default function Nav() {
   const pathname = usePathname() ?? "/";
   const current = activeRoute(pathname);
   const [open, setOpen] = useState<string | null>(null);
-  const [sheet, setSheet] = useState<string | null>(null);
+  const [sheet, setOpenSheet] = useState<string | null>(null);
+  const [closing, setClosing] = useState(false);
   const ref = useRef<HTMLElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ y: number; t: number; dy: number } | null>(null);
+
+  // closing slides the sheet down first; opening another tab swaps it straight away
+  const setSheet = (next: string | null | ((v: string | null) => string | null)) => {
+    const value = typeof next === "function" ? next(sheet) : next;
+    if (value === null && sheet) {
+      setClosing(true);
+      window.setTimeout(() => {
+        setOpenSheet(null);
+        setClosing(false);
+      }, 180);
+    } else {
+      setClosing(false);
+      setOpenSheet(value);
+      if (value) navigator.vibrate?.(6);
+    }
+  };
+
+  // drag the sheet down to close it
+  const onDragStart = (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse" || (sheetRef.current?.scrollTop ?? 0) > 0) return;
+    drag.current = { y: e.clientY, t: Date.now(), dy: 0 };
+  };
+  const onDragMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    const el = sheetRef.current;
+    if (!d || !el) return;
+    d.dy = Math.max(0, e.clientY - d.y);
+    if (d.dy > 4) {
+      el.style.transition = "none";
+      el.style.transform = `translateY(${d.dy}px)`;
+    }
+  };
+  const onDragEnd = () => {
+    const d = drag.current;
+    const el = sheetRef.current;
+    drag.current = null;
+    if (!d || !el) return;
+    el.style.transition = "";
+    el.style.transform = "";
+    const fast = d.dy / Math.max(1, Date.now() - d.t) > 0.5;
+    if (d.dy > 90 || (fast && d.dy > 30)) {
+      el.style.transform = `translateY(${d.dy}px)`;
+      setSheet(null);
+    }
+  };
 
   // close menus on navigation, outside clicks and Escape
   useEffect(() => {
     setOpen(null);
-    setSheet(null);
+    setOpenSheet(null);
+    setClosing(false);
   }, [pathname]);
   useEffect(() => {
     if (!open) return;
@@ -140,11 +189,21 @@ export default function Nav() {
 
       {openTab?.pages && (
         <>
-          <div className="bsheet-scrim" aria-hidden="true" onClick={() => setSheet(null)} />
-          <div className="bsheet" id="bsheet" role="dialog" aria-label={openTab.label}>
+          <div className={`bsheet-scrim${closing ? " out" : ""}`} aria-hidden="true" onClick={() => setSheet(null)} />
+          <div
+            ref={sheetRef}
+            className={`bsheet${closing ? " out" : ""}`}
+            id="bsheet"
+            role="dialog"
+            aria-label={openTab.label}
+            onPointerDown={onDragStart}
+            onPointerMove={onDragMove}
+            onPointerUp={onDragEnd}
+            onPointerCancel={onDragEnd}
+          >
             <h2>{openTab.label}</h2>
             {openTab.pages.map((p) => (
-              <Link key={p.href} href={p.href} aria-current={p.href === current ? "page" : undefined} onClick={() => setSheet(null)}>
+              <Link key={p.href} href={p.href} aria-current={p.href === current ? "page" : undefined} onClick={() => setOpenSheet(null)}>
                 <b>{p.label}</b>
                 <span>{p.note}</span>
               </Link>
