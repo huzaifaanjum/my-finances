@@ -7,7 +7,7 @@ import Card from "@/components/ui/Card";
 import FloatingTip from "@/components/ui/FloatingTip";
 import { Kpi, KpiGrid } from "@/components/ui/Kpi";
 import RangeControl from "@/components/ui/RangeControl";
-import { Legend, Note, SectionHeading } from "@/components/ui/text";
+import { Legend, Note } from "@/components/ui/text";
 import { useElementWidth } from "@/hooks/useElementWidth";
 import { compactMoney, money, pctLabel } from "@/lib/format";
 import { BUCKETS, MONTHS_LONG } from "@/lib/payslips/analysis";
@@ -136,10 +136,10 @@ export default function PayForecast({ latest, settings, onSettings, pensionSoFar
 
   return (
     <section className="ps-sec">
-      <SectionHeading title="How much you'll make">
-        A forecast built from your latest payslip: raises each January, the yearly incentive each March, the signing bonuses, and payroll plans that stop once
-        their yearly maximum is reached. Pay stops at 65.
-      </SectionHeading>
+      <p className="ps-intro">
+        Built from your latest payslip: raises each January, the yearly incentive each March, the signing bonuses, and payroll plans that stop once their
+        yearly maximum is reached. Pay stops at 65.
+      </p>
 
       <div className="ps-fc">
         <Card

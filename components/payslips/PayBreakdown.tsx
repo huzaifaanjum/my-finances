@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { SegmentBar } from "@/components/ui/bars";
 import Card from "@/components/ui/Card";
-import { KeyValue, Note, SectionHeading } from "@/components/ui/text";
+import { KeyValue, Note } from "@/components/ui/text";
 import { deltaMoney, money, percent } from "@/lib/format";
 import {
   BUCKET_ORDER,
@@ -15,20 +13,13 @@ import {
   pensionLine,
   periodLabel,
   slipBuckets,
-  type Bucket,
 } from "@/lib/payslips/analysis";
-import type { Payslip, PayslipData } from "@/lib/payslips/types";
+import type { Payslip } from "@/lib/payslips/types";
 import Link from "next/link";
 import { LSA_MONTHLY } from "@/lib/benefits";
 import LineByLine from "./LineByLine";
+import type { Mode } from "./PayHero";
 
-type Mode = "latest" | "average" | "total";
-
-const MODES: { id: Mode; label: string }[] = [
-  { id: "latest", label: "Latest" },
-  { id: "average", label: "Average" },
-  { id: "total", label: "All together" },
-];
 
 const TAX_NOTE: Record<string, string> = {
   N: "not taxable",
@@ -37,94 +28,21 @@ const TAX_NOTE: Record<string, string> = {
   FP: "taxable federally and in Quebec",
 };
 
-function addBuckets(slips: PayslipData[]): Record<Bucket, number> {
-  const out = { takeHome: 0, incomeTax: 0, govPlans: 0, pension: 0, insurance: 0, other: 0 };
-  for (const d of slips) {
-    const b = slipBuckets(d);
-    for (const k of BUCKET_ORDER) out[k] += b[k];
-  }
-  return out;
-}
-
-/** Where gross pay goes, line by line, plus how payslips compare. */
-export default function PayBreakdown({ used }: { used: Payslip[] }) {
-  const [mode, setMode] = useState<Mode>("latest");
+/** Line by line, what Air Canada pays on top, the year so far, and how payslips compare. The summary is in PayHero. */
+export default function PayBreakdown({ used, mode }: { used: Payslip[]; mode: Mode }) {
   const slips = used.map((p) => p.data);
   const latest = slips[slips.length - 1];
   const chosen = mode === "latest" ? [latest] : slips;
   const div = mode === "average" ? slips.length : 1;
-  const buckets = addBuckets(chosen);
-  const gross = chosen.reduce((t, d) => t + d.current.gross, 0) / div;
-  const per = (v: number) => v / div;
-  const deducted = gross - per(buckets.takeHome);
   const scope =
     mode === "latest" ? `your ${periodLabel(latest, true)} payslip` : mode === "average" ? `the average of ${slips.length} payslips` : `${slips.length} payslips added up`;
 
-  const shown = BUCKET_ORDER.filter((k) => Math.abs(buckets[k]) >= 0.005);
   const prev = slips[slips.length - 2];
   const drivers = prev ? netDrivers(prev, latest) : [];
   const netDiff = prev ? latest.current.net - prev.current.net : 0;
 
   return (
     <section className="ps-sec">
-      <SectionHeading title="What your pay contributes to">
-        Every dollar of gross pay, followed to where it ends up: your bank account, your retirement, governments and insurance.
-      </SectionHeading>
-
-      <Card
-        header={
-          <div className="ps-head">
-            <div>
-              <h3>Where your pay goes</h3>
-              <p className="d">From {scope}.</p>
-            </div>
-            {slips.length > 1 && (
-              <div className="ps-seg" role="group" aria-label="Which payslips">
-                {MODES.map((m) => (
-                  <button key={m.id} type="button" aria-pressed={mode === m.id} onClick={() => setMode(m.id)}>
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        }
-      >
-        <div className="off-flow">
-          <div>
-            <span>Gross pay</span>
-            <b>{money(gross, 2)}</b>
-          </div>
-          <i>−</i>
-          <div>
-            <span>Taken off</span>
-            <b className="neg">{money(deducted, 2)}</b>
-          </div>
-          <i>=</i>
-          <div>
-            <span>Take-home</span>
-            <b className="pos">{money(per(buckets.takeHome), 2)}</b>
-          </div>
-        </div>
-        <SegmentBar
-          variant="thick"
-          segments={shown.map((k) => ({ width: (buckets[k] / div / (gross || 1)) * 100, color: BUCKETS[k].color, title: BUCKETS[k].label }))}
-        />
-        <div className="ps-buckets">
-          {shown.map((k) => (
-            <div key={k} className="ps-bucket" style={{ ["--c" as string]: BUCKETS[k].color }}>
-              <span>{BUCKETS[k].label}</span>
-              <b>{money((buckets[k] / div / (gross || 1)) * 100, 2)}</b>
-              <em>of every $100 · goes to {BUCKETS[k].who.charAt(0).toLowerCase() + BUCKETS[k].who.slice(1)}</em>
-              <small>
-                {money(per(buckets[k]), 2)}
-                {mode !== "total" && <> · {money(per(buckets[k]) * 12)} a year</>}
-              </small>
-            </div>
-          ))}
-        </div>
-      </Card>
-
       <div className="irow">
         <LineByLine chosen={chosen} div={div} latest={latest} scope={scope} />
 
