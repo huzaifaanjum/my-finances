@@ -1810,3 +1810,37 @@ select option{background:#18181b;color:var(--text)}
 .jc-t span:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
 .jc-t span.mute{color:var(--mute);font-weight:400}
 @media (max-width:760px){.jc-head{grid-template-columns:minmax(0,1fr)}.jc-row{grid-template-columns:minmax(0,1fr)}.jc-t>div{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)}.jc-t>div>span:first-child{grid-column:1/-1}.jc-t>div.h>span:first-child{display:none}}
+.ki-lockbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;border:1px dashed var(--line);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--mute)}
+.ki-lockbar b{color:var(--text);font-weight:600}
+/* insights: tabs and even rows */
+.iv{display:grid;gap:24px}
+.iv-panel{display:grid;gap:32px}
+.iv-sec{display:grid;gap:12px}
+.iv-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.iv-pair>*{height:100%;margin:0}
+@media (max-width:1000px){.iv-pair{grid-template-columns:minmax(0,1fr)}}
+/* health check: neutral cards, the status chip carries the colour */
+.hct{border-top:1px solid var(--line)}
+/* overview: highlights under the chart, tidy summary tiles */
+.ov-left{display:grid;gap:20px;min-width:0}
+.ov-hl{border:1px solid var(--line);border-radius:14px;padding:16px 20px;display:grid;gap:12px}
+.ov-hl h3{margin:0;font-size:15px}
+.ov-hl>div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.ov-hl-i{display:grid;gap:3px;align-content:start;padding:2px 16px;border-left:1px solid var(--line);color:var(--text);text-decoration:none}
+.ov-hl-i:first-child{border-left:0;padding-left:0}
+.ov-hl-i span{font-size:12.5px;color:var(--mute)}
+.ov-hl-i b{font-size:21px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.ov-hl-i b.pos{color:var(--std)}.ov-hl-i b.warn{color:var(--promo)}
+.ov-hl-i em{font-style:normal;font-size:12px;line-height:1.45;color:var(--mute)}
+.ov-hl-i:hover span{color:var(--text)}
+.ov-tiles{grid-template-columns:repeat(5,minmax(0,1fr))}
+.ov-tile{border-top:1px solid var(--line);position:relative}
+.ov-tile:hover{border-top-color:#52525b}
+.ov-tile span{display:flex;align-items:center;gap:7px}
+.ov-tile span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c);flex:none}
+.ov-tile:not(.pos):not(.warn):not(.neg) span::before{background:var(--line)}
+@media (max-width:1200px){.ov-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}.ov-hl>div{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 0}.ov-hl-i:nth-child(3){border-left:0;padding-left:0}}
+@media (max-width:640px){.ov-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.ov-hl>div{grid-template-columns:minmax(0,1fr)}.ov-hl-i{border-left:0;padding:8px 0;border-top:1px solid var(--line)}.ov-hl-i:first-child{border-top:0}}
+.ov-main{align-items:stretch}
+.ov-main>.stack{display:flex;flex-direction:column;gap:20px}
+.ov-main>.stack>:last-child{flex:1}

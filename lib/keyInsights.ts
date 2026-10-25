@@ -20,8 +20,11 @@ import { forecast, marginal, type ForecastSettings } from "@/lib/payslips/foreca
 import type { Payslip } from "@/lib/payslips/types";
 import { SLIDERS } from "@/lib/planner/config";
 import { COLOR } from "@/lib/colors";
+import { AIRCANADA, FLEXSPRING, yearlyTotal } from "@/lib/jobs";
+import { PAY as PAYDATA } from "@/lib/pay";
+import type { TaxSummary } from "@/lib/taxSummary";
 
-export type Topic = "payslips" | "offer" | "insurance";
+export type Topic = "tax" | "career" | "future" | "payslips" | "offer" | "insurance";
 export type Tone = "good" | "watch" | "info";
 
 export interface KeyInsight {
@@ -36,6 +39,9 @@ export interface KeyInsight {
 }
 
 export const TOPICS: Record<Topic, { title: string; href: string; color: string }> = {
+  tax: { title: "Tax", href: "/tax", color: COLOR.tax },
+  career: { title: "Air Canada vs FlexSpring", href: "/offer", color: COLOR.keep },
+  future: { title: "Retirement and perks", href: "/pension", color: COLOR.pension },
   payslips: { title: "Payslips", href: "/payslips", color: COLOR.keep },
   offer: { title: "Job offer", href: "/offer", color: COLOR.extra },
   insurance: { title: "Insurance", href: "/insurance", color: COLOR.insurance },
@@ -297,4 +303,121 @@ export function payslipInsights(used: Payslip[], settings: ForecastSettings, pen
     });
   }
   return out.map((i) => ({ ...i, topic: "payslips" }));
+}
+
+/* ---------- tax ---------- */
+
+/** Your 2026 return and the moves that change it. */
+export function taxInsights(t: TaxSummary): KeyInsight[] {
+  const list: Omit<KeyInsight, "topic">[] = [
+    {
+      id: "tax-refund",
+      title: "Your 2026 refund estimate",
+      value: money(t.refund),
+      body: `${money(t.fedRefund)} federal and ${money(t.qcRefund)} Quebec on about ${money(t.income)} from FlexSpring and Air Canada. ${money(t.carryValue)} of it comes from tuition carried forward from past years.`,
+      tone: "good",
+    },
+  ];
+  if (t.unclaimed > 0.5)
+    list.push({
+      id: "tax-unclaimed",
+      title: "Quebec tuition credit you didn't claim",
+      value: money(t.unclaimed),
+      body: "Your 2025 Quebec return used only that year's tuition. Ask Revenu Québec to adjust 2025 (line 398 to $2,503.79) and get it now instead of next spring. Same money, sooner.",
+      tone: "watch",
+    });
+  if (!t.hasFhsa)
+    list.push({
+      id: "tax-fhsa",
+      title: "Open an FHSA before Dec 31",
+      value: `+${money(t.fhsaValue)}`,
+      body: "That's what $8,000 in it would add to your refund. Even with $0 in it, opening it keeps 2026's $8,000 of room, which carries to 2027.",
+      tone: "watch",
+    });
+  list.push(
+    {
+      id: "tax-best",
+      title: "With the FHSA and your RRSP room",
+      value: `up to ${money(t.best)}`,
+      body: `Your refund if you put $8,000 in an FHSA and use all ${money(t.rrspRoom)} of RRSP room (by Mar 1, 2027). Only with spare cash; the FHSA comes first.`,
+      tone: "info",
+    },
+    {
+      id: "tax-credits",
+      title: "Solidarity and GST credits end mid-2027",
+      value: `${money(t.paymentsLeft)} left`,
+      body: "They are set from the previous year's income. Your 2026 income is above where both stop, so don't count on them after June 2027.",
+      tone: "info",
+    },
+  );
+  return list.map((i) => ({ ...i, topic: "tax" }));
+}
+
+/* ---------- career ---------- */
+
+/** How Air Canada compares with FlexSpring, your previous job. */
+export function careerInsights(): KeyInsight[] {
+  const f = FLEXSPRING;
+  const a = AIRCANADA;
+  const list: Omit<KeyInsight, "topic">[] = [
+    {
+      id: "job-total",
+      title: "More pay, all in",
+      value: `+${money(yearlyTotal(a) - yearlyTotal(f))} a year`,
+      body: `${percent((yearlyTotal(a) - yearlyTotal(f)) / yearlyTotal(f))} more than FlexSpring once salary, incentive, pension match and benefits are counted.`,
+      tone: "good",
+    },
+    {
+      id: "job-net",
+      title: "More take-home every month",
+      value: `+${money(a.netMonthly - f.netMonthly)}`,
+      body: `${money(a.netMonthly)} vs ${money(f.netMonthly)} at FlexSpring (two cheques), even after 6% to your pension and your insurance premiums.`,
+      tone: "good",
+    },
+    {
+      id: "job-usable",
+      title: "Money you can actually spend",
+      value: `+${money(a.usableYearly - f.usableYearly)} a year`,
+      body: "Most of the gain is pension, health cover and tax, which you can't spend now. This counts take-home, the first prorated incentive and the spending account after tax.",
+      tone: "info",
+    },
+    {
+      id: "job-pension",
+      title: "A pension you didn't have",
+      value: `${money(PAYDATA.monthlyBase * PAYDATA.pensionRate * 2)} a month`,
+      body: "Your 6% plus Air Canada's 6% goes into your pension every month. FlexSpring had no pension or group insurance.",
+      tone: "good",
+    },
+  ];
+  return list.map((i) => ({ ...i, topic: "career" }));
+}
+
+/* ---------- retirement and perks ---------- */
+
+/** Retirement income, the pension fund check and Aeroplan. */
+export function futureInsights(monthlyAt65: number, replacement: number, inflation: number): KeyInsight[] {
+  const list: Omit<KeyInsight, "topic">[] = [
+    {
+      id: "fut-income",
+      title: "Income at 65, in today's dollars",
+      value: `${money(monthlyAt65)} a month`,
+      body: `${percent(replacement)} of your take-home today, from the Air Canada pension, QPP, OAS and investing on your own. It assumes ${inflation}% inflation, Canada's rate for September 2026.`,
+      tone: "good",
+    },
+    {
+      id: "fut-fund",
+      title: "Check where your pension is invested",
+      value: "10 minutes",
+      body: "Payslips show the money going in, not which fund holds it. In your Manulife account, make sure it's a target-date fund around 2060, not cash or money market.",
+      tone: "watch",
+    },
+    {
+      id: "fut-aeroplan",
+      title: "Aeroplan points expire again",
+      value: "from Nov 30",
+      body: "Points now expire after 18 months with no earning or redeeming. Your yearly 15,000 counts as activity; link Starbucks or Uber to earn between grants.",
+      tone: "info",
+    },
+  ];
+  return list.map((i) => ({ ...i, topic: "future" }));
 }

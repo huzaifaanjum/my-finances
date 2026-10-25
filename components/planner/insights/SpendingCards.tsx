@@ -1,5 +1,8 @@
 "use client";
 
+import { AIRCANADA, FLEXSPRING } from "@/lib/jobs";
+import { PAY } from "@/lib/pay";
+import { taxSummary } from "@/lib/taxSummary";
 import { G } from "@/components/glossary/GlossaryText";
 import { usePlanner } from "@/components/providers/PlannerProvider";
 import { ProgressBar, SegmentBar } from "@/components/ui/bars";
@@ -67,7 +70,9 @@ export function MilestonesCard() {
 
 /** Your budget in everyday units. */
 export function QuickFacts() {
-  const { net, left, exp, rent } = usePlanner().plan;
+  const { plan } = usePlanner();
+  const { net, left, exp, rent } = plan;
+  const tax = taxSummary(plan.state);
   const DAYS = 30.4;
   const WORK_DAYS = 21.7;
   const facts: [value: string, what: string, detail: string][] = [
@@ -77,6 +82,9 @@ export function QuickFacts() {
     [money(exp.total * 12), "spent in a year", "at today's budget"],
     [money(Math.max(0, left) * 12), "saved from pay in a year", "before bonuses"],
     [money(exp.groups[1] * 12), "on subscriptions a year", `${money(exp.groups[1])} a month`],
+    [money(tax.refund), "2026 tax refund, estimated", tax.unclaimed > 0.5 ? `${money(tax.unclaimed)} of it you can claim now` : "file by Apr 30, 2027"],
+    [money(PAY.monthlyBase * PAY.pensionRate * 2), "into your pension a month", "your 6% plus Air Canada's 6%"],
+    [`+${money(AIRCANADA.netMonthly - FLEXSPRING.netMonthly)}`, "more take-home a month", "than at FlexSpring"],
   ];
   return (
     <div>

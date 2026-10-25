@@ -1,5 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import SeeAlso from "@/components/ui/SeeAlso";
-import { Panel, SectionHeading } from "@/components/ui/text";
+import { SectionHeading } from "@/components/ui/text";
 import GuidelinesSection from "./GuidelinesSection";
 import HealthCheck from "./HealthCheck";
 import IncomeStreamsCard from "./IncomeStreamsCard";
@@ -9,59 +12,81 @@ import PayNeededCard from "./PayNeededCard";
 import { MilestonesCard, MoneyMixCard, QuickFacts } from "./SpendingCards";
 import WaffleCard from "./WaffleCard";
 
-const SECTIONS: [id: string, label: string][] = [
-  ["health", "Health check"],
-  ["key-insights", "Key insights"],
-  ["budget", "Your budget"],
-  ["guidelines", "Guidelines"],
-  ["income", "Income target"],
-  ["facts", "Milestones and facts"],
+type Tab = "key" | "budget" | "income" | "facts";
+const TABS: { id: Tab; label: string; note: string }[] = [
+  { id: "key", label: "Key insights", note: "tax, job, pay, insurance" },
+  { id: "budget", label: "Budget health", note: "checks and guidelines" },
+  { id: "income", label: "Income target", note: "pay that fits the guidelines" },
+  { id: "facts", label: "Milestones", note: "and quick facts" },
 ];
 
-/** Every insight in the app: budget health, key insights from each tab, and the numbers behind them. */
+/** Every insight in the app, one subject per tab so nothing is buried in a long page. */
 export default function InsightsView() {
+  const [tab, setTabState] = useState<Tab>("key");
+  useEffect(() => {
+    try {
+      const t = localStorage.getItem("iv_tab");
+      if (TABS.some((x) => x.id === t)) setTabState(t as Tab);
+    } catch {}
+  }, []);
+  const setTab = (t: Tab) => {
+    setTabState(t);
+    try {
+      localStorage.setItem("iv_tab", t);
+    } catch {}
+  };
+
   return (
-    <Panel className="flush">
-      <nav className="iv-nav" aria-label="On this page">
-        {SECTIONS.map(([id, label]) => (
-          <a key={id} href={`#${id}`}>
-            {label}
-          </a>
+    <div className="iv">
+      <div className="ps-tabs" role="tablist" aria-label="Insights sections">
+        {TABS.map((t) => (
+          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}>
+            {t.label}
+            <small>{t.note}</small>
+          </button>
         ))}
-      </nav>
-      <div className="ins-wrap">
-        <div id="health" className="iv-anchor">
-          <HealthCheck />
-        </div>
-        <KeyInsights />
-        <section id="budget" className="iv-anchor">
-          <SectionHeading title="Your budget">How your take-home is split, and where the spending goes.</SectionHeading>
-          <div className="irow">
-            <WaffleCard />
-            <MoneyMixCard />
-          </div>
-        </section>
-        <div id="guidelines" className="iv-anchor">
-          <GuidelinesSection />
-        </div>
-        <section id="income" className="iv-anchor">
-          <SectionHeading title="Income target">
-            How much take-home pay would make today&apos;s budget fit the guidelines, and which extra income streams could get you there.
-          </SectionHeading>
-          <div className="irow">
-            <IncomeTargetCard />
-            <IncomeStreamsCard />
-          </div>
-          <PayNeededCard />
-        </section>
-        <section id="facts" className="iv-anchor iv-facts">
-          <MilestonesCard />
-          <QuickFacts />
-        </section>
-        <SeeAlso href="/recommendations" label="Action plan">
-          What to do about all this: next steps ranked by what they are worth, where to put your money, and your checklist
-        </SeeAlso>
       </div>
-    </Panel>
+
+      <div role="tabpanel" className="iv-panel">
+        {tab === "key" && <KeyInsights />}
+        {tab === "budget" && (
+          <>
+            <HealthCheck />
+            <section className="iv-sec">
+              <SectionHeading title="Your budget">How your take-home is split, and where the spending goes.</SectionHeading>
+              <div className="iv-pair">
+                <WaffleCard />
+                <MoneyMixCard />
+              </div>
+            </section>
+            <GuidelinesSection />
+          </>
+        )}
+        {tab === "income" && (
+          <>
+            <section className="iv-sec">
+              <SectionHeading title="Income target">
+                How much take-home pay would make today&apos;s budget fit the guidelines, and which extra income streams could get you there.
+              </SectionHeading>
+              <div className="iv-pair">
+                <IncomeTargetCard />
+                <IncomeStreamsCard />
+              </div>
+            </section>
+            <PayNeededCard />
+          </>
+        )}
+        {tab === "facts" && (
+          <section className="iv-facts">
+            <MilestonesCard />
+            <QuickFacts />
+          </section>
+        )}
+      </div>
+
+      <SeeAlso href="/recommendations" label="Action plan">
+        What to do about all this: next steps ranked by what they are worth, where to put your money, and your checklist
+      </SeeAlso>
+    </div>
   );
 }

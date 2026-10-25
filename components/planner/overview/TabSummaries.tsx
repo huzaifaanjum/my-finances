@@ -16,6 +16,8 @@ import { summarizeGoal } from "@/lib/planner/goals";
 import { healthTiles } from "@/lib/planner/insights";
 import { retirement } from "@/lib/planner/retirement";
 import { checklist, isDone, recContext } from "@/lib/recommendations";
+import { benefitItems } from "@/lib/benefitsChecklist";
+import { taxSummary } from "@/lib/taxSummary";
 
 interface Tile {
   href: string;
@@ -46,6 +48,9 @@ export default function TabSummaries() {
   const month = monthlyStats(plan.rows);
   const slips = vault.payslips.filter((p) => !p.excluded);
   const latest = slips[slips.length - 1];
+  const tax = taxSummary(plan.state);
+  const benefitSteps = benefitItems().flatMap((b) => b.steps);
+  const benefitsDone = benefitSteps.filter((s) => !!read[s.id] || !!s.also?.some((id) => read[id])).length;
 
   const tiles: Tile[] = [
     {
@@ -92,6 +97,20 @@ export default function TabSummaries() {
       tab: "Payslips",
       value: latest ? money(latest.data.current.net, 2) : vault.status === "unlocked" ? "None yet" : "Locked",
       note: latest ? `deposited for ${periodLabel(latest.data, true)}` : vault.status === "unlocked" ? "upload your first payslip" : "unlock to see your latest deposit",
+    },
+    {
+      href: "/tax",
+      tab: "Tax",
+      value: `${money(tax.refund)} back`,
+      note: tax.unclaimed > 0.5 ? `2026 estimate · ${money(tax.unclaimed)} to claim on 2025` : "2026 estimate, file by Apr 30, 2027",
+      tone: tax.unclaimed > 0.5 || !tax.hasFhsa ? "warn" : "pos",
+    },
+    {
+      href: "/benefits",
+      tab: "Benefits",
+      value: `${benefitsDone} of ${benefitSteps.length} steps`,
+      note: "done to use every Air Canada benefit",
+      tone: benefitsDone === benefitSteps.length ? "pos" : undefined,
     },
     {
       href: "/monthly",

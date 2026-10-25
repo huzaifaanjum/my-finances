@@ -1,5 +1,6 @@
 // Calculations behind the Insights page. Everything here is pure, so it is easy to check by hand.
 import { LSA_YEARLY } from "@/lib/benefits";
+import { payMarginal } from "@/lib/pay";
 import { money, percent } from "@/lib/format";
 import { dayLabel } from "./calendar";
 import { EMPLOYER_HEALTH, INCOME_STREAMS, SALARY, TAKE_HOME_PER_GROSS, type StreamKey } from "./config";
@@ -195,7 +196,11 @@ export function automaticIncome(plan: Plan): AutoIncome[] {
   return [
     { name: "Interest on savings", detail: `3% in a high-interest account on your ${money(bal)} balance`, monthly: (bal * 0.03) / 12 },
     { name: "Cashback credit card", detail: "1.5% back on everyday spending, paid off monthly", monthly: Math.max(0, plan.exp.total - plan.rent) * 0.015 },
-    { name: "Tax refund (FHSA or RRSP)", detail: "about $1,400 a year, spread over 12 months", monthly: 1400 / 12 },
+    {
+      name: "Tax refund (FHSA)",
+      detail: `about ${money(payMarginal().rrsp * 8)} a year for $8,000 in an FHSA, spread over 12 months`,
+      monthly: (payMarginal().rrsp * 8) / 12,
+    },
   ];
 }
 

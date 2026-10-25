@@ -9,7 +9,9 @@ import { usePensionStart } from "@/components/payslips/usePensionStart";
 import { usePlanner } from "@/components/providers/PlannerProvider";
 import { SectionHeading } from "@/components/ui/text";
 import { money } from "@/lib/format";
-import { insuranceInsights, offerInsights, payslipInsights, TOPICS, type KeyInsight, type Tone, type Topic } from "@/lib/keyInsights";
+import { careerInsights, futureInsights, insuranceInsights, offerInsights, payslipInsights, taxInsights, TOPICS, type KeyInsight, type Tone, type Topic } from "@/lib/keyInsights";
+import { retirement } from "@/lib/planner/retirement";
+import { taxSummary } from "@/lib/taxSummary";
 
 const TONES: Record<Tone, { label: string; icon: string }> = {
   watch: { label: "To watch", icon: "M8 4v5M8 11.5v.5" },
@@ -17,10 +19,14 @@ const TONES: Record<Tone, { label: string; icon: string }> = {
   info: { label: "Good to know", icon: "M8 7v5M8 4.5v.5" },
 };
 const ORDER: Tone[] = ["watch", "good", "info"];
-const TOPIC_ORDER: Topic[] = ["payslips", "offer", "insurance"];
+const TOPIC_ORDER: Topic[] = ["tax", "career", "payslips", "offer", "insurance", "future"];
 
-/** Columns on wide screens that leave no half-empty last row: 9 cards → 3×3, 8 → 4×2. */
-const columnsFor = (n: number) => (n % 4 === 0 ? 4 : n % 3 === 0 ? 3 : n % 4 >= 2 || n < 4 ? 4 : 3);
+/** Columns on wide screens with the fewest empty slots in the last row: 5 → 5, 8 → 4×2, 9 → 3×3, 7 → 4+3. */
+function columnsFor(n: number): number {
+  if (n <= 5) return Math.max(1, n);
+  const gaps = (c: number) => (c - (n % c)) % c;
+  return [4, 3, 5].reduce((best, c) => (gaps(c) < gaps(best) ? c : best), 4);
+}
 
 /** Key insights from Payslips, My offer and Insurance, in one place. */
 export default function KeyInsights() {
@@ -36,10 +42,16 @@ export default function KeyInsights() {
   const all = useMemo<KeyInsight[]>(
     () => [
       ...(unlocked && used.length ? payslipInsights(used, settings, start.mine + start.match, plan.net) : []),
+      ...taxInsights(taxSummary(plan.state)),
+      ...careerInsights(),
       ...offerInsights(),
       ...insuranceInsights(plan.net),
+      ...(() => {
+        const r = retirement(plan, start);
+        return futureInsights(r.total, r.replacement, plan.state.numbers.ret_inf);
+      })(),
     ],
-    [unlocked, used, settings, start, plan.net],
+    [unlocked, used, settings, start, plan],
   );
   const byTopic = (t: Topic) => all.filter((i) => i.topic === t);
   const shown = all.filter((i) => (topic === "all" || i.topic === topic) && (tone === "all" || i.tone === tone));
@@ -48,7 +60,7 @@ export default function KeyInsights() {
 
   return (
     <section id="key-insights" className="ki">
-      <SectionHeading title="Key insights">What your payslips, offer letter and insurance mean for your money, gathered from every tab.</SectionHeading>
+      <SectionHeading title="Key insights">What your taxes, your job, your payslips, insurance and retirement mean for your money, gathered from every tab.</SectionHeading>
 
       <div className="ki-bar">
         <div className="ki-topics" role="group" aria-label="Source">
@@ -89,27 +101,19 @@ export default function KeyInsights() {
                   </h3>
                   <Link href={TOPICS[t].href}>Open {TOPICS[t].title} →</Link>
                 </div>
-                <div className="ki-grid" style={{ ["--cols" as string]: columnsFor(items.length + (locked ? 1 : 0)) }}>
-                  {locked && (
-                    <article className="ki-card ki-locked">
-                      <span className="ki-tone">
-                        <svg viewBox="0 0 16 16" aria-hidden="true">
-                          <rect x="3.5" y="7" width="9" height="6.5" rx="1.2" />
-                          <path d="M5.5 7V5.5a2.5 2.5 0 0 1 5 0V7" />
-                        </svg>
-                        {unlocked ? "No payslips yet" : "Locked"}
-                      </span>
-                      <h4>{unlocked ? "Upload a payslip to see these" : "Payslip insights are locked"}</h4>
-                      <p>
-                        {unlocked
-                          ? "Your next deposit, plan vs payslip, marginal tax rate, the late-year bump and your pension appear here once a payslip is uploaded."
-                          : "They are worked out from your encrypted payslips, so they appear once you unlock the Payslips tab with its password."}
-                      </p>
-                      <Link href="/payslips" className="ps-btn sm primary">
-                        {unlocked ? "Upload on Payslips" : "Unlock on Payslips"}
-                      </Link>
-                    </article>
-                  )}
+                {locked && (
+                  <div className="ki-lockbar">
+                    <span>
+                      <b>{unlocked ? "No payslips yet." : "Locked."}</b>{" "}
+                      {unlocked ? "Upload a payslip to see your next deposit, tax rate and pension here." : "Payslip insights come from your encrypted payslips; unlock them to see them here."}
+                    </span>
+                    <Link href="/payslips" className="ps-btn sm">
+                      {unlocked ? "Upload" : "Unlock"}
+                    </Link>
+                  </div>
+                )}
+                {items.length > 0 && (
+                <div className="ki-grid" style={{ ["--cols" as string]: columnsFor(items.length) }}>
                   {items.map((i) => (
                     <article key={i.id} className={`ki-card ${i.tone}`}>
                       <span className="ki-tone">
@@ -133,6 +137,7 @@ export default function KeyInsights() {
                     </article>
                   ))}
                 </div>
+                )}
               </div>
             );
           })}
