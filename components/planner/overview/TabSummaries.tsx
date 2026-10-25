@@ -13,7 +13,7 @@ import { COMP } from "@/lib/offer";
 import { periodLabel } from "@/lib/payslips/analysis";
 import { monthLabel } from "@/lib/planner/calendar";
 import { investmentPlan } from "@/lib/planner/finance";
-import { GOALS } from "@/lib/planner/goals";
+import { customGoalPlan, GOALS } from "@/lib/planner/goals";
 import { healthTiles } from "@/lib/planner/insights";
 import { retirement } from "@/lib/planner/retirement";
 import { checklist, isDone, recContext } from "@/lib/recommendations";
@@ -36,8 +36,13 @@ export default function TabSummaries() {
   const health = healthTiles(plan);
   const acts = health.filter((t) => t.level === "act");
   const watch = health.filter((t) => t.level === "watch");
-  const goals = GOALS.map((g) => ({ g, s: summarize(g.id, plan) }));
-  const onTrack = goals.filter((x) => x.s.onTrack).length;
+  const builtIn = GOALS.map((g) => ({ name: g.name, ok: summarize(g.id, plan).onTrack, when: summarize(g.id, plan).facts.find(([k]) => k === "Savings ready")?.[1] ?? "—" }));
+  const mine = plan.state.goals.map((g) => {
+    const p = customGoalPlan(g, plan);
+    return { name: g.name || "Goal", ok: p.onTrack || p.left === 0, when: p.onTrack || p.left === 0 ? "on time" : "behind" };
+  });
+  const goals = [...builtIn, ...mine];
+  const onTrack = goals.filter((x) => x.ok).length;
   const hit = investmentPlan(plan).sim.hit;
   const r = retirement(plan, usePensionStart());
   const done = steps.filter((s) => isDone(s, read)).length;
@@ -61,9 +66,9 @@ export default function TabSummaries() {
     },
     {
       href: "/goals",
-      tab: "Home & car",
+      tab: "Goals",
       value: `${onTrack} of ${goals.length} on track`,
-      note: goals.map((x) => `${x.g.name}: ${x.s.facts.find(([k]) => k === "Savings ready")?.[1] ?? "—"}`).join(" · "),
+      note: goals.map((x) => `${x.name}: ${x.when}`).join(" · "),
       tone: onTrack === goals.length ? "pos" : "warn",
     },
     {

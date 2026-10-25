@@ -1514,3 +1514,43 @@ button.bd-need:hover{border-color:var(--mute)}
 .bf-grp .bf-item:last-child{border-bottom:0}
 .bf-grp .bf-item[open]{background:#111114}
 @media (max-width:520px){.bf-gh{grid-template-columns:4px minmax(0,1fr);padding:12px 14px}.bf-gs{grid-column:2;justify-items:start}.bf-grp .bf-item{padding:0 14px}}
+/* goals: sections, add card, custom goal page */
+.goal-wrap{display:grid;gap:36px}
+.goal-sec{display:grid;gap:14px}
+.goal-sh{margin:0;font-size:15px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.goal-sh span{font-size:12.5px;font-weight:400;color:var(--mute)}
+.goal-add{border-style:dashed;background:none;cursor:default}
+.goal-add:hover{background:none;border-color:var(--line)}
+.goal-add p{margin:-6px 0 0;font-size:13px;color:var(--mute)}
+.goal-add ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.goal-add button{width:100%;display:grid;gap:1px;text-align:left;background:#0f0f12;border:1px solid var(--line);border-radius:9px;padding:8px 12px;color:var(--text);font:inherit;cursor:pointer}
+.goal-add button:hover{border-color:var(--std)}
+.goal-add button b{font-size:13.5px;font-weight:600}
+.goal-add button small{font-size:12px;color:var(--mute)}
+.cg-kpis{margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:14px;padding:16px 4px}
+.cg-kpis>div{display:grid;gap:3px;padding:0 18px;border-left:1px solid var(--line)}
+.cg-kpis>div:first-child{border-left:0}
+.cg-kpis dt{font-size:12.5px;color:var(--mute)}
+.cg-kpis dd{margin:0;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.cg-kpis small{font-size:12px;color:var(--mute)}
+.cg-kpis .pos dd{color:var(--std)}.cg-kpis .warn dd{color:var(--promo)}
+.cg-lay{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:20px;align-items:start}
+.cg-form{gap:12px}
+.cg-form h2{margin:0;font-size:16px}
+.cg-form label{display:grid;gap:5px;font-size:12.5px;color:var(--mute)}
+.cg-form .ot-name,.cg-form .ot-date{flex:none;width:100%;box-sizing:border-box;padding:8px 10px;font-size:14px}
+.cg-form .mi{width:100%}
+.cg-use{justify-self:start;text-align:left}
+.cg-del{justify-self:start;margin-top:6px;background:none;border:1px solid var(--line);border-radius:8px;color:var(--mute);font:inherit;font-size:12.5px;padding:6px 12px;cursor:pointer}
+.cg-del:hover{color:var(--neg);border-color:var(--neg)}
+.cg-chart{display:grid;gap:4px}
+.cg-chart svg{width:100%;height:auto;display:block;touch-action:none}
+.cg-key{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--mute)}
+.cg-key span{display:inline-flex;align-items:center;gap:6px}
+.cg-key i{width:9px;height:9px;border-radius:2px}
+.cg-key i.dash{height:0;border-top:2px dashed var(--c-want);border-radius:0;width:14px}
+.cg-key i.due{width:0;height:12px;border-left:2px dashed var(--promo);border-radius:0}
+.cg .jo-note a{color:var(--std)}
+@media (max-width:900px){.cg-lay{grid-template-columns:minmax(0,1fr)}.cg-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 0}.cg-kpis>div:nth-child(3){border-left:0}}
+@media (max-width:480px){.cg-kpis{grid-template-columns:minmax(0,1fr)}.cg-kpis>div{border-left:0}}
+.goal-grid{align-items:start}

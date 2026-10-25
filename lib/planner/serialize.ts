@@ -4,7 +4,7 @@ import { isoDate, planDay, todayIso } from "./calendar";
 import { EXPENSE_GROUPS, FLAGS, HORIZONS, SLIDERS, type FlagKey, type SliderKey } from "./config";
 import { defaultExpenses, incentiveItem, nextId, ONE_TIME_MONTHS, signingItems } from "./defaults";
 import { stepOn } from "./projection";
-import type { IncomeTag, OneTimeItem, PayStep, PlannerState, RecurringExpense, RecurringIncome } from "./types";
+import type { CustomGoal, IncomeTag, OneTimeItem, PayStep, PlannerState, RecurringExpense, RecurringIncome } from "./types";
 
 /** Saves before version 2 kept expenses as fixed sliders, the bonuses as numbers and one-time items by month. */
 const VERSION = 2;
@@ -42,6 +42,8 @@ interface SavedExpense {
 export interface SavedState {
   ver?: number;
   v: Record<string, string | number | boolean>;
+  /** your own goals */
+  gl?: { id: number; k: string; n: string; t: number; d: string; s: number; m: number }[];
   /** pay steps */
   py?: { id: number; a: number; d: string }[];
   ri?: SavedIncome[];
@@ -67,6 +69,7 @@ export function toSaved(s: PlannerState): SavedState {
     ver: VERSION,
     v,
     py: s.pay.map((p) => ({ id: p.id, a: p.amount, d: p.date })),
+    gl: s.goals.map((g) => ({ id: g.id, k: g.kind, n: g.name, t: g.target, d: g.date, s: g.saved, m: g.monthly })),
     ri: s.income.map((o) => ({ id: o.id, n: o.name, a: o.amount, ev: o.every, m: o.month, ...(o.tag && { t: o.tag }) })),
     re: s.expenses.map((e) => ({ id: e.id, n: e.name, a: e.amount, ev: e.every, g: e.group, nd: e.need })),
     oo: s.oneTime.income.map(out),
@@ -112,6 +115,19 @@ function readPay(raw: unknown): PayStep[] | null {
   }));
 }
 
+function readGoals(raw: unknown): CustomGoal[] | null {
+  if (!Array.isArray(raw)) return null;
+  return raw.map((g: Partial<NonNullable<SavedState["gl"]>[number]>, k) => ({
+    id: Number(g.id) || k + 1,
+    kind: String(g.k ?? "custom"),
+    name: String(g.n ?? ""),
+    target: amountOf(g.t),
+    date: typeof g.d === "string" && ISO.test(g.d) ? g.d : isoDate(12),
+    saved: amountOf(g.s),
+    monthly: amountOf(g.m),
+  }));
+}
+
 function readIncome(raw: unknown): RecurringIncome[] | null {
   if (!Array.isArray(raw)) return null;
   return raw.map((o: Partial<SavedIncome>) => ({
@@ -145,6 +161,7 @@ export function fromSaved(raw: unknown, base: PlannerState): PlannerState {
     numbers: { ...base.numbers },
     flags: { ...base.flags },
     pay: base.pay.map((p) => ({ ...p })),
+    goals: readGoals(saved.gl) ?? base.goals.map((g) => ({ ...g })),
     income: base.income.map((o) => ({ ...o })),
     expenses: base.expenses.map((e) => ({ ...e })),
     oneTime: { income: readItems(saved.oo), expense: readItems(saved.ox) },

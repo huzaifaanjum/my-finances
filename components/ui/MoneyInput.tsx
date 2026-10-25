@@ -39,9 +39,10 @@ export default function MoneyInput({ value, onChange, max = 1_000_000, step = 10
         onFocus={(e) => {
           setFocused(true);
           setText(String(value));
-          // the text changes from "4,740" to "4740" on focus; select it after that so typing replaces it
+          // swap "4,740" for "4740" and select it right away, so whatever you type replaces it
           const el = e.currentTarget;
-          requestAnimationFrame(() => el.select());
+          el.value = String(value);
+          el.select();
         }}
         onBlur={() => {
           setFocused(false);

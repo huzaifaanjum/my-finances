@@ -28,7 +28,7 @@ export const NAV: NavItem[] = [
   {
     label: "Goals",
     pages: [
-      { href: "/goals", label: "Home & car", note: "Saving for a home and a car" },
+      { href: "/goals", label: "Saving goals", note: "Home, car and anything else you save for" },
       { href: "/millionaire", label: "Investing", note: "Your road to a million" },
       { href: "/pension", label: "Retirement", note: "Pension, QPP and OAS at 65" },
     ],

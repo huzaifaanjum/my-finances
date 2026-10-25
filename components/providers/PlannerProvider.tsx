@@ -6,7 +6,7 @@ import type { FlagKey, NumericKey } from "@/lib/planner/config";
 import { isoDate, planDay, todayIso } from "@/lib/planner/calendar";
 import { createDefaultState, nextId, ONE_TIME_DEFAULTS, ONE_TIME_MONTHS } from "@/lib/planner/defaults";
 import { buildPlan, currentStep, type Plan } from "@/lib/planner/projection";
-import type { OneTimeItem, OneTimeKind, PayStep, PlannerState, RecurringExpense, RecurringIncome } from "@/lib/planner/types";
+import type { CustomGoal, OneTimeItem, OneTimeKind, PayStep, PlannerState, RecurringExpense, RecurringIncome } from "@/lib/planner/types";
 
 interface PlannerActions {
   setNumber: (key: NumericKey, value: number) => void;
@@ -16,6 +16,10 @@ interface PlannerActions {
   addPay: (step?: Partial<Omit<PayStep, "id">>) => void;
   updatePay: (id: number, patch: Partial<Omit<PayStep, "id">>) => void;
   removePay: (id: number) => void;
+  /** adds a goal and returns its id */
+  addGoal: (goal: Omit<CustomGoal, "id">) => number;
+  updateGoal: (id: number, patch: Partial<Omit<CustomGoal, "id">>) => void;
+  removeGoal: (id: number) => void;
   /** a blank row, or a preset such as the incentive */
   addIncome: (preset?: Omit<RecurringIncome, "id">) => void;
   updateIncome: (id: number, patch: Partial<Omit<RecurringIncome, "id">>) => void;
@@ -74,6 +78,14 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       updatePay: (id, patch) => edit((s) => syncNet({ ...s, pay: s.pay.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
       removePay: (id) => edit((s) => (s.pay.length > 1 ? syncNet({ ...s, pay: s.pay.filter((p) => p.id !== id) }) : s)),
       setFlag: (key, value) => edit((s) => ({ ...s, flags: { ...s.flags, [key]: value } })),
+      addGoal: (goal) => {
+        // a timestamp id is unique and known right away, so the caller can open the new goal
+        const id = Date.now();
+        edit((s) => ({ ...s, goals: [...s.goals, { ...goal, id }] }));
+        return id;
+      },
+      updateGoal: (id, patch) => edit((s) => ({ ...s, goals: s.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)) })),
+      removeGoal: (id) => edit((s) => ({ ...s, goals: s.goals.filter((g) => g.id !== id) })),
       addIncome: (preset) =>
         edit((s) => ({ ...s, income: [...s.income, { name: "", amount: 0, every: 1, month: 0, ...preset, id: nextId(s.income) }] })),
       updateIncome: (id, patch) => edit((s) => ({ ...s, income: s.income.map((o) => (o.id === id ? { ...o, ...patch } : o)) })),

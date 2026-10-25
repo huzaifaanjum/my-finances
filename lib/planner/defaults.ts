@@ -42,6 +42,7 @@ export function createDefaultState(): PlannerState {
     pay: [{ id: 1, amount: sliders.net, date: isoDate(0, 1) }],
     income: [],
     expenses: defaultExpenses(),
+    goals: [],
     oneTime: {
       income: signingItems(PAY.signingNet, 1),
       expense: [{ id: 1, name: "Credit card balance (remaining)", amount: 1000, date: isoDate(0, 1), month: 0 }],

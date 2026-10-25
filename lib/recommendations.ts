@@ -128,7 +128,7 @@ export function checklist(ctx: RecContext): Step[] {
       area: "habits",
       priority: "later",
       title: "Review the plan every quarter",
-      body: "Update take-home from your latest payslip, adjust expenses, and check that the Home & car and Investing dates still hold.",
+      body: "Update take-home from your latest payslip, adjust expenses, and check that your Goals and Investing dates still hold.",
       when: "Quarterly",
     },
 
