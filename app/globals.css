@@ -1498,3 +1498,19 @@ button.bd-need:hover{border-color:var(--mute)}
 @media (max-width:980px){.jo-lay{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:640px){.jo-hero{grid-template-columns:minmax(0,1fr);padding:18px}.jo-total{text-align:left}.jo-total b{font-size:34px}.jo-id h2{font-size:24px}.jo-rate dl{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 0}.jo-rate dl>div{border-left:0;padding:0}.jo-track-x span:nth-child(2){display:none}}
 .jo-grp li>span>:first-child{justify-self:start}
+/* benefits: each category is its own card with a tinted header */
+.bf-list{gap:20px}
+.bf-grp{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0c0c0f}
+.bf-gh{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 18px;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 14%,transparent),color-mix(in srgb,var(--c) 3%,transparent));border-bottom:1px solid color-mix(in srgb,var(--c) 30%,var(--line))}
+.bf-gh>i{align-self:stretch;border-radius:999px;background:var(--c)}
+.bf-gh h2{margin:0;font-size:15.5px;display:block;padding:0}
+.bf-gh p{margin:2px 0 0;font-size:12.5px;color:var(--mute)}
+.bf-gs{display:grid;justify-items:end;gap:3px;font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+.bf-gs b{font-size:14px;font-weight:600;color:var(--text)}
+.bf-gp{display:block;width:96px;height:var(--bar-xs);border-radius:999px;background:var(--line);overflow:hidden}
+.bf-gp s{display:block;height:100%;border-radius:999px;background:var(--c)}
+.bf-grp .bf-item{border-top:1px solid #1d1d21;padding:0 18px}
+.bf-grp .bf-item:first-of-type{border-top:0}
+.bf-grp .bf-item:last-child{border-bottom:0}
+.bf-grp .bf-item[open]{background:#111114}
+@media (max-width:520px){.bf-gh{grid-template-columns:4px minmax(0,1fr);padding:12px 14px}.bf-gs{grid-column:2;justify-items:start}.bf-grp .bf-item{padding:0 14px}}

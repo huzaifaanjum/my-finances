@@ -135,15 +135,26 @@ export default function BenefitsView() {
             {GROUP_ORDER.map((g) => {
               const list = items.filter((b) => b.group === g);
               const groupDone = list.filter((b) => status(b).all).length;
+              const groupValue = list.reduce((t, b) => t + (b.value && !b.once ? b.value : 0), 0);
+              const groupSteps = { done: list.reduce((t, b) => t + status(b).n, 0), total: list.reduce((t, b) => t + b.steps.length, 0) };
               return (
-                <section key={g} className="bf-grp">
-                  <h2>
-                    <i style={{ background: BENEFIT_GROUPS[g].color }} />
-                    {BENEFIT_GROUPS[g].title}
-                    <span>
-                      {groupDone} of {list.length} all set
-                    </span>
-                  </h2>
+                <section key={g} className="bf-grp" style={{ ["--c" as string]: BENEFIT_GROUPS[g].color }} aria-labelledby={`bf-${g}`}>
+                  <header className="bf-gh">
+                    <i aria-hidden="true" />
+                    <div>
+                      <h2 id={`bf-${g}`}>{BENEFIT_GROUPS[g].title}</h2>
+                      <p>{BENEFIT_GROUPS[g].note}</p>
+                    </div>
+                    <div className="bf-gs">
+                      {groupValue > 0 && <b>{money(groupValue)} a year</b>}
+                      <span>
+                        {groupDone} of {list.length} all set
+                      </span>
+                      <span className="bf-gp" aria-hidden="true">
+                        <s style={{ width: `${(groupSteps.done / (groupSteps.total || 1)) * 100}%` }} />
+                      </span>
+                    </div>
+                  </header>
                   {list.map((b) => {
                     const { n, all } = status(b);
                     return (
