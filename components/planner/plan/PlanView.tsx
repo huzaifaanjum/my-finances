@@ -6,6 +6,7 @@ import { deltaMoney, money } from "@/lib/format";
 import { buildPlan } from "@/lib/planner/projection";
 import type { PlannerState } from "@/lib/planner/types";
 import BudgetBar from "./BudgetBar";
+import BudgetCards from "./BudgetCards";
 import ExpensesEditor from "./ExpensesEditor";
 import IncomeEditor from "./IncomeEditor";
 import LeversCard from "./LeversCard";
@@ -28,7 +29,10 @@ export default function PlanView() {
   return (
     <div className="planlay">
       <div className="pl-in">
-        <BudgetBar />
+        <div className="bc-wrap">
+          <BudgetCards />
+          <BudgetBar />
+        </div>
 
         <section>
           <h2>Income</h2>

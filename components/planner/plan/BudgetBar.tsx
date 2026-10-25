@@ -1,8 +1,8 @@
 "use client";
 
 import { usePlan } from "@/components/providers/PlannerProvider";
-import { money, percent } from "@/lib/format";
 import { COLOR } from "@/lib/colors";
+import { money, percent } from "@/lib/format";
 
 /** Your month in one bar: take-home split into fixed costs, subscriptions, day-to-day spending and what is left. The 50/30/20 check sits under Expenses. */
 export default function BudgetBar() {

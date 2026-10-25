@@ -1844,3 +1844,62 @@ select option{background:#18181b;color:var(--text)}
 .ov-main{align-items:stretch}
 .ov-main>.stack{display:flex;flex-direction:column;gap:20px}
 .ov-main>.stack>:last-child{flex:1}
+/* header: save status pill and lock button */
+.nav-r{gap:8px}
+.nav-sync{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px 0 9px;border:1px solid var(--line);border-radius:999px;background:#0f0f12;color:var(--mute);font-size:12.5px;font-weight:500;white-space:nowrap;cursor:default}
+.nav-sync svg{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round}
+.nav-sync i{width:7px;height:7px;border-radius:50%;background:var(--none);flex:none;margin-left:-11px;margin-top:6px;box-shadow:0 0 0 2px #0f0f12}
+.nav-sync.ok i{background:var(--std)}
+.nav-sync.ok span{color:var(--text)}
+.nav-sync.busy i{background:var(--promo);animation:nav-pulse 1s ease-in-out infinite}
+.nav-sync.error{border-color:rgba(248,113,113,.45)}
+.nav-sync.error i{background:var(--neg)}
+.nav-sync.error span{color:var(--neg)}
+@keyframes nav-pulse{50%{opacity:.35}}
+.nav-lock{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 10px;border:1px solid var(--line);border-radius:999px;background:#0f0f12;color:var(--text);font-size:12.5px;font-weight:500}
+.nav-lock svg{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.nav-lock:hover{border-color:var(--mute);background:#16161a}
+@media (prefers-reduced-motion:reduce){.nav-sync.busy i{animation:none}}
+@media (max-width:640px){.nav-sync{display:inline-flex;padding:0 8px}.nav-sync span{display:none}.nav-lock span{display:none}.nav-lock{padding:0 9px}}
+/* budget: income, expenses and savings cards */
+.bc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:32px}
+.bc-card{display:grid;gap:10px;align-content:start;border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.bc-card header{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.bc-card header span{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)}
+.bc-card header em{font-style:normal;font-size:12.5px;color:var(--mute)}
+.bc-card>b{font-size:32px;line-height:1.1;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.bc-card.pos>b{color:var(--std)}.bc-card.warn>b{color:var(--promo)}.bc-card.neg>b{color:var(--neg)}
+.bc-card>p{margin:-4px 0 0;font-size:12.5px;color:var(--mute)}
+.bc-card .stackbar{margin:2px 0}
+.bc-card ul{list-style:none;margin:0;padding:0;display:grid}
+.bc-card li{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-top:1px solid #1d1d21;font-size:13px}
+.bc-card li:first-child{border-top:0}
+.bc-card li>span{display:inline-flex;align-items:center;gap:7px;color:var(--mute)}
+.bc-card li>span i{width:9px;height:9px;border-radius:2px}
+.bc-card li strong{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.bc-card li strong small{font-weight:400;color:var(--mute);margin-left:4px}
+.bc-card li strong.pos{color:var(--std)}.bc-card li strong.warn{color:var(--promo)}
+.bc-meter{position:relative;height:var(--bar-md);border-radius:999px;background:var(--line);margin:2px 0}
+.bc-meter i{display:block;height:100%;border-radius:999px}
+.bc-meter s{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--text);border-radius:1px}
+@media (max-width:1000px){.bc{grid-template-columns:minmax(0,1fr)}}
+/* budget cards inside the left column: compact */
+.pl-in .bc{margin:0;gap:10px}
+.pl-in .bc-card{padding:14px 16px;gap:8px}
+.pl-in .bc-card header span{font-size:12px}
+.pl-in .bc-card header em{font-size:11.5px}
+.pl-in .bc-card>b{font-size:24px}
+.pl-in .bc-card>p{font-size:12px}
+.pl-in .bc-card li{flex-direction:column;align-items:flex-start;gap:1px;padding:6px 0;font-size:12px}
+.pl-in .bc-card li strong{text-align:left}
+@media (max-width:1300px) and (min-width:1001px){.pl-in .bc{grid-template-columns:minmax(0,1fr)}.pl-in .bc-card li{flex-direction:row;align-items:baseline}}
+.bc-card header em{white-space:nowrap}
+/* budget: three headline numbers above the month bar */
+.bc-wrap{display:grid;gap:12px}
+.pl-in .bc,.bc{margin:0;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.pl-in .bc-card,.bc-card{display:grid;gap:2px;padding:14px 16px;border-radius:12px}
+.bc-card>span{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--mute)}
+.pl-in .bc-card>b,.bc-card>b{font-size:26px;line-height:1.15;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.bc-card>em{font-style:normal;font-size:12px;color:var(--mute)}
+@media (max-width:1300px) and (min-width:1001px){.pl-in .bc{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:520px){.pl-in .bc,.bc{grid-template-columns:minmax(0,1fr)}}
