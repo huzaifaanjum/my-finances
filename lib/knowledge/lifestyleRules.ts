@@ -1,5 +1,6 @@
 // Travel, entertainment, subscriptions and everyday spending: enjoying money without derailing the plan.
 
+import { AEROPLAN } from "@/lib/aeroplan";
 import { LSA_YEARLY } from "@/lib/benefits";
 import { money } from "@/lib/format";
 import { OFFER } from "@/lib/offer";
@@ -49,13 +50,47 @@ export const LIFESTYLE_RULES: Rule[] = [
     id: "points-value",
     group: G,
     title: "Spend points where they are worth most",
-    summary: "Aeroplan points are usually worth 1.5 to 2 cents each on flights, far less on merchandise.",
+    summary: `Aeroplan points are typically worth about ${AEROPLAN.centsTypical}¢ each on flights, ${AEROPLAN.centsPremium[0]}¢ or more on partner business class, and well under 1¢ on merchandise.`,
     plain:
-      "Loyalty points have no fixed value: it depends on what you redeem them for. Flights and travel usually get 1.5 to 2 cents or more per point; gift cards and merchandise often get under 1 cent.",
-    why: "The same points can be worth twice as much with a little planning. Treat them as money and spend them where they stretch furthest.",
-    example: "15,000 points at 0.7¢ on merchandise is $105. On a flight at 1.8¢ it is $270.",
-    you: `Air Canada gives you ${(OFFER.aeroplanPoints / 1000).toFixed(0)},000 Aeroplan points each January, starting 2027. Use them on flights for family or friends, or where standby isn't practical.`,
-    demo: "points",
+      "Loyalty points have no fixed value: it depends on what you redeem them for. To compare, work out cents per point: the cash price you would otherwise pay, minus the taxes and fees you still pay, divided by the points. Flights usually beat 1.5¢; gift cards and merchandise often get under 1¢.",
+    why: "The same points can be worth two to five times as much with a little planning. Treat them as money and spend them where they stretch furthest.",
+    example: `A $450 flight that costs 18,000 points plus $90 in taxes gets 2¢ a point. The same 18,000 points on merchandise are worth about $126.`,
+    you: `Air Canada gives you ${(OFFER.aeroplanPoints / 1000).toFixed(0)},000 Aeroplan points each January, starting 2027: about $${Math.round((OFFER.aeroplanPoints * AEROPLAN.centsTypical) / 100)} at ${AEROPLAN.centsTypical}¢. Use them where standby isn't practical: for family, friends, or a guaranteed seat.`,
+    demo: "aeroCpp",
+    link: { href: "/benefits", label: "Benefits" },
+  },
+  {
+    id: "aeroplan-expiry",
+    group: G,
+    title: "Keep Aeroplan points from expiring",
+    summary: `From Nov 30, 2026, points expire after ${AEROPLAN.expiryMonths} months with no activity. Any small earn resets the clock.`,
+    plain: `Aeroplan paused point expiry for a while; the pause ends Nov 29, 2026. From then on, an account with no earning, redeeming, transferring or donating for ${AEROPLAN.expiryMonths} months loses its points. Logging in or checking your balance does not count.`,
+    why: "Points left alone are easy to forget. A whole yearly grant could disappear without a single trip.",
+    example: `Points granted in January 2027 with no activity afterwards would expire around July 2028. One $${AEROPLAN.starbucks.load} Starbucks load in between resets the ${AEROPLAN.expiryMonths} months.`,
+    you: "Your yearly grant counts as activity, so the January deposit keeps the account alive. Still, link Starbucks or Uber so something earns between grants, and check that the grant lands each January.",
+    link: { href: "/benefits", label: "Benefits" },
+  },
+  {
+    id: "aeroplan-partners",
+    group: G,
+    title: "Book partner flights to stretch points",
+    summary: "Star Alliance partner flights use a fixed chart with no fuel surcharges, and often cost fewer points than Air Canada's own seats.",
+    plain: `Air Canada flights (and a few select partners) have changing, dynamic prices. Most other Star Alliance airlines, such as Lufthansa, ANA, Swiss or United, follow Aeroplan's fixed chart based on distance and region, with no fuel surcharges added. You pay taxes plus a $${AEROPLAN.partnerFee} booking fee per partner ticket. A one-way award can include a stopover for ${AEROPLAN.stopover.toLocaleString("en-CA")} points, so one trip becomes two cities.`,
+    why: "Fixed prices make partner awards predictable, and the best sweet spots, like business class to Europe, get several cents per point.",
+    example: `Short flights in North America start at ${AEROPLAN.shortHaulFrom.toLocaleString("en-CA")} points one way. Business class from eastern Canada to Europe on a partner is about ${AEROPLAN.europeBusiness.toLocaleString("en-CA")} points one way, a seat that often costs $3,000 or more in cash. The chart changed on ${AEROPLAN.chartChange}, so check the current price before planning.`,
+    you: `Four years of your grant (${(OFFER.aeroplanPoints * 4).toLocaleString("en-CA")} points) is a one-way business seat to Europe on a partner, or about ten short one-way flights.`,
+    demo: "aeroGoal",
+  },
+  {
+    id: "aeroplan-earn",
+    group: G,
+    title: "Earn Aeroplan points on what you already buy",
+    summary: "Link Starbucks and Uber, shop through the eStore, and pool with family. Same spending, more points.",
+    plain: `Link your Aeroplan number in the Starbucks and Uber apps: Starbucks gives ${AEROPLAN.starbucks.points} points when you load $${AEROPLAN.starbucks.load} or more, and Uber rides and Uber Eats earn too. The Aeroplan eStore pays up to ${AEROPLAN.eStoreUpTo} points per $1 at many online shops if you start there. Family Sharing lets up to ${AEROPLAN.poolMax} people pool points toward one award; leaving a pool locks you out for ${AEROPLAN.poolLockoutMonths} months.`,
+    why: "None of this costs extra, and small earns also keep your points from expiring.",
+    example: "Buying a $300 laptop bag through the eStore at 5 points per $1 adds 1,500 points: a quarter of a short flight.",
+    you: `Aeroplan credit cards (Amex, CIBC, TD) earn more, but only help if you pay the balance in full every month; at 20%+ interest one carried balance wipes out a year of points. Elite status now uses Status Qualifying Credits (${AEROPLAN.status25K.toLocaleString("en-CA")} for 25K), and cards can add at most ${AEROPLAN.cardSqcCap.toLocaleString("en-CA")} a year.`,
+    link: { href: "/benefits", label: "Benefits" },
   },
   {
     id: "trip-insurance",

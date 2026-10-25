@@ -2,6 +2,7 @@
 // Values come from the offer letter, your payslip and the Manulife coverage summary.
 // Step ids are shared with the earlier My offer / Recommendations checklists, so saved ticks carry over.
 
+import { AEROPLAN } from "@/lib/aeroplan";
 import { benefit, BENEFITS, LSA_YEARLY, PREMIUM_TAX } from "@/lib/benefits";
 import { money } from "@/lib/format";
 import { OFFER } from "@/lib/offer";
@@ -237,12 +238,33 @@ export function benefitItems(): BenefitItem[] {
       id: "b-aeroplan",
       group: "perks",
       name: "Aeroplan points",
-      value: OFFER.aeroplanPoints * 0.018,
-      valueNote: `${(OFFER.aeroplanPoints / 1000).toFixed(0)},000 points a year, at about 1.8¢ on flights`,
-      what: "A yearly grant each January, starting 2027.",
+      value: (OFFER.aeroplanPoints * AEROPLAN.centsTypical) / 100,
+      valueNote: `${(OFFER.aeroplanPoints / 1000).toFixed(0)},000 points a year, about ${AEROPLAN.centsTypical}¢ each on flights; partner business class can reach ${AEROPLAN.centsPremium[0]}¢ or more`,
+      what: `A yearly grant each January, starting 2027. Short flights in North America start at ${AEROPLAN.shortHaulFrom.toLocaleString("en-CA")} points one way, so one grant covers about two short trips, or a quarter of a business seat to Europe (${AEROPLAN.europeBusiness.toLocaleString("en-CA")}).`,
+      link: { href: "/knowledge", label: "Knowledge" },
       steps: [
         { id: "offer-aeroplan-link", title: "Make sure your Aeroplan number is linked", body: "Confirm on the portal which account receives the points.", when: "Before Jan 2027" },
-        { id: "offer-aeroplan-flights", title: "Spend points on flights, not merchandise", body: "They are usually worth about twice as much on flights." },
+        {
+          id: "ben-aeroplan-expiry",
+          title: "Keep your account active: expiry is back",
+          body: `From Nov 30, 2026, points expire after ${AEROPLAN.expiryMonths} months with no earning or redeeming. Logging in doesn't count; one Starbucks or Uber earn does.`,
+          when: "By Nov 30",
+        },
+        {
+          id: "ben-aeroplan-earn",
+          title: "Link Starbucks and Uber, and shop through the eStore",
+          body: `Starbucks gives ${AEROPLAN.starbucks.points} points when you load $${AEROPLAN.starbucks.load} or more; Uber rides and Uber Eats earn once linked; the Aeroplan eStore pays up to ${AEROPLAN.eStoreUpTo} points per $1 at many online shops. Same spending, more points.`,
+        },
+        {
+          id: "ben-aeroplan-family",
+          title: "Pool points with Family Sharing",
+          body: `Up to ${AEROPLAN.poolMax} people can pool points toward one award, so you reach a trip sooner. Pick the pool leader with care: leaving a pool locks you out for ${AEROPLAN.poolLockoutMonths} months.`,
+        },
+        {
+          id: "offer-aeroplan-flights",
+          title: "Spend points on flights, and look at partner airlines",
+          body: `Flights get about twice the value of merchandise. Star Alliance partner flights use a fixed chart with no fuel surcharges (a $${AEROPLAN.partnerFee} booking fee applies), often cheaper than Air Canada's changing prices. A stopover adds ${AEROPLAN.stopover.toLocaleString("en-CA")} points.`,
+        },
       ],
     },
     {

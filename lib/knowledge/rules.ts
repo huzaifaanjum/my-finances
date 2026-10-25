@@ -36,7 +36,9 @@ export type DemoKey =
   | "funBudget"
   | "smallSpends"
   | "rewards"
-  | "bills";
+  | "bills"
+  | "aeroCpp"
+  | "aeroGoal";
 
 export interface Rule {
   id: string;

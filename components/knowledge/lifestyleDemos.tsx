@@ -3,6 +3,7 @@
 // Calculators for the travel, fun and subscriptions rules.
 
 import { useState, type ReactElement } from "react";
+import { AEROPLAN, centsPerPoint } from "@/lib/aeroplan";
 import type { DemoKey } from "@/lib/knowledge/rules";
 import { C, Bar, Demo, Note, Slider, Stat, Stats, Verdict, fvMonthly, money, num } from "./ui";
 
@@ -69,6 +70,60 @@ function Points() {
         <Stat label={`On flights (${num(cents, 1)}¢)`} value={money((points * cents) / 100)} tone="good" />
       </Stats>
       <Note>Point values vary by route, date and redemption; these are typical ranges, not fixed prices.</Note>
+    </Demo>
+  );
+}
+
+/** Is this redemption a good use of points? Cents per point against the typical and merchandise values. */
+function AeroCpp() {
+  const [cash, setCash] = useState(450);
+  const [points, setPoints] = useState(18000);
+  const [fees, setFees] = useState(90);
+  const cpp = centsPerPoint(cash, fees, points);
+  const tone = cpp >= 2 ? "good" : cpp >= AEROPLAN.centsTypical ? "good" : cpp >= 1 ? "warn" : "bad";
+  return (
+    <Demo>
+      <Slider label="Cash price of the same ticket" value={cash} onChange={setCash} min={100} max={6000} step={25} format={money} />
+      <Slider label="Points it costs" value={points} onChange={setPoints} min={6000} max={150000} step={500} format={(v) => v.toLocaleString("en-CA")} />
+      <Slider label="Taxes and fees you still pay" value={fees} onChange={setFees} min={0} max={800} step={5} format={money} />
+      <Stats>
+        <Stat label="You get" value={`${num(cpp, 2)}¢ a point`} tone={tone} />
+        <Stat label="Points saved you" value={money(Math.max(0, cash - fees))} />
+        <Stat label="Same points on merchandise" value={money((points * AEROPLAN.centsMerch) / 100)} tone="warn" />
+      </Stats>
+      {cpp >= AEROPLAN.centsTypical ? (
+        <Verdict tone="good">Good use: at or above the typical {AEROPLAN.centsTypical}¢ a point.</Verdict>
+      ) : cpp >= 1 ? (
+        <Verdict tone="warn">Below the typical {AEROPLAN.centsTypical}¢. Fine if you need the seat, but a partner flight or other dates may stretch points further.</Verdict>
+      ) : (
+        <Verdict tone="bad">Poor value: paying cash and keeping the points is likely better.</Verdict>
+      )}
+    </Demo>
+  );
+}
+
+/** How long until you can afford an award, from the yearly grant plus everyday earning. */
+function AeroGoal() {
+  const [goal, setGoal] = useState<number>(AEROPLAN.europeBusiness);
+  const [monthly, setMonthly] = useState(300);
+  const [pool, setPool] = useState(0);
+  const yearly = 15000 + monthly * 12;
+  const need = Math.max(0, goal - pool);
+  const months = yearly > 0 ? Math.ceil((need / yearly) * 12) : Infinity;
+  return (
+    <Demo>
+      <Slider label="Award you want (one way)" value={goal} onChange={setGoal} min={6000} max={110000} step={500} format={(v) => v.toLocaleString("en-CA")} />
+      <Slider label="Points from everyday earning a month" value={monthly} onChange={setMonthly} min={0} max={3000} step={50} format={(v) => v.toLocaleString("en-CA")} />
+      <Slider label="Points pooled from family" value={pool} onChange={setPool} min={0} max={100000} step={1000} format={(v) => v.toLocaleString("en-CA")} />
+      <Stats>
+        <Stat label="You earn a year" value={yearly.toLocaleString("en-CA")} />
+        <Stat label="Time to the award" value={Number.isFinite(months) ? (months <= 1 ? "now" : months < 24 ? `${months} months` : `${num(months / 12, 1)} years`) : "–"} tone={months <= 24 ? "good" : "warn"} />
+        <Stat label="Worth at the typical value" value={money((goal * AEROPLAN.centsTypical) / 100)} />
+      </Stats>
+      <Note>
+        Uses your 15,000-point yearly grant. Short North American flights start at {AEROPLAN.shortHaulFrom.toLocaleString("en-CA")}; partner business class to Europe is about{" "}
+        {AEROPLAN.europeBusiness.toLocaleString("en-CA")}. Prices follow the chart that changed on {AEROPLAN.chartChange}.
+      </Note>
     </Demo>
   );
 }
@@ -174,6 +229,8 @@ export const LIFESTYLE_DEMOS: Partial<Record<DemoKey, () => ReactElement>> = {
   funBudget: FunBudget,
   sinkingFund: SinkingFund,
   points: Points,
+  aeroCpp: AeroCpp,
+  aeroGoal: AeroGoal,
   fxFees: FxFees,
   subscriptions: Subscriptions,
   smallSpends: SmallSpends,
