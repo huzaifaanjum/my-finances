@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Crosshair, fiveTicks, linePath, plotHeight, plotWidth, viewBoxX, XLabel, YGrid, type Frame } from "@/components/charts/axes";
+import { useElementWidth } from "@/hooks/useElementWidth";
+import { Crosshair, fiveTicks, linePath, plotHeight, plotWidth, viewBoxX, XLabel, YGrid, type Frame, fitFrame, NARROW } from "@/components/charts/axes";
 import { Legend } from "@/components/ui/text";
 import { compactMoney, money } from "@/lib/format";
 import { monthLabel } from "@/lib/planner/calendar";
 import { COLOR } from "@/lib/colors";
 
-const FRAME: Frame = { width: 760, height: 320, left: 56, right: 14, top: 14, bottom: 28 };
+const BASE: Frame = { width: 760, height: 320, left: 56, right: 14, top: 14, bottom: 28 };
 
 interface Props {
   /** savings by plan month if you never buy */
@@ -29,6 +30,8 @@ const at = (a: number[], i: number) => a[Math.max(0, Math.min(i, a.length - 1))]
 
 /** One timeline: savings with and without the purchase, and the loan being paid down from the month you buy. */
 export default function GoalTimelineChart({ without, withLoan, target, targetLabel, buy, balances, faster }: Props) {
+  const [box, boxWidth] = useElementWidth<HTMLDivElement>(BASE.width);
+  const FRAME = fitFrame(BASE, boxWidth);
   const [hover, setHover] = useState<number | null>(null);
   const n = without.length - 1;
 
@@ -42,7 +45,7 @@ export default function GoalTimelineChart({ without, withLoan, target, targetLab
   const X = (m: number) => FRAME.left + (m / n) * pw;
   const Y = (v: number) => FRAME.top + ph - ((v - min) / (max - min)) * ph;
 
-  const yearStep = Math.max(1, Math.ceil(n / 12 / 7));
+  const yearStep = Math.max(1, Math.ceil(n / 12 / (FRAME.width < NARROW ? 4 : 7)));
   const ticks: number[] = [];
   for (let m = 0; m <= n; m += 12 * yearStep) ticks.push(m);
 
@@ -53,7 +56,7 @@ export default function GoalTimelineChart({ without, withLoan, target, targetLab
   const owed = m < buy ? 0 : at(faster ?? balances, m - buy);
 
   return (
-    <div>
+    <div ref={box}>
       <div className="pj-read">
         <span>{m === 0 ? "Now" : monthLabel(m)}</span>
         <span>Savings</span>

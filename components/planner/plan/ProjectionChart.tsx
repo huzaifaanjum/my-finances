@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Crosshair, fiveTicks, linePath, plotHeight, plotWidth, viewBoxX, XLabel, YGrid, type Frame } from "@/components/charts/axes";
+import { useElementWidth } from "@/hooks/useElementWidth";
+import { Crosshair, fiveTicks, linePath, plotHeight, plotWidth, viewBoxX, XLabel, YGrid, type Frame, fitFrame, NARROW } from "@/components/charts/axes";
 import { Legend } from "@/components/ui/text";
 import { compactMoney, deltaMoney, money } from "@/lib/format";
 import { axisMonthLabel } from "@/lib/planner/calendar";
 import type { MonthRow } from "@/lib/planner/types";
 import { COLOR } from "@/lib/colors";
 
-const FRAME: Frame = { width: 640, height: 260, left: 56, right: 24, top: 12, bottom: 28 };
+const BASE: Frame = { width: 640, height: 260, left: 56, right: 24, top: 12, bottom: 28 };
 
 /** Savings balance month by month, with the plan you started from drawn underneath. */
 export default function ProjectionChart({ rows, before, changed }: { rows: MonthRow[]; before: MonthRow[]; changed: boolean }) {
+  const [box, boxWidth] = useElementWidth<HTMLDivElement>(BASE.width);
+  const FRAME = fitFrame(BASE, boxWidth);
   const [hover, setHover] = useState<number | null>(null);
   const n = rows.length;
   const all = [...rows, ...before].map((r) => r.balance);
@@ -23,7 +26,7 @@ export default function ProjectionChart({ rows, before, changed }: { rows: Month
   const ph = plotHeight(FRAME);
   const X = (i: number) => FRAME.left + (i / Math.max(1, n - 1)) * pw;
   const Y = (v: number) => FRAME.top + ph - ((v - min) / (max - min)) * ph;
-  const step = Math.ceil(n / 8);
+  const step = Math.ceil(n / (FRAME.width < NARROW ? 4 : 8));
   const now = linePath(rows.map((r, i) => [X(i), Y(r.balance)]));
   const area = `${now} L${X(n - 1).toFixed(1)} ${Y(Math.max(0, min)).toFixed(1)} L${X(0).toFixed(1)} ${Y(Math.max(0, min)).toFixed(1)} Z`;
 
@@ -32,7 +35,7 @@ export default function ProjectionChart({ rows, before, changed }: { rows: Month
   const diff = row.balance - (before[k]?.balance ?? row.balance);
 
   return (
-    <div>
+    <div ref={box}>
       <div className="pj-read">
         {hover === null ? (
           <span>Point at the chart to see any month</span>

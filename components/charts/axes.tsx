@@ -73,3 +73,8 @@ export function viewBoxX(e: PointerEvent<SVGSVGElement>, viewWidth: number): num
   const b = e.currentTarget.getBoundingClientRect();
   return ((e.clientX - b.left) * viewWidth) / b.width;
 }
+
+/** On a phone, draw at the real width so labels stay readable; wider screens keep the fixed frame. */
+export const NARROW = 560;
+export const fitFrame = (f: Frame, width: number): Frame =>
+  width < NARROW && typeof window !== "undefined" && window.innerWidth <= NARROW ? { ...f, width, height: Math.round(f.height * 0.85), left: Math.min(f.left, 48) } : f;

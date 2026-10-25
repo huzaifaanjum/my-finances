@@ -1,19 +1,22 @@
 "use client";
 
-import { fiveTicks, linePath, plotHeight, plotWidth, XLabel, YGrid, type Frame } from "@/components/charts/axes";
+import { fiveTicks, linePath, plotHeight, plotWidth, XLabel, YGrid, type Frame, fitFrame, NARROW } from "@/components/charts/axes";
 import { axisMonthLabel, dayLabel, monthDate } from "@/lib/planner/calendar";
 import { Note } from "@/components/ui/text";
 import { money } from "@/lib/format";
 import type { Plan } from "@/lib/planner/projection";
+import { useElementWidth } from "@/hooks/useElementWidth";
 import { COLOR } from "@/lib/colors";
 
-const FRAME: Frame = { width: 640, height: 280, left: 56, right: 12, top: 12, bottom: 28 };
+const BASE: Frame = { width: 640, height: 280, left: 56, right: 12, top: 12, bottom: 28 };
 
 const labelStep = (n: number) => (n <= 6 ? 1 : n <= 12 ? 2 : n <= 24 ? 3 : n <= 36 ? 6 : 12);
 
 /** Day-by-day chequing balance: bills on the 1st, spending through the month, pay at the end. */
 /** `compact` drops the title and the explanation, for a card that already has both. */
 export default function CashBalanceChart({ plan, compact }: { plan: Plan; compact?: boolean }) {
+  const [box, boxWidth] = useElementWidth<HTMLDivElement>(BASE.width);
+  const FRAME = fitFrame(BASE, boxWidth);
   const { days, months } = plan;
   const vals = days.map((p) => p.bal);
   let max = Math.max(...vals);
@@ -24,12 +27,12 @@ export default function CashBalanceChart({ plan, compact }: { plan: Plan; compac
   const ph = plotHeight(FRAME);
   const X = (k: number) => FRAME.left + (k / Math.max(1, days.length - 1)) * pw;
   const Y = (v: number) => FRAME.top + ph - ((v - min) / (max - min)) * ph;
-  const step = labelStep(months);
+  const step = labelStep(months) * (FRAME.width < NARROW ? 2 : 1);
   const end = vals[vals.length - 1];
   const saved = plan.last.balance;
 
   return (
-    <div>
+    <div ref={box}>
       {!compact && <div className="ct">Cash balance</div>}
       <svg viewBox={`0 0 ${FRAME.width} ${FRAME.height}`} role="img" aria-label="Savings balance chart">
         <YGrid frame={FRAME} values={fiveTicks(min, max)} y={Y} />
