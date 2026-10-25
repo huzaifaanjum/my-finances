@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/layout/PageShell";
-import OfferSummary from "@/components/offer/OfferSummary";
+import OfferView from "@/components/offer/OfferView";
 import SeeAlso from "@/components/ui/SeeAlso";
 
 export const metadata: Metadata = { title: "Job offer" };
@@ -12,7 +12,7 @@ export default function OfferPage() {
       subtitle="Your Air Canada offer from August 3, 2026: what it adds up to and how your pay is put together."
     >
       <div className="off">
-        <OfferSummary />
+        <OfferView />
         <div className="seealso-row">
           <SeeAlso href="/insights" label="Insights">
             Key takeaways from the offer letter: probation, signing bonus conditions, severance and the fine print
