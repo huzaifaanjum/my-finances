@@ -68,11 +68,26 @@ export default function Nav() {
     };
   }, [open, sheet]);
 
+  // the sidebar covers the page, so the page behind it shouldn't scroll
+  useEffect(() => {
+    if (!sheet) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [sheet]);
+
   const currentLabel = NAV.flatMap((i) => (isGroup(i) ? i.pages : [i])).find((p) => p.href === current)?.label ?? "Menu";
 
   return (
-    <nav className="nav" aria-label="Main" ref={ref}>
+    <nav className={`nav${sheet ? " sheet-on" : ""}`} aria-label="Main" ref={ref}>
       <div className="nav-in">
+        <button type="button" className="nav-burger" aria-expanded={sheet} aria-controls="nav-sidebar" aria-label={`Open menu, on ${currentLabel}`} onClick={() => setSheet((v) => !v)}>
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d={sheet ? "M4 4l8 8M12 4l-8 8" : "M2.5 4.5h11M2.5 8h11M2.5 11.5h11"} />
+          </svg>
+        </button>
         <Link href="/" className="nav-brand">
           My Finances
         </Link>
@@ -96,12 +111,6 @@ export default function Nav() {
             ),
           )}
         </ul>
-        <button type="button" className="nav-burger" aria-expanded={sheet} onClick={() => setSheet((v) => !v)}>
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d={sheet ? "M4 4l8 8M12 4l-8 8" : "M2.5 4.5h11M2.5 8h11M2.5 11.5h11"} />
-          </svg>
-          {currentLabel}
-        </button>
         <div className="nav-r">
           <SyncStatus />
           <button type="button" className="nav-lock" onClick={() => signOut()} title="Lock the app; you'll need your passcode to come back">
@@ -113,8 +122,19 @@ export default function Nav() {
           </button>
         </div>
       </div>
+      {sheet && <div className="nav-scrim" aria-hidden="true" onClick={() => setSheet(false)} />}
       {sheet && (
-        <div className="nav-sheet">
+        <div className="nav-sheet" id="nav-sidebar" role="dialog" aria-modal="true" aria-label="Menu">
+          <div className="nav-sheet-h">
+            <Link href="/" className="nav-brand" onClick={() => setSheet(false)}>
+              My Finances
+            </Link>
+            <button type="button" className="nav-x" aria-label="Close menu" autoFocus onClick={() => setSheet(false)}>
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 4l8 8M12 4l-8 8" />
+              </svg>
+            </button>
+          </div>
           {NAV.map((item) =>
             isGroup(item) ? (
               <div key={item.label} className="nav-sg">
