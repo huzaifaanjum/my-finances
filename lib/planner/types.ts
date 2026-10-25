@@ -1,3 +1,4 @@
+import type { FiledReturn, GovPayment } from "@/lib/taxHistory";
 import type { FlagKey, NumericKey } from "./config";
 
 export type OneTimeKind = "income" | "expense";
@@ -77,6 +78,12 @@ export interface PlannerState {
   oneTime: Record<OneTimeKind, OneTimeItem[]>;
   /** saving goals, home and car included */
   goals: CustomGoal[];
+  /** Tax tab: claim amounts ("rrsp") and T4 figures you typed in ("flex.gross") */
+  tax: Record<string, number>;
+  /** returns you already filed, from your notices of assessment */
+  taxHistory: FiledReturn[];
+  /** solidarity credit, GST credit and other government payments */
+  govPayments: GovPayment[];
 }
 
 export interface MonthRow {

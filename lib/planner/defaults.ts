@@ -51,6 +51,9 @@ export function createDefaultState(): PlannerState {
     pay: [{ id: 1, amount: sliders.net, date: isoDate(0, 1) }],
     income: [],
     expenses: defaultExpenses(),
+    tax: {},
+    taxHistory: [],
+    govPayments: [],
     goals: defaultGoals((k) => sliders[k as SliderKey], FLAGS.ctax),
     oneTime: {
       income: signingItems(PAY.signingNet, 1),

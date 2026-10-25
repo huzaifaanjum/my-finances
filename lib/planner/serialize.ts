@@ -1,5 +1,6 @@
 // Converts between PlannerState and the shape stored in MongoDB.
 // The stored shape predates the React rewrite: `v` is keyed by the old input ids, so existing saves keep loading.
+import { readHistory, readPayments } from "@/lib/taxHistory";
 import { isoDate, planDay, todayIso } from "./calendar";
 import { EXPENSE_GROUPS, FLAGS, HORIZONS, SLIDERS, type FlagKey, type SliderKey } from "./config";
 import { defaultExpenses, defaultGoals, incentiveItem, nextId, ONE_TIME_MONTHS, signingItems } from "./defaults";
@@ -42,6 +43,12 @@ interface SavedExpense {
 export interface SavedState {
   ver?: number;
   v: Record<string, string | number | boolean>;
+  /** government payments */
+  gp?: unknown[];
+  /** filed returns */
+  th?: unknown[];
+  /** Tax tab values */
+  tx?: Record<string, number>;
   /** 2 once goals hold home and car as templates */
   gv?: number;
   /** your goals */
@@ -72,6 +79,9 @@ export function toSaved(s: PlannerState): SavedState {
     v,
     py: s.pay.map((p) => ({ id: p.id, a: p.amount, d: p.date })),
     gv: 2,
+    tx: s.tax,
+    th: s.taxHistory,
+    gp: s.govPayments,
     gl: s.goals.map((g) => ({ id: g.id, k: g.kind, n: g.name, v: g.values, d: g.date, s: g.saved, m: g.monthly })),
     ri: s.income.map((o) => ({ id: o.id, n: o.name, a: o.amount, ev: o.every, m: o.month, ...(o.tag && { t: o.tag }) })),
     re: s.expenses.map((e) => ({ id: e.id, n: e.name, a: e.amount, ev: e.every, g: e.group, nd: e.need })),
@@ -171,6 +181,9 @@ export function fromSaved(raw: unknown, base: PlannerState): PlannerState {
     flags: { ...base.flags },
     pay: base.pay.map((p) => ({ ...p })),
     goals: base.goals.map((g) => ({ ...g })),
+    tax: readValues(saved.tx) ?? { ...base.tax },
+    taxHistory: readHistory(saved.th) ?? base.taxHistory,
+    govPayments: readPayments(saved.gp) ?? base.govPayments,
     income: base.income.map((o) => ({ ...o })),
     expenses: base.expenses.map((e) => ({ ...e })),
     oneTime: { income: readItems(saved.oo), expense: readItems(saved.ox) },

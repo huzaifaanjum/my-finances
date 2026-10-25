@@ -7,7 +7,7 @@ export const KEY_DATES: { date: string; label: string; what: string }[] = [
   { date: "2027-02-28", label: "End Feb 2027", what: "T4 and RL-1 tax slips arrive. Then you can file" },
   { date: "2027-03-01", label: "Mar 1, 2027", what: "RRSP deadline for your 2026 return. Travel privileges start (28 weeks)" },
   { date: "2027-04-30", label: "Apr 30, 2027", what: "File your federal and Quebec returns" },
-  { date: "2027-05-31", label: "May 2027", what: "Expected refund of about $1,400 (estimate)" },
+  { date: "2027-05-31", label: "May 2027", what: "Refund arrives, a few weeks after filing; the Tax tab estimates it" },
   { date: "2027-08-17", label: "Aug 17, 2027", what: "Second $2,500 signing payment (gross)" },
 ];
 

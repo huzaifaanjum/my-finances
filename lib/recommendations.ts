@@ -174,7 +174,7 @@ export function checklist(ctx: RecContext): Step[] {
       area: "tax",
       priority: "now",
       title: "Open an FHSA this year, even with $0",
-      body: "FHSA room only starts building once the account exists. Opening one before Dec 31 gives you $8,000 of room for this year that carries forward if you don't use it.",
+      body: "CRA My Account shows you don't have an FHSA yet. Room only starts once the account exists: opening one before Dec 31 gives you $8,000 of room for 2026 that carries forward one year if you don't use it. The Tax tab shows what filling it would add to your refund.",
       when: "By Dec 31",
       link: { href: "/goals/house", label: "House goal" },
     },
@@ -223,6 +223,19 @@ export function checklist(ctx: RecContext): Step[] {
       title: "Claim moving expenses if you moved for this job",
       body: "If you moved at least 40 km closer to work to start at Air Canada, moving costs can be deducted from your Montréal income on both returns. Keep the receipts.",
       when: "Tax time",
+    },
+    {
+      id: "rec-qc-tuition-carry",
+      area: "tax",
+      priority: "soon",
+      title: "Use your carried-forward Quebec tuition credit",
+      body: "Revenu Québec holds $19,127.72 of tuition fees you haven't used. At 8% that is $1,530 off your Quebec tax. Your 2025 return claimed only that year's fees, so it is still waiting. It never expires.",
+      steps: [
+        "Fastest: in My Account at Revenu Québec, ask for a change to your 2025 return and claim the carried-forward tuition on Schedule T (line 398). The $1,530 could come back now.",
+        "Or simply claim it on your 2026 return in spring 2027: on Schedule T, use the unused fees shown on your notice of assessment.",
+        "Federal side is already handled: your CRA notice shows $7,077 of unused federal tuition, which the CRA applies on your 2026 return automatically (about $827). The Tax tab counts it.",
+      ],
+      link: { href: "/tax", label: "Tax" },
     },
     {
       id: "rec-pension-fund-check",

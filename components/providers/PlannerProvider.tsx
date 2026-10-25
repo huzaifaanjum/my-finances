@@ -20,6 +20,8 @@ interface PlannerActions {
   addGoal: (goal: Omit<CustomGoal, "id">) => number;
   updateGoal: (id: number, patch: Partial<Omit<CustomGoal, "id">>) => void;
   removeGoal: (id: number) => void;
+  /** a Tax tab value; null removes it (back to the estimate) */
+  setTaxValue: (key: string, value: number | null) => void;
   /** one template field of a goal */
   setGoalValue: (id: number, key: string, value: number) => void;
   /** a blank row, or a preset such as the incentive */
@@ -88,6 +90,13 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       },
       updateGoal: (id, patch) => edit((s) => ({ ...s, goals: s.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)) })),
       removeGoal: (id) => edit((s) => ({ ...s, goals: s.goals.filter((g) => g.id !== id) })),
+      setTaxValue: (key, value) =>
+        edit((s) => {
+          const tax = { ...s.tax };
+          if (value === null) delete tax[key];
+          else tax[key] = value;
+          return { ...s, tax };
+        }),
       setGoalValue: (id, key, value) =>
         edit((s) => ({ ...s, goals: s.goals.map((g) => (g.id === id ? { ...g, values: { ...g.values, [key]: value } } : g)) })),
       addIncome: (preset) =>
