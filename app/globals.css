@@ -1903,3 +1903,21 @@ select option{background:#18181b;color:var(--text)}
 .bc-card>em{font-style:normal;font-size:12px;color:var(--mute)}
 @media (max-width:1300px) and (min-width:1001px){.pl-in .bc{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:520px){.pl-in .bc,.bc{grid-template-columns:minmax(0,1fr)}}
+/* budget projection: one headline, a plain sentence, the chart, four milestones */
+.pj-hero{display:grid;gap:4px;margin:4px 0 14px}
+.pj-hero>span{font-size:13px;color:var(--mute)}
+.pj-hero>div{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.pj-hero b{font-size:36px;line-height:1.1;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--std)}
+.pj-hero b.neg{color:var(--neg)}
+.pj-hero em{font-style:normal;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.pj-hero p{margin:4px 0 0;font-size:13px;line-height:1.55;color:var(--mute);text-align:justify}
+.pj-hero strong{color:var(--text);font-weight:600}
+.pj-read{min-height:22px}
+.pj-marks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:12px;margin-top:14px}
+.pj-m{display:grid;gap:2px;align-content:start;padding:12px 14px;border-left:1px solid var(--line);min-width:0}
+.pj-m:first-child{border-left:0}
+.pj-m span{font-size:12px;color:var(--mute)}
+.pj-m b{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.pj-m em{font-style:normal;font-size:12px;color:var(--mute)}
+.pj-m.neg b{color:var(--neg)}.pj-m.warn b{color:var(--promo)}
+@media (max-width:560px){.pj-marks{grid-template-columns:repeat(2,minmax(0,1fr))}.pj-m:nth-child(3){border-left:0}.pj-m:nth-child(n+3){border-top:1px solid var(--line)}}

@@ -1,18 +1,17 @@
 "use client";
 
 import { HorizonSelect } from "@/components/planner/shared/controls";
-import { deltaMoney, money, percent, signedMoney } from "@/lib/format";
+import { deltaMoney, money } from "@/lib/format";
 import type { Plan } from "@/lib/planner/projection";
 import ProjectionChart from "./ProjectionChart";
 
-/** One headline number with how far it moved since the page opened. */
-function Tile({ label, value, delta, note }: { label: string; value: string; delta?: number; note?: string }) {
-  const d = delta === undefined ? 0 : Math.round(delta);
+/** A milestone in the strip under the chart: what, when or how much, and how it moved since the page opened. */
+function Mark({ label, value, change, tone }: { label: string; value: string; change?: string; tone?: "warn" | "neg" | "pos" }) {
   return (
-    <div className="pj-tile">
+    <div className={`pj-m ${tone ?? ""}`}>
       <span>{label}</span>
       <b>{value}</b>
-      {d !== 0 ? <em className={d > 0 ? "up" : "down"}>{deltaMoney(d)}</em> : note && <em>{note}</em>}
+      {change && <em className={change.startsWith("+") ? "up" : change.startsWith("−") || change.startsWith("-") ? "down" : undefined}>{change}</em>}
     </div>
   );
 }
@@ -39,6 +38,14 @@ export default function ProjectionPanel({ plan, before, changed, onUndo, onKeep 
   const hundredK = plan.eta(100_000);
   const hundredKWas = before.eta(100_000);
 
+  // where the end balance comes from: what you start with, pay left over, and bonuses or one-time money
+  const first = plan.rows[0];
+  const start = first.balance - first.deposit;
+  const fromPay = plan.rows.reduce((t, r) => t + r.base, 0);
+  const extra = plan.rows.reduce((t, r) => t + r.extra, 0);
+  const endDelta = Math.round(plan.last.balance - before.last.balance);
+  const delta = (v: number) => (Math.round(v) ? deltaMoney(v) : undefined);
+
   return (
     <section className="pj" aria-live="polite">
       <div className="tabs">
@@ -46,24 +53,40 @@ export default function ProjectionPanel({ plan, before, changed, onUndo, onKeep 
         <HorizonSelect />
       </div>
 
-      <div className="pj-tiles">
-        <Tile label="Left over each month" value={signedMoney(plan.left)} delta={plan.left - before.left} note={`${percent(plan.rate)} of take-home`} />
-        <Tile label={`Saved by ${plan.last.label}`} value={money(plan.last.balance)} delta={plan.last.balance - before.last.balance} />
-        <Tile label="Saved in 5 years" value={money(fiveYears)} delta={fiveYears - before.far[59].balance} note={plan.state.pay.length > 1 ? "with your pay changes, no returns" : "no raises, no returns"} />
-        <Tile label="3-month emergency fund" value={emergency} note={etaChange(emergency, emergencyWas)} />
-        <Tile label="First $100k" value={hundredK} note={etaChange(hundredK, hundredKWas)} />
-        <Tile
-          label="Lowest balance"
-          value={money(plan.low.bal)}
-          delta={plan.low.bal - before.low.bal}
-          note={plan.low.bal < 0 ? "you would overdraw" : undefined}
-        />
+      <div className="pj-hero">
+        <span>Saved by {plan.last.label}</span>
+        <div>
+          <b className={plan.last.balance < 0 ? "neg" : undefined}>{money(plan.last.balance)}</b>
+          {changed && endDelta !== 0 && <em className={endDelta > 0 ? "up" : "down"}>{deltaMoney(endDelta)} vs before</em>}
+        </div>
+        <p>
+          You start at <strong>{money(start)}</strong>, add <strong>{money(fromPay)}</strong> from pay over {plan.rows.length - 1} months
+          {Math.abs(extra) >= 1 && (
+            <>
+              {" "}
+              and <strong>{extra >= 0 ? money(extra) : `−${money(-extra)}`}</strong> from bonuses and one-time money
+            </>
+          )}
+          . No investment growth is counted.
+        </p>
       </div>
 
       <ProjectionChart rows={plan.rows} before={before.rows} changed={changed} />
 
+      <div className="pj-marks">
+        <Mark
+          label="Lowest balance"
+          value={money(plan.low.bal)}
+          change={delta(plan.low.bal - before.low.bal) ?? (plan.low.bal < 0 ? "you'd overdraw" : undefined)}
+          tone={plan.low.bal < 0 ? "neg" : plan.low.bal < 500 ? "warn" : undefined}
+        />
+        <Mark label="3 months of costs saved" value={emergency} change={etaChange(emergency, emergencyWas)} />
+        <Mark label="First $100k" value={hundredK} change={etaChange(hundredK, hundredKWas)} />
+        <Mark label="In 5 years" value={money(fiveYears)} change={delta(fiveYears - before.far[59].balance) ?? "no raises or returns"} />
+      </div>
+
       <div className="pj-act">
-        <span>{changed ? "Compared with the plan you opened this page with." : "Change any amount and the projection updates here."}</span>
+        <span>{changed ? "The dashed line is the plan you opened this page with." : "Change any amount on the left and this updates."}</span>
         {changed && (
           <>
             <button type="button" className="add" onClick={onUndo}>
