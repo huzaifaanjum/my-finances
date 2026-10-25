@@ -49,13 +49,14 @@ export interface RecurringExpense {
   need: boolean;
 }
 
-/** A goal you add yourself, from a template: save up a target by a date. */
+/** A saving goal made from a template ("house", "car", "trip", "custom"…). */
 export interface CustomGoal {
   id: number;
-  /** template it started from: "trip", "wedding", "custom"… */
+  /** which template: decides the fields and how the cost adds up */
   kind: string;
   name: string;
-  target: number;
+  /** the template's fields, by key */
+  values: Record<string, number>;
   /** "2027-08-31" */
   date: string;
   /** already set aside for it */
@@ -74,7 +75,7 @@ export interface PlannerState {
   income: RecurringIncome[];
   expenses: RecurringExpense[];
   oneTime: Record<OneTimeKind, OneTimeItem[]>;
-  /** goals beyond the built-in home and car */
+  /** saving goals, home and car included */
   goals: CustomGoal[];
 }
 

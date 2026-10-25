@@ -7,6 +7,22 @@ import type { PlannerState } from "@/lib/planner/types";
 
 const API = "/api/state";
 const SAVE_DELAY = 800;
+/** A change made right before the tab closed, kept in this browser until the cloud has it. */
+const PENDING_KEY = "plan_pending";
+
+function readPending(): { at: number; state: unknown } | null {
+  try {
+    const raw = localStorage.getItem(PENDING_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+function clearPending() {
+  try {
+    localStorage.removeItem(PENDING_KEY);
+  } catch {}
+}
 const RETRY_DELAY = 15000;
 const POLL_EVERY = 45000;
 /** Show the page even if the server never answers. */
@@ -50,6 +66,7 @@ export function useCloudSync({ state, revision, applyRemote }: Options): { statu
       const res = await api<{ updatedAt: number }>(API, { method: "PUT", body: { state: toSaved(stateRef.current) } });
       s.lastAt = res.updatedAt;
       s.dirty = false;
+      clearPending();
       setStatus({ text: "saved", tone: "ok" });
     } catch (e) {
       if (e instanceof AuthError) return signOut(true);
@@ -70,9 +87,18 @@ export function useCloudSync({ state, revision, applyRemote }: Options): { statu
       }
       if (!s.loaded) {
         s.loaded = true;
-        if (!res.state) {
+        // a change from just before the last close that the cloud doesn't have yet
+        const pending = readPending();
+        if (pending && pending.at > (res.updatedAt || 0)) {
+          applyRemote(fromSaved(pending.state, stateRef.current));
           s.dirty = true;
           void push();
+        } else {
+          if (pending) clearPending();
+          if (!res.state) {
+            s.dirty = true;
+            void push();
+          }
         }
       }
       if (!s.dirty) setStatus({ text: "synced", tone: "ok" });
@@ -94,12 +120,37 @@ export function useCloudSync({ state, revision, applyRemote }: Options): { statu
     const poll = setInterval(() => {
       if (document.visibilityState === "visible" && !s.dirty && !s.saving) void pull();
     }, POLL_EVERY);
+    // a change made just before closing or reloading would wait out the save delay and be lost; send it now
+    const flush = () => {
+      if (!s.dirty || !s.loaded) return;
+      clearTimeout(s.timer);
+      const passcode = getPasscode();
+      if (!passcode) return;
+      const saved = toSaved(stateRef.current);
+      try {
+        localStorage.setItem(PENDING_KEY, JSON.stringify({ at: Date.now(), state: saved }));
+      } catch {}
+      void fetch(API, {
+        method: "PUT",
+        keepalive: true,
+        headers: { "content-type": "application/json", "x-passcode": passcode },
+        body: JSON.stringify({ state: saved }),
+      }).catch(() => {});
+      s.dirty = false;
+    };
+    const onHidden = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
     document.addEventListener("visibilitychange", onVisible);
+    document.addEventListener("visibilitychange", onHidden);
+    window.addEventListener("pagehide", flush);
     return () => {
       clearTimeout(fallback);
       clearInterval(poll);
       clearTimeout(s.timer);
       document.removeEventListener("visibilitychange", onVisible);
+      document.removeEventListener("visibilitychange", onHidden);
+      window.removeEventListener("pagehide", flush);
     };
   }, [pull]);
 

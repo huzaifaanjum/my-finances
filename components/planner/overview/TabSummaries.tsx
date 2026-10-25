@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useVault } from "@/components/payslips/PayslipVault";
 import { usePensionStart } from "@/components/payslips/usePensionStart";
-import { summarize } from "@/components/planner/goals/GoalsView";
 import { monthlyStats } from "@/components/planner/monthly/stats";
 import { usePlan } from "@/components/providers/PlannerProvider";
 import { useKnowledgeProgress } from "@/hooks/useKnowledgeProgress";
@@ -13,7 +12,7 @@ import { COMP } from "@/lib/offer";
 import { periodLabel } from "@/lib/payslips/analysis";
 import { monthLabel } from "@/lib/planner/calendar";
 import { investmentPlan } from "@/lib/planner/finance";
-import { customGoalPlan, GOALS } from "@/lib/planner/goals";
+import { summarizeGoal } from "@/lib/planner/goals";
 import { healthTiles } from "@/lib/planner/insights";
 import { retirement } from "@/lib/planner/retirement";
 import { checklist, isDone, recContext } from "@/lib/recommendations";
@@ -36,12 +35,10 @@ export default function TabSummaries() {
   const health = healthTiles(plan);
   const acts = health.filter((t) => t.level === "act");
   const watch = health.filter((t) => t.level === "watch");
-  const builtIn = GOALS.map((g) => ({ name: g.name, ok: summarize(g.id, plan).onTrack, when: summarize(g.id, plan).facts.find(([k]) => k === "Savings ready")?.[1] ?? "—" }));
-  const mine = plan.state.goals.map((g) => {
-    const p = customGoalPlan(g, plan);
-    return { name: g.name || "Goal", ok: p.onTrack || p.left === 0, when: p.onTrack || p.left === 0 ? "on time" : "behind" };
+  const goals = plan.state.goals.map((g) => {
+    const x = summarizeGoal(g, plan);
+    return { name: g.name || "Goal", ok: x.onTrack, when: x.when };
   });
-  const goals = [...builtIn, ...mine];
   const onTrack = goals.filter((x) => x.ok).length;
   const hit = investmentPlan(plan).sim.hit;
   const r = retirement(plan, usePensionStart());

@@ -1,17 +1,14 @@
 "use client";
 
 import { GlossaryScope, G } from "@/components/glossary/GlossaryText";
-import { usePlan } from "@/components/providers/PlannerProvider";
-import { PlannerCheckbox, PlannerSlider } from "@/components/planner/shared/controls";
 import { Note } from "@/components/ui/text";
 import { money } from "@/lib/format";
 import { monthLabel } from "@/lib/planner/calendar";
-import { carPlan } from "@/lib/planner/car";
+import { GoalCheckbox, GoalSlider, useCar } from "./GoalScope";
 
 /** Whether your savings cover the down payment when you plan to buy. */
 function DownPaymentCheck() {
-  const plan = usePlan();
-  const car = carPlan(plan);
+  const car = useCar();
   const when = car.buy === 0 ? "now" : monthLabel(car.buy);
   const ok = car.savedAtBuy >= car.down;
   return (
@@ -46,13 +43,13 @@ export default function CarControls() {
     <div>
       <h3 className="sec">Car</h3>
       <div className="stack">
-        <PlannerSlider k="cprice" />
-        <PlannerCheckbox k="ctax" label="Add GST and QST (14.975%)" />
-        <PlannerSlider k="cdown" />
-        <PlannerSlider k="capr" />
-        <PlannerSlider k="cterm" />
-        <PlannerSlider k="cextra" />
-        <PlannerSlider k="cbuy" />
+        <GoalSlider k="cprice" />
+        <GoalCheckbox k="ctax" label="Add GST and QST (14.975%)" />
+        <GoalSlider k="cdown" />
+        <GoalSlider k="capr" />
+        <GoalSlider k="cterm" />
+        <GoalSlider k="cextra" />
+        <GoalSlider k="cbuy" />
       </div>
       <DownPaymentCheck />
       <Note style={{ marginTop: 12 }}>

@@ -1,31 +1,12 @@
 import type { Metadata } from "next";
-import PageShell from "@/components/layout/PageShell";
-import CarGoal from "@/components/planner/goals/CarGoal";
-import CustomGoalView from "@/components/planner/goals/CustomGoalView";
-import HouseGoal from "@/components/planner/goals/HouseGoal";
-import { findGoal, GOALS } from "@/lib/planner/goals";
+import GoalPage from "@/components/planner/goals/CustomGoalView";
 
 type Props = { params: Promise<{ id: string }> };
 
-// house and car are built in; goals you add (g + id) live in your saved plan
-export const dynamicParams = true;
+export const metadata: Metadata = { title: "Saving goal" };
 
-export function generateStaticParams() {
-  return GOALS.map((g) => ({ id: g.id }));
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const goal = findGoal((await params).id);
-  return { title: goal ? `${goal.name} goal` : "Goal" };
-}
-
-export default async function GoalPage({ params }: Props) {
+/** Every goal lives in your saved plan; "/goals/house" and "/goals/car" open your first goal of that kind. */
+export default async function Page({ params }: Props) {
   const { id } = await params;
-  const goal = findGoal(id);
-  if (!goal) return <CustomGoalView slug={id} />;
-  return (
-    <PageShell title={goal.name} subtitle={goal.subtitle} back={{ href: "/goals", label: "Goals" }}>
-      {goal.id === "house" ? <HouseGoal /> : <CarGoal />}
-    </PageShell>
-  );
+  return <GoalPage slug={id} />;
 }

@@ -20,6 +20,8 @@ interface PlannerActions {
   addGoal: (goal: Omit<CustomGoal, "id">) => number;
   updateGoal: (id: number, patch: Partial<Omit<CustomGoal, "id">>) => void;
   removeGoal: (id: number) => void;
+  /** one template field of a goal */
+  setGoalValue: (id: number, key: string, value: number) => void;
   /** a blank row, or a preset such as the incentive */
   addIncome: (preset?: Omit<RecurringIncome, "id">) => void;
   updateIncome: (id: number, patch: Partial<Omit<RecurringIncome, "id">>) => void;
@@ -86,6 +88,8 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       },
       updateGoal: (id, patch) => edit((s) => ({ ...s, goals: s.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)) })),
       removeGoal: (id) => edit((s) => ({ ...s, goals: s.goals.filter((g) => g.id !== id) })),
+      setGoalValue: (id, key, value) =>
+        edit((s) => ({ ...s, goals: s.goals.map((g) => (g.id === id ? { ...g, values: { ...g.values, [key]: value } } : g)) })),
       addIncome: (preset) =>
         edit((s) => ({ ...s, income: [...s.income, { name: "", amount: 0, every: 1, month: 0, ...preset, id: nextId(s.income) }] })),
       updateIncome: (id, patch) => edit((s) => ({ ...s, income: s.income.map((o) => (o.id === id ? { ...o, ...patch } : o)) })),

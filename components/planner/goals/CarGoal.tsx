@@ -4,16 +4,16 @@ import { usePlan } from "@/components/providers/PlannerProvider";
 import Card from "@/components/ui/Card";
 import { money } from "@/lib/format";
 import { monthLabel } from "@/lib/planner/calendar";
-import { carPlan } from "@/lib/planner/car";
 import { savingsWithPurchase } from "@/lib/planner/projection";
 import CarControls from "./CarControls";
 import { CarKpis, LoanComparisons } from "./CarResults";
+import { useCar } from "./GoalScope";
 import GoalTimelineChart from "./GoalTimelineChart";
 
 /** Stats on top, sliders beside the timeline, then the three loan comparisons in a row. */
 export default function CarGoal() {
   const plan = usePlan();
-  const car = carPlan(plan);
+  const car = useCar();
   const faster = car.extra > 0 ? car.withExtra : null;
   const loan = faster ?? car.regular;
   const paidOff = car.buy + loan.months;

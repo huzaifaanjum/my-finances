@@ -2,7 +2,7 @@
 // The stored shape predates the React rewrite: `v` is keyed by the old input ids, so existing saves keep loading.
 import { isoDate, planDay, todayIso } from "./calendar";
 import { EXPENSE_GROUPS, FLAGS, HORIZONS, SLIDERS, type FlagKey, type SliderKey } from "./config";
-import { defaultExpenses, incentiveItem, nextId, ONE_TIME_MONTHS, signingItems } from "./defaults";
+import { defaultExpenses, defaultGoals, incentiveItem, nextId, ONE_TIME_MONTHS, signingItems } from "./defaults";
 import { stepOn } from "./projection";
 import type { CustomGoal, IncomeTag, OneTimeItem, PayStep, PlannerState, RecurringExpense, RecurringIncome } from "./types";
 
@@ -42,8 +42,10 @@ interface SavedExpense {
 export interface SavedState {
   ver?: number;
   v: Record<string, string | number | boolean>;
-  /** your own goals */
-  gl?: { id: number; k: string; n: string; t: number; d: string; s: number; m: number }[];
+  /** 2 once goals hold home and car as templates */
+  gv?: number;
+  /** your goals */
+  gl?: { id: number; k: string; n: string; v?: Record<string, number>; t?: number; d: string; s: number; m: number }[];
   /** pay steps */
   py?: { id: number; a: number; d: string }[];
   ri?: SavedIncome[];
@@ -69,7 +71,8 @@ export function toSaved(s: PlannerState): SavedState {
     ver: VERSION,
     v,
     py: s.pay.map((p) => ({ id: p.id, a: p.amount, d: p.date })),
-    gl: s.goals.map((g) => ({ id: g.id, k: g.kind, n: g.name, t: g.target, d: g.date, s: g.saved, m: g.monthly })),
+    gv: 2,
+    gl: s.goals.map((g) => ({ id: g.id, k: g.kind, n: g.name, v: g.values, d: g.date, s: g.saved, m: g.monthly })),
     ri: s.income.map((o) => ({ id: o.id, n: o.name, a: o.amount, ev: o.every, m: o.month, ...(o.tag && { t: o.tag }) })),
     re: s.expenses.map((e) => ({ id: e.id, n: e.name, a: e.amount, ev: e.every, g: e.group, nd: e.need })),
     oo: s.oneTime.income.map(out),
@@ -115,13 +118,19 @@ function readPay(raw: unknown): PayStep[] | null {
   }));
 }
 
+function readValues(raw: unknown): Record<string, number> | null {
+  if (!raw || typeof raw !== "object") return null;
+  return Object.fromEntries(Object.entries(raw as Record<string, unknown>).map(([k, v]) => [k, Number(v) || 0]));
+}
+
 function readGoals(raw: unknown): CustomGoal[] | null {
   if (!Array.isArray(raw)) return null;
   return raw.map((g: Partial<NonNullable<SavedState["gl"]>[number]>, k) => ({
     id: Number(g.id) || k + 1,
-    kind: String(g.k ?? "custom"),
+    // the first goals saved only had a target, so they become "something else" goals
+    kind: g.v ? String(g.k ?? "custom") : "custom",
     name: String(g.n ?? ""),
-    target: amountOf(g.t),
+    values: readValues(g.v) ?? { target: amountOf(g.t) },
     date: typeof g.d === "string" && ISO.test(g.d) ? g.d : isoDate(12),
     saved: amountOf(g.s),
     monthly: amountOf(g.m),
@@ -161,7 +170,7 @@ export function fromSaved(raw: unknown, base: PlannerState): PlannerState {
     numbers: { ...base.numbers },
     flags: { ...base.flags },
     pay: base.pay.map((p) => ({ ...p })),
-    goals: readGoals(saved.gl) ?? base.goals.map((g) => ({ ...g })),
+    goals: base.goals.map((g) => ({ ...g })),
     income: base.income.map((o) => ({ ...o })),
     expenses: base.expenses.map((e) => ({ ...e })),
     oneTime: { income: readItems(saved.oo), expense: readItems(saved.ox) },
@@ -182,6 +191,21 @@ export function fromSaved(raw: unknown, base: PlannerState): PlannerState {
     const n = readNumber(v[k]);
     if (n !== null) next.numbers[k] = Math.max(0, n);
   });
+
+  // saves without goals kept one house and one car in the sliders
+  const num = (k: string) => {
+    const n = readNumber(v[k]);
+    const d = SLIDERS[k as SliderKey];
+    return n === null ? d.initial : clampToSlider(n, d.min, d.max, d.step);
+  };
+  const goals = readGoals(saved.gl);
+  if (saved.gv === 2 && goals) next.goals = goals;
+  else {
+    // before goal templates: one home and one car lived in the sliders, and any other goals had only a target
+    const seeded = defaultGoals(num, typeof v.ctax === "boolean" ? v.ctax : FLAGS.ctax);
+    const ids = new Set(seeded.map((g) => g.id));
+    next.goals = [...seeded, ...(goals ?? []).map((g) => (ids.has(g.id) ? { ...g, id: g.id + 1000 } : g))];
+  }
 
   // saves without pay steps had one take-home figure
   next.pay = readPay(saved.py) ?? [{ id: 1, amount: next.numbers.net, date: isoDate(0, 1) }];

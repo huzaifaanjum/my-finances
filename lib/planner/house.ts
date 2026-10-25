@@ -22,6 +22,19 @@ export function minDown(price: number): number {
 /** Canadian fixed mortgages compound twice a year; this is the matching monthly-compounded rate. */
 export const monthlyEquivalent = (ratePct: number) => (Math.pow(1 + ratePct / 200, 1 / 6) - 1) * 1200;
 
+/** A house goal's settings. */
+export interface HouseValues {
+  home: number;
+  /** down payment, percent */
+  dpp: number;
+  hrate: number;
+  /** amortization, years */
+  hamort: number;
+  hextra: number;
+  /** plan month you buy in */
+  hbuy: number;
+}
+
 export interface HousePlan {
   price: number;
   dppPct: number;
@@ -48,8 +61,8 @@ export interface HousePlan {
   ready: number;
 }
 
-export function housePlan(plan: Plan, dppPct = plan.state.numbers.dpp): HousePlan {
-  const { home: price, hrate: rate, hamort: years, hbuy: buy, hextra: extra } = plan.state.numbers;
+export function housePlan(plan: Plan, v: HouseValues, dppPct = v.dpp): HousePlan {
+  const { home: price, hrate: rate, hamort: years, hbuy: buy, hextra: extra } = v;
   const down = (price * dppPct) / 100;
   const base = price - down;
   const premium = base * cmhcRate(dppPct);

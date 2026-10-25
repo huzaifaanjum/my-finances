@@ -2,7 +2,6 @@
 
 import { G, GlossaryScope } from "@/components/glossary/GlossaryText";
 import { usePlan } from "@/components/providers/PlannerProvider";
-import { PlannerSlider } from "@/components/planner/shared/controls";
 import Card from "@/components/ui/Card";
 import { Kpi, KpiGrid } from "@/components/ui/Kpi";
 import { KeyValue, Note } from "@/components/ui/text";
@@ -11,7 +10,9 @@ import { monthLabel } from "@/lib/planner/calendar";
 import { amortize } from "@/lib/planner/finance";
 import { housePlan, monthlyEquivalent, type HousePlan } from "@/lib/planner/house";
 import { savingsWithPurchase, type Plan } from "@/lib/planner/projection";
+import { GoalSlider, useGoal } from "./GoalScope";
 import GoalTimelineChart from "./GoalTimelineChart";
+import { houseValues } from "@/lib/planner/goals";
 
 const DOWN_OPTIONS = [5, 10, 15, 20, 25];
 const AMORTIZATIONS = [15, 20, 25, 30];
@@ -80,12 +81,12 @@ function HouseControls({ plan, h }: { plan: Plan; h: HousePlan }) {
       <div>
         <h3 className="sec">House</h3>
         <div className="stack">
-          <PlannerSlider k="home" />
-          <PlannerSlider k="dpp" />
-          <PlannerSlider k="hrate" />
-          <PlannerSlider k="hamort" />
-          <PlannerSlider k="hextra" />
-          <PlannerSlider k="hbuy" />
+          <GoalSlider k="home" />
+          <GoalSlider k="dpp" />
+          <GoalSlider k="hrate" />
+          <GoalSlider k="hamort" />
+          <GoalSlider k="hextra" />
+          <GoalSlider k="hbuy" />
         </div>
         <BuyCheck h={h} />
       </div>
@@ -99,6 +100,7 @@ function HouseControls({ plan, h }: { plan: Plan; h: HousePlan }) {
 
 /** Cash and down payment details, then amortization length, paying extra, and a different rate. */
 function MortgageComparisons({ plan, h }: { plan: Plan; h: HousePlan }) {
+  const goal = useGoal();
   const nt = plan.net || 1;
   const extras = [...new Set([0, 100, 250, 500, 1000, h.extra])].sort((a, b) => a - b);
   return (
@@ -124,7 +126,7 @@ function MortgageComparisons({ plan, h }: { plan: Plan; h: HousePlan }) {
                 <th>Monthly</th>
               </tr>
               {DOWN_OPTIONS.map((d) => {
-                const o = housePlan(plan, d);
+                const o = housePlan(plan, houseValues(goal), d);
                 return (
                   <tr key={d} className={d === h.dppPct ? "sel" : undefined}>
                     <td>
@@ -228,7 +230,8 @@ function MortgageComparisons({ plan, h }: { plan: Plan; h: HousePlan }) {
 /** Stats on top, sliders beside the two charts, then the three mortgage comparisons in a row. */
 export default function HouseGoal() {
   const plan = usePlan();
-  const h = housePlan(plan);
+  const values = houseValues(useGoal());
+  const h = housePlan(plan, values);
   const sooner = h.loan.months - h.withExtra.months;
   const paid = h.extra > 0 ? h.withExtra : h.loan;
   const paidOff = h.buy + paid.months;

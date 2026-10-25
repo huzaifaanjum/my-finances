@@ -1,7 +1,7 @@
 import { PAY } from "@/lib/pay";
 import { isoDate } from "./calendar";
 import { EXPENSE_GROUPS, FLAGS, OTHER_NUMBERS, SLIDERS, type NumericKey, type SliderKey } from "./config";
-import type { OneTimeItem, OneTimeKind, PlannerState, RecurringExpense, RecurringIncome } from "./types";
+import type { CustomGoal, OneTimeItem, OneTimeKind, PlannerState, RecurringExpense, RecurringIncome } from "./types";
 
 /** Signing bonus payments: February and August 2027 (plan months 4 and 10), on payday. */
 export const SIGNING_MONTHS = [4, 10] as const;
@@ -32,6 +32,15 @@ export function incentiveItem(amount: number, id: number): RecurringIncome {
   return { id, name: "Annual incentive", amount, every: 12, month: INCENTIVE_MONTH, tag: "incentive" };
 }
 
+/** The home and car goals every plan starts with, from the old house and car settings. */
+export function defaultGoals(num: (key: string) => number, ctax: boolean): CustomGoal[] {
+  const pick = (keys: string[]) => Object.fromEntries(keys.map((k) => [k, num(k)]));
+  return [
+    { id: 1, kind: "house", name: "Home", values: pick(["home", "dpp", "hrate", "hamort", "hextra", "hbuy"]), date: isoDate(36), saved: 0, monthly: 0 },
+    { id: 2, kind: "car", name: "Car", values: { ...pick(["cprice", "cdown", "capr", "cterm", "cextra", "cbuy"]), ctax: ctax ? 1 : 0 }, date: isoDate(12), saved: 0, monthly: 0 },
+  ];
+}
+
 export function createDefaultState(): PlannerState {
   const sliders = Object.fromEntries(
     (Object.keys(SLIDERS) as SliderKey[]).map((k) => [k, SLIDERS[k].initial]),
@@ -42,7 +51,7 @@ export function createDefaultState(): PlannerState {
     pay: [{ id: 1, amount: sliders.net, date: isoDate(0, 1) }],
     income: [],
     expenses: defaultExpenses(),
-    goals: [],
+    goals: defaultGoals((k) => sliders[k as SliderKey], FLAGS.ctax),
     oneTime: {
       income: signingItems(PAY.signingNet, 1),
       expense: [{ id: 1, name: "Credit card balance (remaining)", amount: 1000, date: isoDate(0, 1), month: 0 }],

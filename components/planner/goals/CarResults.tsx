@@ -5,7 +5,8 @@ import Card from "@/components/ui/Card";
 import { Kpi, KpiGrid } from "@/components/ui/Kpi";
 import { deltaMoney, money, percent, signedMoney } from "@/lib/format";
 import { monthLabel } from "@/lib/planner/calendar";
-import { carPlan, yearsLabel } from "@/lib/planner/car";
+import { yearsLabel } from "@/lib/planner/car";
+import { useCar } from "./GoalScope";
 import { amortize } from "@/lib/planner/finance";
 
 const TERMS = [24, 36, 48, 60, 72, 84];
@@ -15,7 +16,7 @@ const RATE_STEPS = [-2, -1, 0, 1, 2];
 export function CarKpis() {
   const plan = usePlan();
   const { net, left } = plan;
-  const car = carPlan(plan);
+  const car = useCar();
   const nt = net || 1;
   const share = car.regular.payment / nt;
   const after = left - car.regular.payment;
@@ -51,7 +52,7 @@ export function CarKpis() {
 /** Three side-by-side tables: loan length, paying extra, and a different rate. */
 export function LoanComparisons() {
   const plan = usePlan();
-  const car = carPlan(plan);
+  const car = useCar();
   const nt = plan.net || 1;
   const extras = [...new Set([0, 100, 200, 300, 500, car.extra])].sort((a, b) => a - b);
 
