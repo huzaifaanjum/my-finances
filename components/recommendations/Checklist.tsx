@@ -125,6 +125,15 @@ export default function Checklist({ steps, read, toggle, error }: Props) {
                               <p>
                                 <G>{s.body}</G>
                               </p>
+                              {s.steps && (
+                                <ol className="ck-steps">
+                                  {s.steps.map((x) => (
+                                    <li key={x}>
+                                      <G>{x}</G>
+                                    </li>
+                                  ))}
+                                </ol>
+                              )}
                               {s.link && (
                                 <Link href={s.link.href} className="ck-link">
                                   Open {s.link.label} →

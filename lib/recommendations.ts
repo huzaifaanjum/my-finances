@@ -23,6 +23,8 @@ export interface Step {
   when?: string;
   /** rough yearly value in dollars, when it can be worked out */
   impact?: number;
+  /** how to do it, one short instruction per step */
+  steps?: string[];
   /** the tab where you act on it */
   link?: { href: string; label: string };
 }
@@ -221,6 +223,23 @@ export function checklist(ctx: RecContext): Step[] {
       title: "Claim moving expenses if you moved for this job",
       body: "If you moved at least 40 km closer to work to start at Air Canada, moving costs can be deducted from your Montréal income on both returns. Keep the receipts.",
       when: "Tax time",
+    },
+    {
+      id: "rec-pension-fund-check",
+      area: "invest",
+      priority: "now",
+      title: "Check that your pension money is invested",
+      body: "Your payslip shows $950.04 going into your pension each month ($475.02 from you and $475.02 from Air Canada). It does not show where that money is invested. If it sits in cash, it barely grows. Take 10 minutes to check.",
+      steps: [
+        "Log in to your Manulife group retirement account (the website or the app).",
+        "Open your pension account and find \"Investments\" or \"My holdings\".",
+        "Look at the fund names. Good: a target-date fund with a year around 2060 in its name, or a growth or equity fund. Not good: \"money market\", \"cash\" or \"guaranteed\".",
+        "Find \"Investment instructions\" or \"Future contributions\". Make sure new money goes to that same fund.",
+        "If either one shows cash or money market, switch it to the target-date fund for 2060.",
+        "Come back and tick this off.",
+      ],
+      when: "This month",
+      link: { href: "/pension", label: "Retirement" },
     },
     {
       id: "rec-tfsa-room",
