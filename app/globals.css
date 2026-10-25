@@ -1621,3 +1621,13 @@ button.bd-need:hover{border-color:var(--mute)}
 .ins-none{margin:12px 0 0;font-size:13px;color:var(--mute)}
 .ins-none b{color:var(--text);font-weight:600}
 @media (max-width:760px){.ins-what li{grid-template-columns:minmax(0,1fr) auto}.ins-what li>p{grid-column:1/-1}}
+/* dropdowns: one chevron for every select, set in from the right edge */
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%23a1a1aa' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 10px center!important;background-size:12px 12px!important;padding-right:30px!important;cursor:pointer}
+select:hover{border-color:var(--mute)}
+select option{background:#18181b;color:var(--text)}
+/* expand arrows on foldable rows: a little room from the card edge */
+.bf-item>summary::after,.bd-grp>summary::after{margin-right:4px}
+/* focus rings inside scrolling areas: draw them just inside the element so the scroll edge can't cut them off */
+:is(.ps-tabs,.iv-nav,.tl,.cf-scroll,.ps-tablewrap,.scroll,.pl-out,.ps-modal-b) :focus-visible{outline-offset:-2px}
+/* the Budget page's right column scrolls on its own; give its edges room for rings and hover borders */
+@media (min-width:1001px){.pl-out{padding:4px 8px 4px 4px;margin:-4px 0 0 -4px}}
