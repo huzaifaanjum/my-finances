@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useKnowledgeProgress } from "@/hooks/useKnowledgeProgress";
 import { GROUPS, RULES } from "@/lib/knowledge/rules";
 import s from "./knowledge.module.css";
@@ -50,6 +50,16 @@ export default function KnowledgeView() {
     () => RULES.filter((r) => (filter === "all" ? true : filter === "read" ? !!read[r.id] : !read[r.id])),
     [filter, read],
   );
+
+  // a link such as /knowledge#net-worth opens that rule once the list has rendered
+  useEffect(() => {
+    if (loading) return;
+    const el = document.getElementById(location.hash.slice(1));
+    if (el instanceof HTMLDetailsElement) {
+      el.open = true;
+      el.scrollIntoView({ block: "start" });
+    }
+  }, [loading]);
 
   return (
     <div className={s.page}>

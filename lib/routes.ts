@@ -47,6 +47,7 @@ export const NAV: NavItem[] = [
   {
     label: "Learn",
     pages: [
+      { href: "/education", label: "Education", note: "How money works, step by step" },
       { href: "/knowledge", label: "Knowledge", note: "Money rules with calculators" },
       { href: "/glossary", label: "Glossary", note: "Plain-language money words" },
     ],

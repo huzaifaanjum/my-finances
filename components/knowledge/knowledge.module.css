@@ -14,7 +14,7 @@
 .tab:focus-visible,.btn:focus-visible,.check:focus-visible{outline:2px solid var(--promo);outline-offset:2px}
 .group{margin-top:28px}
 .groupTitle{font:600 13px/1.3 system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin:0 0 10px}
-.rule{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#0c0c0f}
+.rule{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#0c0c0f;scroll-margin-top:72px}
 .rule[open]{border-color:#3f3f46}
 .sum{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:14px 16px;cursor:pointer;list-style:none}
 .sum::-webkit-details-marker{display:none}

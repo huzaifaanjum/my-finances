@@ -18,7 +18,7 @@ app/
   login/                     passcode sign-in
   (app)/layout.tsx           nav + PlannerProvider, shared by every signed-in page
   (app)/page.tsx, plan/, insights/, recommendations/, monthly/, goals/, millionaire/,
-  pension/, offer/, payslips/, knowledge/, glossary/
+  pension/, offer/, payslips/, education/, knowledge/, glossary/
                              one thin page per route: metadata + its view
   api/payslips               encrypted payslips: vault (second password), list, file
   api/state, api/knowledge   GET/PUT saved data (passcode in the x-passcode header)
@@ -32,6 +32,7 @@ components/
   recommendations/           every piece of advice in one place: next steps, where to invest, checklist
   payslips/                  payslip vault, upload, viewer, editor, breakdown and forecast
   knowledge/                 Knowledge checklist and its interactive demos
+  education/                 Financial education course, built from lib/education (progress shares api/knowledge)
 hooks/                       useCloudSync, useKnowledgeProgress, useElementWidth
 lib/
   planner/                   pure model: config, projection, loans, investing, pension, insights

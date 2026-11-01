@@ -1,3 +1,4 @@
+import { FOUNDATION_RULES } from "./foundationRules";
 import { LIFESTYLE_RULES } from "./lifestyleRules";
 import { MORE_RULES } from "./moreRules";
 
@@ -38,7 +39,15 @@ export type DemoKey =
   | "rewards"
   | "bills"
   | "aeroCpp"
-  | "aeroGoal";
+  | "aeroGoal"
+  | "netWorth"
+  | "minPayment"
+  | "debtOrder"
+  | "allocation"
+  | "tfsaRrsp"
+  | "rentBuy"
+  | "loanSplit"
+  | "savingsFi";
 
 export interface Rule {
   id: string;
@@ -65,6 +74,7 @@ export const GROUPS = [
   "Your pay",
   "Debt and credit",
   "Grow your money",
+  "Investing basics",
   "Retirement",
   "Benefits and insurance",
   "Big purchases",
@@ -257,4 +267,5 @@ export const RULES: Rule[] = [
   },
   ...MORE_RULES,
   ...LIFESTYLE_RULES,
+  ...FOUNDATION_RULES,
 ];

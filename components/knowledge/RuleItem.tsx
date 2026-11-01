@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { G, GlossaryScope } from "@/components/glossary/GlossaryText";
 import type { Rule } from "@/lib/knowledge/rules";
 import { DemoFor } from "./demos";
 import s from "./knowledge.module.css";
@@ -9,15 +11,18 @@ function Block({ title, className = "", children }: { title: string; className?:
   return (
     <div className={`${s.blk} ${className}`}>
       <h4>{title}</h4>
-      <p>{children}</p>
+      <p>
+        <G>{children}</G>
+      </p>
     </div>
   );
 }
 
-/** One rule: a collapsible card with an explanation, a worked example and a live demo. */
+/** One rule: a collapsible card with an explanation, a worked example and a live demo. The body only renders once opened. */
 export default function RuleItem({ rule, isRead, onToggle }: { rule: Rule; isRead: boolean; onToggle: (read: boolean) => void }) {
+  const [open, setOpen] = useState(false);
   return (
-    <details id={rule.id} className={`${s.rule} ${isRead ? s.done : ""}`}>
+    <details id={rule.id} className={`${s.rule} ${isRead ? s.done : ""}`} onToggle={(e) => setOpen(e.currentTarget.open)}>
       <summary className={s.sum}>
         <input
           type="checkbox"
@@ -35,25 +40,29 @@ export default function RuleItem({ rule, isRead, onToggle }: { rule: Rule; isRea
           ▶
         </span>
       </summary>
-      <div className={s.body}>
-        <Block title="In plain words">{rule.plain}</Block>
-        <Block title="How it helps you">{rule.why}</Block>
-        <Block title="Example" className={s.ex}>
-          {rule.example}
-        </Block>
-        {rule.demo && <DemoFor name={rule.demo} />}
-        <Block title="For you" className={s.you}>
-          {rule.you}
-        </Block>
-        {rule.link && (
-          <Link href={rule.link.href} className={s.link}>
-            See it in your numbers: {rule.link.label} →
-          </Link>
-        )}
-        <button type="button" className={`${s.btn} ${isRead ? s.btnGhost : ""}`} onClick={() => onToggle(!isRead)}>
-          {isRead ? "Mark as not read" : "Mark as read"}
-        </button>
-      </div>
+      {open && (
+        <GlossaryScope>
+          <div className={s.body}>
+            <Block title="In plain words">{rule.plain}</Block>
+            <Block title="How it helps you">{rule.why}</Block>
+            <Block title="Example" className={s.ex}>
+              {rule.example}
+            </Block>
+            {rule.demo && <DemoFor name={rule.demo} />}
+            <Block title="For you" className={s.you}>
+              {rule.you}
+            </Block>
+            {rule.link && (
+              <Link href={rule.link.href} className={s.link}>
+                See it in your numbers: {rule.link.label} →
+              </Link>
+            )}
+            <button type="button" className={`${s.btn} ${isRead ? s.btnGhost : ""}`} onClick={() => onToggle(!isRead)}>
+              {isRead ? "Mark as not read" : "Mark as read"}
+            </button>
+          </div>
+        </GlossaryScope>
+      )}
     </details>
   );
 }
