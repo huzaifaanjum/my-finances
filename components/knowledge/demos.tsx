@@ -2,6 +2,7 @@
 
 import { useState, type ReactElement } from "react";
 import type { DemoKey } from "@/lib/knowledge/rules";
+import { BUSINESS_DEMOS } from "./businessDemos";
 import { FOUNDATION_DEMOS } from "./foundationDemos";
 import { LIFESTYLE_DEMOS } from "./lifestyleDemos";
 import { MORE_DEMOS } from "./moreDemos";
@@ -363,6 +364,7 @@ const DEMOS: Partial<Record<DemoKey, () => ReactElement>> = {
   ...MORE_DEMOS,
   ...LIFESTYLE_DEMOS,
   ...FOUNDATION_DEMOS,
+  ...BUSINESS_DEMOS,
   payFirst: PayFirst,
   budget: Budget,
   emergency: Emergency,

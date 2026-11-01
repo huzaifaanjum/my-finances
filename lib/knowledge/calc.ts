@@ -1,5 +1,8 @@
 // Pure maths behind the foundation calculators, kept apart from the UI so the worked examples can be checked.
 
+import { PAY } from "@/lib/pay";
+import { federalTax, quebecTax, taxYear } from "@/lib/payslips/tax";
+
 export interface Debt {
   name: string;
   balance: number;
@@ -92,6 +95,28 @@ export function mixOutlook(stockPct: number) {
   const s = stockPct / 100;
   return { yearly: s * 7 + (1 - s) * 3.5, badYear: s * -35 + (1 - s) * -5 };
 }
+
+/** Extra income tax on side profit, added on top of your salary and pension. Leaves out QPIP and the health services fund. */
+export function sideIncomeTax(profit: number, year = 2026): number {
+  const p = taxYear(year);
+  const pension = PAY.salary * PAY.pensionRate;
+  const fedTaxable = PAY.salary - pension;
+  const qcTaxable = fedTaxable + PAY.employerHealth * 12;
+  const tax = (extra: number) => {
+    const i = { gross: PAY.salary, fedTaxable: fedTaxable + extra, qcTaxable: qcTaxable + extra };
+    return federalTax(i, p) + quebecTax(i, p);
+  };
+  return tax(profit) - tax(0);
+}
+
+/** The hourly rate that reaches a yearly profit, once unpaid hours and business costs are counted. */
+export const freelanceRate = (profit: number, costs: number, billableHoursPerWeek: number, weeks: number) => (profit + costs) / (billableHoursPerWeek * weeks);
+
+/** Subscribers after some months, adding the same number each month while a share cancels. */
+export const subscribersAfter = (monthlyNew: number, churnPct: number, months: number) => {
+  const c = churnPct / 100;
+  return c === 0 ? monthlyNew * months : (monthlyNew * (1 - Math.pow(1 - c, months))) / c;
+};
 
 /** After-tax value of $1,000 of pre-tax income put in a TFSA or an RRSP. */
 export function tfsaVsRrsp(amount: number, nowPct: number, laterPct: number, years: number, annualPct: number) {

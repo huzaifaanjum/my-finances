@@ -1,3 +1,4 @@
+import { BUSINESS_RULES } from "./businessRules";
 import { FOUNDATION_RULES } from "./foundationRules";
 import { LIFESTYLE_RULES } from "./lifestyleRules";
 import { MORE_RULES } from "./moreRules";
@@ -47,7 +48,11 @@ export type DemoKey =
   | "tfsaRrsp"
   | "rentBuy"
   | "loanSplit"
-  | "savingsFi";
+  | "savingsFi"
+  | "sideIncome"
+  | "freelanceRate"
+  | "subscriptionGrowth"
+  | "paymentFees";
 
 export interface Rule {
   id: string;
@@ -78,6 +83,7 @@ export const GROUPS = [
   "Retirement",
   "Benefits and insurance",
   "Big purchases",
+  "Side income and business",
   "Travel, fun and subscriptions",
   "Habits and paperwork",
 ] as const;
@@ -268,4 +274,5 @@ export const RULES: Rule[] = [
   ...MORE_RULES,
   ...LIFESTYLE_RULES,
   ...FOUNDATION_RULES,
+  ...BUSINESS_RULES,
 ];

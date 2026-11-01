@@ -131,9 +131,10 @@ export const CORE_LESSONS: Lesson[] = [
     idea: "Self-employed income is taxable, and nobody withholds tax for you.",
     explain:
       "Freelance or side-business income goes on your return, and you can deduct real business costs. No tax comes off when you are paid, so set aside money yourself. You also pay both the employee and employer share of QPP on that profit. Registration for GST and QST becomes mandatory once you pass $30,000 in sales over four quarters.",
-    example: "$10,000 of side profit at your marginal rate of about 36% costs about $3,600 in income tax, plus QPP. Move about 40% of each payment into a separate account.",
+    example: "$10,000 of side profit at your marginal rate of about 36% costs about $3,600 in income tax. Move about 40% of each payment into a separate account.",
     remember: "Save for the tax the day you are paid. It isn't your money.",
-    you: "Check that your work permit allows it first. Some permits limit who you can work for.",
+    you: "Check that your work permit allows it first. Your salary is already above the QPP ceiling, so in a full year side profit should add little or no QPP. The Revenue streams page has the full steps.",
+    rule: { id: "side-income-tax", label: "Set aside 40% of side profit" },
   },
 
   // keeping

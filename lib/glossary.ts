@@ -1,7 +1,7 @@
 // Plain-language explanations for finance terms. The first mention of a term in each card is underlined
 // and shows this text on hover, focus or tap (see components/glossary).
 
-export type GlossaryCategory = "core" | "pay" | "save" | "invest" | "retire" | "benefits" | "job" | "plan" | "borrow";
+export type GlossaryCategory = "core" | "pay" | "save" | "invest" | "retire" | "benefits" | "job" | "plan" | "borrow" | "business";
 
 export const GLOSSARY_CATEGORIES: { id: GlossaryCategory; label: string }[] = [
   { id: "core", label: "Money basics" },
@@ -13,6 +13,7 @@ export const GLOSSARY_CATEGORIES: { id: GlossaryCategory; label: string }[] = [
   { id: "job", label: "Your job" },
   { id: "plan", label: "Budgeting" },
   { id: "borrow", label: "Buying and borrowing" },
+  { id: "business", label: "Running a business" },
 ];
 
 export interface GlossaryTerm {
@@ -28,6 +29,42 @@ export interface GlossaryTerm {
 // words they start with ("net worth" before "net", "RRSP room" before "RRSP"). Use (?:...) for groups: each term
 // must add exactly one capture group.
 export const GLOSSARY: GlossaryTerm[] = [
+  // running a business
+  { pattern: "sole propriet(?:or|orship)s?", category: "business", title: "Sole proprietorship", what: "A business owned and run by one person, with no legal separation from that person.", why: "It is the cheapest way to start, but your personal savings are exposed to business debts and lawsuits." },
+  { pattern: "\\bNEQ\\b", category: "business", title: "NEQ", what: "Your Quebec enterprise number, given when you register with the Registraire des entreprises.", why: "Banks and payment services ask for it, and it identifies your business with the government." },
+  { pattern: "\\bREQ\\b|registraire des entreprises", category: "business", title: "REQ (Registraire des entreprises)", what: "Quebec's public register of businesses.", why: "You must register here if you operate under any name other than your own first and last name." },
+  { pattern: "merchant of record", category: "business", title: "Merchant of record", what: "The company that is legally the seller of your product, which handles tax, fraud and disputes for you.", why: "It costs more per sale, but it takes on the job of collecting sales tax worldwide." },
+  { pattern: "\\bchargebacks?\\b", category: "business", title: "Chargeback", what: "When a customer asks their bank to reverse a card payment.", why: "You lose the sale and pay a fee, often $15 to $20, so clear receipts and easy refunds pay off." },
+  { pattern: "\\binterchange(?:-plus)?\\b", category: "business", title: "Interchange", what: "The fee a card network sets, paid to the customer's bank on each card sale.", why: "It is the largest part of card fees. Interchange-plus pricing shows it separately from the processor's margin." },
+  { pattern: "small supplier", category: "business", title: "Small supplier", what: "A business with $30,000 or less in taxable sales over four quarters.", why: "It doesn't have to charge GST and QST. Pass the limit and you must register." },
+  { pattern: "\\bMRR\\b|monthly recurring revenue", category: "business", title: "MRR (monthly recurring revenue)", what: "The subscription income a business can expect each month.", why: "It is the main score for a software business, and the income that keeps coming." },
+  { pattern: "\\bchurn\\b", category: "business", title: "Churn", what: "The share of subscribers who cancel each month.", why: "It sets a ceiling on your income. At 5% churn, you lose 1 in 20 customers a month, so growth stalls when new sign-ups only replace them." },
+  { pattern: "micro-saas", category: "business", title: "Micro-SaaS", what: "A small subscription software product for a narrow audience, often run by one person.", why: "It can earn recurring income with low costs, but most earn little, so test demand before building much." },
+  { pattern: "\\bSaaS\\b", category: "business", title: "SaaS (software as a service)", what: "Software people use online and pay for by subscription.", why: "Income repeats each month, unlike client work that stops when you stop." },
+  { pattern: "\\bprofit\\b(?! sharing)|\\brevenue\\b(?! streams?)", category: "business", title: "Revenue and profit", what: "Revenue is all the money customers pay you. Profit is what is left after business costs.", why: "You pay income tax on profit, not revenue, while the $30,000 GST limit looks at sales." },
+  { pattern: "self-employ(?:ed|ment)", category: "business", title: "Self-employed", what: "Working for yourself rather than for an employer. No tax comes off your pay.", why: "You set aside your own tax. Your work permit must allow it, and it can affect immigration programs." },
+  { pattern: "\\bfreelanc(?:e|er|ers|ing)\\b", category: "business", title: "Freelancing", what: "Selling your skills to clients project by project, as a self-employed person.", why: "It is the fastest way to earn from your skills, but income stops when you stop working." },
+  { pattern: "\\bretainers?\\b", category: "business", title: "Retainer", what: "A fixed monthly fee a client pays for your ongoing help.", why: "It turns one-off client work into income you can predict." },
+  { pattern: "t2125 and tp-80|\\bT2125\\b|\\bTP-80\\b", category: "business", title: "T2125 and TP-80", what: "The federal and Quebec forms for reporting business income and costs.", why: "Your profit from them is added to your salary on your tax return." },
+  { pattern: "\\binstalments?\\b", category: "business", title: "Tax instalments", what: "Quarterly tax payments you make yourself, because no tax is withheld on business income.", why: "They are usually required if you owe more than about $1,800 at tax time two years running. Missing them adds interest." },
+  { pattern: "input tax credits?|\\bITCs?\\b", category: "business", title: "Input tax credit", what: "GST you paid on business costs, which a registered business can claim back. The QST version is an input tax refund.", why: "It is the main upside of registering for GST and QST early." },
+  { pattern: "occupancy certificate", category: "business", title: "Occupancy certificate", what: "A Montreal permit for running an activity from a location, sometimes including a home.", why: "Rules and fees vary by borough, so ask yours even for a laptop-only business." },
+  { pattern: "\\btrademarks?\\b", category: "business", title: "Trademark", what: "A registered right to a name or logo for certain goods or services.", why: "Registering a business name doesn't give you this. It is what protects a brand from copycats." },
+  { pattern: "\\bCNESST\\b", category: "business", title: "CNESST", what: "Quebec's workplace health and safety board.", why: "You don't need to register with no workers, and personal cover is optional. Hiring makes registration mandatory." },
+  { pattern: "professional liability", category: "business", title: "Professional liability insurance", what: "Insurance for claims that your work caused a client a financial loss. Also called errors and omissions.", why: "A sole proprietor's personal savings are exposed, so it is worth a look once you sign client contracts." },
+  { pattern: "clics[ée]qur", category: "business", title: "clicSÉQUR", what: "The Quebec government's login for online services.", why: "You use it to register your business with the REQ." },
+  { pattern: "pre-authori[sz]ed debits?", category: "business", title: "Pre-authorised debit", what: "Permission for a business to pull payments straight from a customer's bank account.", why: "On Stripe it is capped at CA$5, so it costs far less than a card on large invoices." },
+  { pattern: "e-transfers?", category: "business", title: "Interac e-Transfer", what: "A bank-to-bank payment in Canada, sent by email or text.", why: "It is the cheapest way for Canadian clients to pay you, though bank limits apply." },
+  { pattern: "\\bpayouts?\\b", category: "business", title: "Payout", what: "When a payment service sends your balance to your bank account.", why: "Standard payouts are usually free. Instant ones cost extra, often around 1%." },
+  { pattern: "currency conversion", category: "business", title: "Currency conversion", what: "Changing money from one currency to another, which services charge for.", why: "It costs 2% on Stripe and 4% on PayPal, so a USD bank account can save real money." },
+  { pattern: "\\bwebhooks?\\b", category: "business", title: "Webhook", what: "A message a payment service sends your app when something happens, such as a successful payment.", why: "Your app should unlock paid features from this, not from the page a customer lands on." },
+  { pattern: "affiliate (?:links?|programs?)", category: "business", title: "Affiliate program", what: "A company pays you when someone buys through your link.", why: "It is low effort, and you must disclose it. It only pays with an audience that trusts you." },
+  { pattern: "\\bIRCC\\b", category: "job", title: "IRCC", what: "Immigration, Refugees and Citizenship Canada, the federal immigration department.", why: "It is the authority on what your work permit allows." },
+  { pattern: "open (?:work )?permits?", category: "job", title: "Open work permit", what: "A work permit that lets you work for almost any employer.", why: "It generally allows self-employment, but confirm your own conditions first." },
+  { pattern: "employer-specific (?:work )?permits?", category: "job", title: "Employer-specific work permit", what: "A work permit tied to one named employer.", why: "It generally doesn't allow a side business, and working outside it can put your status at risk." },
+  { pattern: "canadian experience class", category: "job", title: "Canadian Experience Class", what: "A permanent residence program for people with skilled work experience in Canada.", why: "Self-employed time generally doesn't count, so your salaried work matters for it." },
+  { pattern: "law 25", category: "business", title: "Law 25", what: "Quebec's privacy law for organisations that handle personal information.", why: "Even a solo business needs a person in charge of privacy and a clear policy." },
+
   // money basics
   { pattern: "net worth", category: "core", title: "Net worth", what: "Everything you own minus everything you owe.", why: "It is the truest score of your finances. Income shows what comes in; net worth shows what you have kept." },
   { pattern: "\\bassets?\\b(?! allocation| mix)", category: "core", title: "Asset", what: "Something you own that has value, such as cash, investments, a pension or a home.", why: "Good assets pay you or grow. Building wealth means slowly swapping spending for assets." },
@@ -148,7 +185,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   { pattern: "GST and QST", category: "borrow", title: "GST and QST", what: "Sales taxes: 5% federal (GST) plus 9.975% Quebec (QST), 14.975% in total, added to the price.", why: "A $30,000 car really costs about $4,500 more at the till, so include it in your plan." },
   { pattern: "welcome tax", category: "borrow", title: "Welcome tax", what: "A Quebec tax you pay once when you buy property (a land transfer tax).", why: "It is a cost on top of your down payment, so save for it too." },
   { pattern: "closing costs", category: "borrow", title: "Closing costs", what: "Fees paid when you finish buying a home: welcome tax, notary, inspection and more.", why: "They are about 3% of the price on top of your down payment, so you need that cash as well." },
-  { pattern: "\\binterest\\b", category: "borrow", title: "Interest", what: "The fee a lender charges you for borrowing money.", why: "Paying a loan off faster, or at a lower rate, means less interest and a cheaper car." },
+  { pattern: "(?<!conflicts? of )\\binterest\\b", category: "borrow", title: "Interest", what: "The fee a lender charges you for borrowing money.", why: "Paying a loan off faster, or at a lower rate, means less interest and a cheaper car." },
   { pattern: "probation", category: "job", title: "Probation", what: "The first months of a job when an employer can end it more easily. Yours ends mid-February.", why: "Some bonus payments depend on you still being employed, so the plan treats them as extra." },
   { pattern: "\\bESOP\\b", category: "invest", title: "ESOP (employee share ownership plan)", what: "A plan to buy company shares through your pay. The employer may add a match.", why: "It can grow your wealth, but keep it small: your job and your shares would both depend on one airline." },
   { pattern: "T4 and RL-1|\\bT4\\b|\\bRL-1\\b", category: "pay", title: "T4 and RL-1", what: "Tax slips from your employer showing what you earned and how much tax was already taken.", why: "You need them to file your return, which is when your refund is worked out." },

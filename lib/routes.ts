@@ -24,6 +24,7 @@ export const NAV: NavItem[] = [
       { href: "/monthly", label: "Cash flow", note: "What you save each month and your balance" },
       { href: "/insights", label: "Insights", note: "Health check and key insights from every tab" },
       { href: "/tax", label: "Tax", note: "Your 2026 return and what you can claim" },
+      { href: "/income", label: "Revenue streams", note: "Income ideas, your business, getting paid" },
     ],
   },
   {
