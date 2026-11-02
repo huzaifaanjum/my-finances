@@ -10,6 +10,9 @@ const rowId = (id: string) => `rev-${id}`;
 
 const NEED_STYLE: Record<Need, string> = { Mandatory: s.must, "Only if": s.when, "Not mandatory": s.free };
 
+/** Where each mandatory list saves its ticks. "Not mandatory" is a plain list. */
+const NEED_BASE: Partial<Record<Need, string>> = { Mandatory: "rev-need-must", "Only if": "rev-need-when" };
+
 /** Registering in Montreal: what to check first, what it costs, then each step in order. */
 export default function BusinessTab({ read, toggle }: { read: ReadMap; toggle: Toggle }) {
   const done = BUSINESS_STEPS.filter((b) => read[rowId(b.id)]).length;
@@ -20,22 +23,46 @@ export default function BusinessTab({ read, toggle }: { read: ReadMap; toggle: T
           What is mandatory <span>to start as a solo developer in Montreal under a brand</span>
         </h2>
         <div className={s.needs}>
-          {NEEDS.map((n) => (
-            <article key={n.need} className={`${s.need} ${NEED_STYLE[n.need]}`}>
-              <header>
-                <h3>{n.title}</h3>
-                <p>{n.note}</p>
-              </header>
-              <ul>
-                {n.items.map((i) => (
-                  <li key={i.name}>
-                    <b>{i.name}</b>
-                    <span>{i.detail}</span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
+          {NEEDS.map((n) => {
+            const base = NEED_BASE[n.need];
+            const done = base ? n.items.filter((_, i) => read[`${base}-${i + 1}`]).length : 0;
+            return (
+              <article key={n.need} className={`${s.need} ${NEED_STYLE[n.need]}`}>
+                <header>
+                  <h3>{n.title}</h3>
+                  <p>{n.note}</p>
+                  {base && (
+                    <p className={s.needCount}>
+                      {done} of {n.items.length} done
+                    </p>
+                  )}
+                </header>
+                <ul>
+                  {n.items.map((item, i) => {
+                    const id = `${base}-${i + 1}`;
+                    return (
+                      <li key={item.name}>
+                        {base ? (
+                          <label className={`${s.needCheck} ${read[id] ? s.needDone : ""}`}>
+                            <input type="checkbox" className={k.check} checked={!!read[id]} onChange={(e) => toggle(id, e.target.checked)} />
+                            <span>
+                              <b>{item.name}</b>
+                              <span>{item.detail}</span>
+                            </span>
+                          </label>
+                        ) : (
+                          <>
+                            <b>{item.name}</b>
+                            <span>{item.detail}</span>
+                          </>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </article>
+            );
+          })}
         </div>
       </section>
 
