@@ -36,6 +36,7 @@ function client(): Promise<MongoClient> {
  *   _id "main"      -> { state, updatedAt }   planner numbers
  *   _id "knowledge" -> { read: { [ruleId]: timestamp } }   checklist progress
  *   _id "payslip-vault" -> { salt, iterations, wrapped, authHash, ... }   payslip password check
+ *   _id "store"     -> { lsaUsed }   spending account already claimed this year
  */
 export async function stateCollection(): Promise<Collection<Document>> {
   return (await client()).db("planner").collection("state");
@@ -44,4 +45,9 @@ export async function stateCollection(): Promise<Collection<Document>> {
 /** One document per payslip: { _id, data, file?, createdAt, updatedAt }, all encrypted in the browser. */
 export async function payslipCollection(): Promise<Collection<Document>> {
   return (await client()).db("planner").collection("payslips");
+}
+
+/** One document per Store product: { _id: item id, ...StoreItem fields }, seeded from lib/store.ts the first time it's read. */
+export async function storeCollection(): Promise<Collection<Document>> {
+  return (await client()).db("planner").collection("store");
 }

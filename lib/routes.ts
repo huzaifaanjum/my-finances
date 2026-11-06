@@ -41,6 +41,7 @@ export const NAV: NavItem[] = [
       { href: "/payslips", label: "Payslips", note: "Encrypted payslips, breakdown and forecast" },
       { href: "/benefits", label: "Benefits", note: "Checklist to use every benefit" },
       { href: "/insurance", label: "Insurance", note: "Coverage, claim limits and costs" },
+      { href: "/store", label: "Store", note: "Products your benefits pay for" },
       { href: "/offer", label: "Job offer", note: "Your Air Canada offer and total pay" },
     ],
   },

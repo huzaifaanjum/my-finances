@@ -9,10 +9,13 @@ interface Props {
   label?: string;
   /** a wider box for longer notes */
   wide?: boolean;
+  /** your own trigger content and class instead of the "i" (label is then the accessible name) */
+  children?: ReactNode;
+  className?: string;
 }
 
 /** Small "i" button that explains a stat card. Hover, focus or tap to open. */
-export default function InfoTip({ text, label, wide }: Props) {
+export default function InfoTip({ text, label, wide, children, className }: Props) {
   const [anchor, setAnchor] = useState<DOMRect | null>(null);
   const openedAt = useRef(0);
   const btn = useRef<HTMLButtonElement>(null);
@@ -45,7 +48,7 @@ export default function InfoTip({ text, label, wide }: Props) {
       <button
         ref={btn}
         type="button"
-        className={label ? "ktip pill" : "ktip"}
+        className={className ?? (label ? "ktip pill" : "ktip")}
         aria-label={label ?? "What this means"}
         aria-describedby={anchor ? "kpi-tip" : undefined}
         onPointerEnter={(e) => e.pointerType === "mouse" && show()}
@@ -59,14 +62,14 @@ export default function InfoTip({ text, label, wide }: Props) {
           else show();
         }}
       >
-        {label ? (
+        {children ?? (label ? (
           <>
             <i>i</i>
             {label}
           </>
         ) : (
           "i"
-        )}
+        ))}
       </button>
       {anchor && (
         <FloatingTip id="kpi-tip" className={`mtip txt${wide ? " wide" : ""}`} anchor={anchor}>
