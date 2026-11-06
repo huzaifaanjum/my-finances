@@ -175,7 +175,7 @@ export function benefitItems(): BenefitItem[] {
       link: { href: "/insurance", label: "Insurance" },
       steps: [
         { id: "rec-lsa-claim", title: "Claim the full $500 this plan year", body: "A gym, running shoes, a fitness tracker, a course, books or software all qualify.", when: "Before year end" },
-        { id: "ben-lsa-deadline", title: "Find the claim deadline in the Manulife app", body: "Unused dollars usually expire at the end of the plan year; put the date in your calendar." },
+        { id: "ben-lsa-deadline", title: "Know when your spending account money runs out", body: "Plan years run April 1 to March 31. Unused dollars carry forward one year, then are lost, so 2026-27 money must be claimed by March 31, 2028." },
       ],
     },
     {

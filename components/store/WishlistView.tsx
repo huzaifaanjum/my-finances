@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Note } from "@/components/ui/text";
 import { useBenefitLimits } from "@/hooks/useBenefitLimits";
 import { useStore } from "@/hooks/useStore";
-import { LSA_YEARLY } from "@/lib/benefits";
+import { limitValue, LSA_YEARLY } from "@/lib/benefits";
 import { money } from "@/lib/format";
 import { claimAll, type StoreItem } from "@/lib/store";
 import ProductCard from "./ProductCard";
@@ -14,7 +14,7 @@ export default function WishlistView() {
   const { limits } = useBenefitLimits();
   const { items, lsaUsed, wishlist, loading, error, toggleWish } = useStore();
   const lsaLeft = LSA_YEARLY - lsaUsed;
-  const glasses = limits["eh-glasses"] ?? 0;
+  const glasses = limitValue("eh-glasses", limits) ?? 0;
 
   const wished = wishlist.map((id) => items.find((i) => i.id === id)).filter((i): i is StoreItem => !!i);
   const { claims, total } = claimAll(wished, lsaLeft, glasses);
@@ -111,7 +111,7 @@ export default function WishlistView() {
                 item={item}
                 claim={claims[i]}
                 lsaLeft={lsaLeft - claims.slice(0, i).reduce((t, c) => t + c.lsa, 0)}
-                visionLeft={limits["eh-glasses"] === undefined ? undefined : glasses - claims.slice(0, i).reduce((t, c) => t + c.vision, 0)}
+                visionLeft={limitValue("eh-glasses", limits) === undefined ? undefined : glasses - claims.slice(0, i).reduce((t, c) => t + c.vision, 0)}
                 wished
                 onWish={() => toggleWish(item.id)}
               />
@@ -119,7 +119,7 @@ export default function WishlistView() {
           </div>
 
           <Note>
-            {`Your $${LSA_YEARLY} spending account is shared, so the wishlist splits it across items in the order you added them${glasses ? ", and glasses and contacts use your vision limit first" : ""}. Buy and claim within the plan year; unused dollars usually expire.`}
+            {`Your $${LSA_YEARLY} spending account is shared, so the wishlist splits it across items in the order you added them${glasses ? ", and glasses and contacts use your vision limit first" : ""}. Plan years run April 1 to March 31; unused dollars carry forward one year, then are lost.`}
           </Note>
         </>
       )}

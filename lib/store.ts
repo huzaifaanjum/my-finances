@@ -1393,21 +1393,32 @@ export const SHOE_BUZZ: Record<string, Buzz> = {
 export type Carry = "expires" | "carries" | "rolling" | "lifetime";
 
 /**
- * Every money limit you can claim against, and what happens to the unused part. Typical Manulife group rules;
- * the HSA one-year carry-forward is a CRA requirement. Ids match CLAIM_LIMITS so amounts come from your statement or booklet.
+ * Every money limit you can claim against, and what happens to the unused part, per your benefits booklet (Sep 17, 2026).
+ * Plan year is April 1 to March 31. Ids match CLAIM_LIMITS, which holds the amounts.
  */
 export const BENEFIT_POTS: { id: string; label: string; per: string; carry: Carry; note: string }[] = [
-  { id: "lsa-year", label: "Lifestyle Spending Account", per: "a plan year", carry: "expires", note: "Unused dollars expire at plan year end" },
-  { id: "eh-massage", label: "Massage therapy", per: "a plan year", carry: "expires", note: "Resets each plan year" },
-  { id: "eh-physio", label: "Physiotherapy", per: "a plan year", carry: "expires", note: "Resets each plan year" },
-  { id: "eh-chiro", label: "Chiropractor", per: "a plan year", carry: "expires", note: "Resets each plan year" },
-  { id: "eh-psych", label: "Psychologist or social worker", per: "a plan year", carry: "expires", note: "Resets each plan year" },
-  { id: "dent-max", label: "Dental", per: "a plan year", carry: "expires", note: "Yearly maximum resets" },
-  { id: "drug-max", label: "Prescription drugs", per: "a plan year", carry: "expires", note: "Many plans have no maximum" },
-  { id: "hsa-year", label: "Health Spending Account", per: "a plan year", carry: "carries", note: "Unused credits carry forward one year, then expire" },
-  { id: "eh-glasses", label: "Glasses or contacts", per: "every 24 months", carry: "rolling", note: "Rolling period; nothing carries over" },
-  { id: "eh-eye-exam", label: "Eye exam", per: "every 24 months", carry: "rolling", note: "Rolling period; nothing carries over" },
-  { id: "eh-hearing", label: "Hearing aids", per: "every 5 years", carry: "rolling", note: "Rolling period; nothing carries over" },
-  { id: "dent-ortho", label: "Orthodontics", per: "lifetime", carry: "lifetime", note: "Never resets; whatever you don't use stays available" },
-  { id: "eh-travel", label: "Emergency medical abroad", per: "lifetime", carry: "lifetime", note: "Never resets" },
+  { id: "eh-physio", label: "Physio, athletic or rehab therapist", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-massage", label: "Massage therapy", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-chiro", label: "Chiropractor", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-psych", label: "Psychologist or therapist", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-acu", label: "Acupuncture", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-osteo", label: "Osteopath", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-naturo", label: "Naturopath", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-podiatry", label: "Podiatrist or chiropodist", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-dietitian", label: "Dietitian or nutritionist", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-homeopath", label: "Homeopath", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-ot", label: "Occupational therapist", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-speech", label: "Speech therapist", per: "a plan year", carry: "expires", note: "Resets April 1" },
+  { id: "eh-orthotics", label: "Custom orthotics", per: "a plan year", carry: "expires", note: "Needs a doctor, podiatrist or chiropractor's note" },
+  { id: "eh-ortho-shoes", label: "Orthopaedic shoes", per: "one pair a plan year", carry: "expires", note: "Needs a doctor or podiatrist's note" },
+  { id: "dent-max", label: "Dental", per: "a plan year", carry: "expires", note: "Cleanings at 100%, crowns at 60%" },
+  { id: "lsa-year", label: "Lifestyle Spending Account", per: "a plan year", carry: "carries", note: "Unused dollars carry forward one year, then are lost" },
+  { id: "hsa-year", label: "Health Spending Account", per: "a plan year", carry: "carries", note: "Carries forward one year; no flex dollars put in" },
+  { id: "eh-eye-exam", label: "Eye exam", per: "every 24 months", carry: "rolling", note: "Renews 24 months after your last claim" },
+  { id: "eh-glasses", label: "Glasses, sunglasses or contacts", per: "every 24 months", carry: "rolling", note: "Prescription; renews 24 months after your last claim" },
+  { id: "eh-hearing", label: "Hearing aids", per: "every 60 months", carry: "rolling", note: "Includes tests and batteries" },
+  { id: "eh-tens", label: "TENS machine", per: "every 60 months", carry: "rolling", note: "Medically necessary, with a doctor's note" },
+  { id: "eh-cpap", label: "CPAP machine", per: "every 60 months", carry: "rolling", note: "Machine and masks only" },
+  { id: "eh-travel", label: "Emergency medical abroad", per: "lifetime", carry: "lifetime", note: "First 90 days of each trip" },
+  { id: "drug-max", label: "Prescription drugs", per: "lifetime", carry: "lifetime", note: "Paid at 100%, no yearly cap" },
 ];

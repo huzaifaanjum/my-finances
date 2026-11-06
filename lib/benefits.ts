@@ -272,8 +272,10 @@ export interface ClaimLimit {
   kind: LimitKind;
   /** "a month", "a year", "per 24 months", "weeks", ... */
   per: string;
-  /** from your Manulife statement; absent means it's in the booklet, not the statement */
+  /** a fixed amount from your statement or booklet; absent means you enter it yourself */
   known?: number;
+  /** true when `known` comes from the benefits booklet rather than the statement */
+  booklet?: boolean;
   hint?: string;
 }
 
@@ -283,9 +285,16 @@ export interface ClaimGroup {
   limits: ClaimLimit[];
 }
 
+/** Benefits booklet for Air Canada management employees, plans J2-J5; you are Band D (plan J3) on Premium health, drugs and dental. */
+export const BOOKLET_DATE = "Sep 17, 2026";
+/** The plan year every "per year" limit resets on. */
+export const PLAN_YEAR = "April 1 to March 31";
+
+const B = { booklet: true } as const;
+
 /**
- * The most each benefit pays. Amounts with `known` come straight from your Oct 13, 2026 statement;
- * the rest are plan-booklet limits the statement doesn't list, entered once from the Manulife app.
+ * The most each benefit pays: `known` amounts come from your Oct 13, 2026 statement, or from the Sep 17, 2026 booklet
+ * where `booklet` is set (Band D, Premium options). Per-person limits; family coverage doubles most of them.
  */
 export const CLAIM_LIMITS: ClaimGroup[] = [
   {
@@ -293,7 +302,8 @@ export const CLAIM_LIMITS: ClaimGroup[] = [
     title: "Long-term disability",
     limits: [
       { id: "ltd-monthly", label: "Monthly benefit", kind: "money", per: "a month, tax-free", known: 4_751 },
-      { id: "ltd-age", label: "Pays until age", kind: "count", per: "years old", hint: "Often 65; check the booklet" },
+      { id: "ltd-age", label: "Pays until age", kind: "count", per: "years old", known: 65, ...B },
+      { id: "ltd-wait", label: "Waiting period", kind: "count", per: "days, or until short-term disability ends", known: 180, ...B },
     ],
   },
   {
@@ -301,43 +311,59 @@ export const CLAIM_LIMITS: ClaimGroup[] = [
     title: "Short-term disability",
     limits: [
       { id: "std-weekly", label: "Weekly benefit", kind: "money", per: "a week, tax-free", known: 1_097 },
-      { id: "std-weeks", label: "Maximum length", kind: "count", per: "weeks" },
-      { id: "std-wait", label: "Waiting period", kind: "count", per: "days before it starts" },
+      { id: "std-wait", label: "Waiting period", kind: "count", per: "days; Air Canada's handbook covers this stretch", known: 90, ...B },
+      { id: "std-weeks", label: "Maximum length", kind: "count", per: "days of Manulife payments after that", known: 90, ...B },
     ],
   },
   {
     benefit: "health",
-    title: "Extended health",
+    title: "Extended health (Premium, paid at 100%)",
     limits: [
-      { id: "eh-massage", label: "Massage therapy", kind: "money", per: "a year" },
-      { id: "eh-physio", label: "Physiotherapy", kind: "money", per: "a year" },
-      { id: "eh-chiro", label: "Chiropractor", kind: "money", per: "a year" },
-      { id: "eh-psych", label: "Psychologist or social worker", kind: "money", per: "a year" },
-      { id: "eh-reimb", label: "Reimbursement rate", kind: "percent", per: "of eligible costs" },
-      { id: "eh-eye-exam", label: "Eye exam", kind: "money", per: "per 24 months" },
-      { id: "eh-glasses", label: "Glasses or contacts", kind: "money", per: "per 24 months" },
-      { id: "eh-hearing", label: "Hearing aids", kind: "money", per: "per 5 years" },
-      { id: "eh-travel", label: "Emergency medical abroad", kind: "money", per: "lifetime maximum" },
-      { id: "eh-travel-days", label: "Days covered per trip", kind: "count", per: "days" },
+      { id: "eh-physio", label: "Physio, athletic or rehab therapist", kind: "money", per: "a plan year, combined", known: 3_000, ...B },
+      { id: "eh-massage", label: "Massage therapy", kind: "money", per: "a plan year", known: 1_500, ...B },
+      { id: "eh-chiro", label: "Chiropractor", kind: "money", per: "a plan year, incl. $100 of x-rays", known: 1_500, ...B },
+      { id: "eh-psych", label: "Psychologist, psychotherapist or social worker", kind: "money", per: "a plan year", known: 1_500, ...B },
+      { id: "eh-acu", label: "Acupuncture", kind: "money", per: "a plan year", known: 1_500, ...B },
+      { id: "eh-osteo", label: "Osteopath", kind: "money", per: "a plan year, incl. $100 of x-rays", known: 1_500, ...B },
+      { id: "eh-naturo", label: "Naturopath", kind: "money", per: "a plan year", known: 1_500, ...B },
+      { id: "eh-podiatry", label: "Podiatrist, chiropodist or podologist", kind: "money", per: "a plan year, combined", known: 1_500, ...B },
+      { id: "eh-dietitian", label: "Dietitian or nutritionist", kind: "money", per: "a plan year", known: 1_500, ...B },
+      { id: "eh-homeopath", label: "Homeopath", kind: "money", per: "a plan year", known: 1_500, ...B },
+      { id: "eh-ot", label: "Occupational therapist", kind: "money", per: "a plan year", known: 1_500, ...B },
+      { id: "eh-speech", label: "Speech therapist", kind: "money", per: "a plan year", known: 1_500, ...B },
+      { id: "eh-reimb", label: "Reimbursement rate", kind: "percent", per: "of eligible costs, no deductible", known: 100, ...B },
+      { id: "eh-eye-exam", label: "Eye exam", kind: "money", per: "per 24 months", known: 125, ...B },
+      { id: "eh-glasses", label: "Glasses, sunglasses or contacts", kind: "money", per: "per 24 months, prescription", known: 425, ...B },
+      { id: "eh-orthotics", label: "Custom orthotics", kind: "money", per: "a plan year", known: 400, ...B },
+      { id: "eh-ortho-shoes", label: "Orthopaedic shoes", kind: "money", per: "one pair a plan year ($600 if custom-made)", known: 250, ...B },
+      { id: "eh-stockings", label: "Compression stockings (20 mmHg+)", kind: "count", per: "pairs a plan year", known: 4, ...B },
+      { id: "eh-hearing", label: "Hearing aids and tests", kind: "money", per: "per 60 months", known: 3_000, ...B },
+      { id: "eh-cpap", label: "CPAP machine", kind: "money", per: "per 60 months", known: 2_000, ...B },
+      { id: "eh-tens", label: "TENS machine", kind: "money", per: "per 60 months", known: 500, ...B },
+      { id: "eh-nursing", label: "Private duty nursing", kind: "money", per: "a plan year, $250 a day", known: 20_000, ...B },
+      { id: "eh-travel", label: "Emergency medical abroad", kind: "money", per: "lifetime maximum", known: 5_000_000, ...B },
+      { id: "eh-travel-days", label: "Days covered per trip", kind: "count", per: "first days of each trip", known: 90, ...B },
     ],
   },
   {
     benefit: "drugs",
-    title: "Prescription drugs",
+    title: "Prescription drugs (Premium)",
     limits: [
-      { id: "drug-reimb", label: "Reimbursement rate", kind: "percent", per: "of each prescription" },
-      { id: "drug-max", label: "Yearly maximum", kind: "money", per: "a year", hint: "Many plans have none" },
+      { id: "drug-reimb", label: "Reimbursement rate", kind: "percent", per: "of each prescription, no deductible", known: 100, ...B },
+      { id: "drug-max", label: "Overall maximum", kind: "money", per: "lifetime; no yearly cap", known: 1_000_000, ...B },
+      { id: "drug-flu", label: "Flu vaccine", kind: "money", per: "per shot", known: 40, ...B },
     ],
   },
   {
     benefit: "dental",
-    title: "Dental",
+    title: "Dental (Premium)",
     limits: [
-      { id: "dent-basic", label: "Basic care (cleanings, fillings)", kind: "percent", per: "covered" },
-      { id: "dent-major", label: "Major care (crowns, bridges)", kind: "percent", per: "covered" },
-      { id: "dent-max", label: "Yearly maximum", kind: "money", per: "a year" },
-      { id: "dent-recall", label: "Cleanings and checkups", kind: "count", per: "months between visits" },
-      { id: "dent-ortho", label: "Orthodontics", kind: "money", per: "lifetime" },
+      { id: "dent-basic", label: "Checkups, cleanings, fillings, root canals", kind: "percent", per: "covered", known: 100, ...B },
+      { id: "dent-major", label: "Crowns, bridges, implants, dentures", kind: "percent", per: "covered", known: 60, ...B },
+      { id: "dent-max", label: "Yearly maximum", kind: "money", per: "a plan year, all of the above combined", known: 2_500, ...B },
+      { id: "dent-recall", label: "Cleanings and checkups", kind: "count", per: "months between visits", known: 6, ...B },
+      { id: "dent-tmj", label: "Jaw (TMJ) treatment, at 50%", kind: "money", per: "lifetime", known: 1_000, ...B },
+      { id: "dent-ortho", label: "Orthodontics", kind: "money", per: "lifetime, children under 21 only", known: 3_000, ...B },
     ],
   },
   {
@@ -354,8 +380,14 @@ export const CLAIM_LIMITS: ClaimGroup[] = [
     benefit: "lsa",
     title: "Spending accounts",
     limits: [
-      { id: "lsa-year", label: "Lifestyle Spending Account", kind: "money", per: "a year", known: LSA_YEARLY },
-      { id: "hsa-year", label: "Health Spending Account", kind: "money", per: "a year, no flex dollars put in", known: 0 },
+      { id: "lsa-year", label: "Lifestyle Spending Account", kind: "money", per: "a plan year; unused carries forward one year", known: LSA_YEARLY },
+      { id: "hsa-year", label: "Health Spending Account", kind: "money", per: "a plan year, no flex dollars put in", known: 0 },
     ],
   },
 ];
+
+/** A limit's amount: from the statement or booklet when known, otherwise what you entered. */
+export function limitValue(id: string, entered: Record<string, number> = {}): number | undefined {
+  const l = CLAIM_LIMITS.flatMap((g) => g.limits).find((x) => x.id === id);
+  return l?.known ?? entered[id];
+}

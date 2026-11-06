@@ -6,7 +6,7 @@ import SeeAlso from "@/components/ui/SeeAlso";
 import { Note } from "@/components/ui/text";
 import { useBenefitLimits } from "@/hooks/useBenefitLimits";
 import { useStore } from "@/hooks/useStore";
-import { LSA_YEARLY } from "@/lib/benefits";
+import { limitValue, LSA_YEARLY } from "@/lib/benefits";
 import { money } from "@/lib/format";
 import { claimFor, QC_SALES_TAX, SHOE_BRANDS, STORE_CATEGORIES, STORE_CHECKED, type StoreBenefit, type StoreCategory } from "@/lib/store";
 import BenefitPots from "./BenefitPots";
@@ -24,7 +24,7 @@ const SORTS: { id: Sort; label: string }[] = [
 export default function StoreView() {
   const { limits } = useBenefitLimits();
   const { items, lsaUsed, wishlist, loading, error, saveLsaUsed, toggleWish } = useStore();
-  const glasses = limits["eh-glasses"];
+  const glasses = limitValue("eh-glasses", limits);
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<StoreCategory | "all">("all");
   const [brand, setBrand] = useState("all");
@@ -95,7 +95,7 @@ export default function StoreView() {
       <section className="ph2 st-hero">
         <div className="st-hero-main">
           <div className="ph2-lead">
-            <span>Spending account left for {new Date().getFullYear()}</span>
+            <span>Spending account left this plan year</span>
             <b>{money(lsaLeft)}</b>
             <div className="st-lsa">
               <div className="st-meter big" role="img" aria-label={`${money(lsaUsed)} claimed of ${money(LSA_YEARLY)}`}>
@@ -279,7 +279,7 @@ export default function StoreView() {
       </div>
 
       <Note>
-        {`Prices are from each brand's Canadian site on ${STORE_CHECKED}, before tax; claims include Quebec's ${(QC_SALES_TAX * 100).toFixed(3)}% sales tax, since the receipt does. Sales end and prices change, so check the link before buying. Keep the receipt and claim in the Manulife app. Spending account claims are a taxable benefit, so they show up on your T4 and RL-1. Glasses and contacts need a prescription; the spending account pays what vision cover doesn't, as a health cost the core plan didn't pay.`}
+        {`Prices are from each brand's Canadian site on ${STORE_CHECKED}, before tax; claims include Quebec's ${(QC_SALES_TAX * 100).toFixed(3)}% sales tax, since the receipt does. Sales end and prices change, so check the link before buying. Keep the receipt and claim in the Manulife app. Spending account claims are a taxable benefit, so they show up on your T4 and RL-1, and it can be used for your eligible dependants too. Glasses and contacts need a prescription; vision cover pays first, then the spending account pays the rest as a health cost the core plan didn't pay.`}
       </Note>
 
       <div className="seealso-row">

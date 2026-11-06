@@ -137,7 +137,7 @@ export default function InsuranceView() {
             <div>
               <dt>Spending account</dt>
               <dd>{money(LSA_YEARLY)}/yr</dd>
-              <small>yours to claim; unused dollars expire</small>
+              <small>yours to claim; unused dollars carry forward one year</small>
             </div>
           </dl>
         </div>
@@ -332,7 +332,7 @@ export default function InsuranceView() {
                 ))}
               </div>
             </details>
-            <Note style={{ marginTop: 10 }}>Manulife&apos;s list is not exhaustive; ask them before buying anything not on it. Unused dollars usually expire at the end of the plan year.</Note>
+            <Note style={{ marginTop: 10 }}>Manulife&apos;s list is not exhaustive; ask them before buying anything not on it. Unused dollars carry forward one plan year (April 1 to March 31), then are lost. It also covers your eligible dependants.</Note>
           </Card>
         )}
       </div>

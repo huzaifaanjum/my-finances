@@ -922,7 +922,7 @@ export const GOAL_TEMPLATES: GoalTemplate[] = [
         ...(v.lsa ? [{ label: "Lifestyle Spending Account", amount: -v.lsa }] : []),
       ],
     }),
-    tips: ["Claim the LSA before the plan year ends; unused dollars expire.", "Many gyms waive the sign-up fee in January and September."],
+    tips: ["Claim the LSA each plan year (April to March); unused dollars carry forward only one year.", "Many gyms waive the sign-up fee in January and September."],
     sources: [{ label: "Montreal fitness guide, 2026 (Cities Insider)", url: "https://citiesinsider.com/country/canada/montreal/fitness-&-exercise/en" }],
   },
   {
