@@ -72,6 +72,7 @@ function ClaimDetails({ item, c, lsaLeft, visionLeft }: { item: StoreItem; c: Cl
 
       <span className="st-tn">
         {item.benefit === "vision" ? "Needs a valid prescription. " : ""}
+        {item.visionOnly ? "Smart glasses: only the prescription eyewear part is a sure claim, so the spending account isn't counted; ask Manulife before relying on it. " : ""}
         {item.per ? "Claim each renewal separately. " : ""}
         Pay, keep the receipt, then claim it in the Manulife app. Spending account claims are a taxable benefit on your T4 and RL-1.
       </span>

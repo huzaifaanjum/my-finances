@@ -46,6 +46,8 @@ export interface StoreItem {
   url: string;
   /** the line on Manulife's eligible list it falls under */
   why: string;
+  /** vision cover only: the spending account may not take the rest (smart glasses) */
+  visionOnly?: boolean;
 }
 
 export const STORE: StoreItem[] = [
@@ -1456,6 +1458,45 @@ export const STORE: StoreItem[] = [
     why: "Glasses or contacts",
   },
   {
+    id: "meta-ray-ban-meta-wayfarer-gen-2",
+    name: "Ray-Ban Meta Wayfarer Gen 2 AI glasses",
+    brand: "Ray-Ban",
+    category: "vision",
+    benefit: "vision",
+    price: 519.99,
+    from: true,
+    image: "https://cdn.shopify.com/s/files/1/0257/6652/7012/files/8056262721391_angle-01.png",
+    url: "https://fyidoctors.com/products/ray-ban-meta-wayfarer-gen-2",
+    why: "Prescription glasses or sunglasses; needs prescription lenses",
+    visionOnly: true,
+  },
+  {
+    id: "meta-ray-ban-meta-skyler-gen-2",
+    name: "Ray-Ban Meta Skyler Gen 2 AI glasses",
+    brand: "Ray-Ban",
+    category: "vision",
+    benefit: "vision",
+    price: 519.99,
+    from: true,
+    image: "https://cdn.shopify.com/s/files/1/0257/6652/7012/files/8056262721230_angle-01.png",
+    url: "https://fyidoctors.com/products/ray-ban-meta-skyler-gen-2",
+    why: "Prescription glasses or sunglasses; needs prescription lenses",
+    visionOnly: true,
+  },
+  {
+    id: "meta-oakley-meta-hstn",
+    name: "Oakley Meta HSTN AI glasses",
+    brand: "Oakley",
+    category: "vision",
+    benefit: "vision",
+    price: 539.99,
+    from: true,
+    image: "https://cdn.shopify.com/s/files/1/0257/6652/7012/files/888392682901_angle-01.png",
+    url: "https://fyidoctors.com/products/oakley-meta-hstn",
+    why: "Prescription glasses or sunglasses; needs prescription lenses",
+    visionOnly: true,
+  },
+  {
     id: "acuvue-oasys",
     name: "Acuvue Oasys contact lenses, 12 pack",
     brand: "Clearly",
@@ -1692,7 +1733,7 @@ export function claimAll(items: StoreItem[], lsaLeft: number, visionLeft: number
 export function claimFor(item: StoreItem, lsaLeft: number, visionLeft: number): Claim {
   const total = r2(item.price * (1 + QC_SALES_TAX));
   const vision = item.benefit === "vision" ? Math.min(total, Math.max(0, visionLeft)) : 0;
-  const lsa = Math.min(total - vision, Math.max(0, lsaLeft));
+  const lsa = item.visionOnly ? 0 : Math.min(total - vision, Math.max(0, lsaLeft));
   return { total, vision: r2(vision), lsa: r2(lsa), you: r2(total - vision - lsa) };
 }
 
