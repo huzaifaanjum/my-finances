@@ -220,7 +220,7 @@ export default function StoreView() {
             );
           })}
         </div>
-        {cat === "shoes" && brands.length > 1 && (
+        {(cat === "shoes" || cat === "tech") && brands.length > 1 && (
           <div className="st-chips st-brands" role="group" aria-label="Brand">
             <button type="button" aria-pressed={brand === "all"} onClick={() => setBrand("all")}>
               All brands
