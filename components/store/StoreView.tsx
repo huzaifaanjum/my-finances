@@ -11,6 +11,7 @@ import { limitValue, LSA_YEARLY } from "@/lib/benefits";
 import { money } from "@/lib/format";
 import { claimFor, QC_SALES_TAX, SHOE_BRANDS, STORE_CATEGORIES, STORE_CHECKED, type StoreBenefit, type StoreCategory } from "@/lib/store";
 import BenefitPots from "./BenefitPots";
+import ActionCards from "./ActionCards";
 import ProductCard from "./ProductCard";
 
 type Sort = "claim" | "low" | "high" | "you";
@@ -163,7 +164,17 @@ export default function StoreView() {
         <BenefitPots limits={limits} lsaUsed={lsaUsed} />
       </section>
 
-      <div className="st-tools">
+      <ActionCards
+        limits={limits}
+        lsaLeft={lsaLeft}
+        onShop={(c) => {
+          setCat(c as StoreCategory);
+          setBrand("all");
+          document.getElementById("st-tools")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}
+      />
+
+      <div className="st-tools" id="st-tools">
         <div className="st-row">
           <label className="st-search">
             <svg viewBox="0 0 24 24" aria-hidden="true">
