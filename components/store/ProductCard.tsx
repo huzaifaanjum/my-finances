@@ -47,10 +47,17 @@ function ClaimDetails({ item, c, lsaLeft, visionLeft }: { item: StoreItem; c: Cl
 
       <span className="st-ts">
         <span className="st-th">Price</span>
-        <Row label={item.from ? "Before tax, from" : "Before tax"} value={money(item.price, 2)} />
+        {item.lenses ? (
+          <>
+            <Row label="Frame" value={money(item.price, 2)} />
+            <Row label="Single-vision lenses, from" value={money(item.lenses, 2)} />
+          </>
+        ) : (
+          <Row label={item.from ? "Before tax, from" : "Before tax"} value={money(item.price, 2)} />
+        )}
         {item.was && <Row label={`Sale, was ${money(item.was, 2)}`} value={`−${money(item.was - item.price, 2)}`} tone="pos" />}
-        <Row label="GST 5%" value={money(item.price * GST, 2)} />
-        <Row label="QST 9.975%" value={money(item.price * QST, 2)} />
+        <Row label="GST 5%" value={money((item.price + (item.lenses ?? 0)) * GST, 2)} />
+        <Row label="QST 9.975%" value={money((item.price + (item.lenses ?? 0)) * QST, 2)} />
         <Row label={item.per ? `Total, ${item.per}` : "Total with tax"} value={money(c.total, 2)} tone="tt" />
       </span>
 
@@ -72,7 +79,7 @@ function ClaimDetails({ item, c, lsaLeft, visionLeft }: { item: StoreItem; c: Cl
 
       <span className="st-tn">
         {item.benefit === "vision" ? "Needs a valid prescription. " : ""}
-        {item.visionOnly ? "Smart glasses: only the prescription eyewear part is a sure claim, so the spending account isn't counted; ask Manulife before relying on it. " : ""}
+        {item.visionOnly ? "Smart glasses: the price includes clear or sun lenses, not your prescription; ask the store what prescription lenses add. Only the prescription eyewear part is a sure claim, so the spending account isn't counted. " : ""}
         {item.per ? "Claim each renewal separately. " : ""}
         Pay, keep the receipt, then claim it in the Manulife app. Spending account claims are a taxable benefit on your T4 and RL-1.
       </span>
@@ -164,6 +171,7 @@ export default function ProductCard({ item, claim: c, lsaLeft, visionLeft, wishe
           {item.was && <s>{money(item.was, 2)}</s>}
           <span>{money(c.total, 2)} with tax</span>
         </div>
+        {item.lenses ? <p className="st-lens">Frame + {money(item.lenses, 2)} single-vision lenses</p> : null}
 
         <InfoTip wide className="st-claim" label={`Claim details for ${item.name}`} text={<ClaimDetails item={item} c={c} lsaLeft={lsaLeft} visionLeft={visionLeft} />}>
           <span>

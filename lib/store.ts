@@ -48,6 +48,8 @@ export interface StoreItem {
   why: string;
   /** vision cover only: the spending account may not take the rest (smart glasses) */
   visionOnly?: boolean;
+  /** the price is the frame only; this is the store's starting price for single-vision prescription lenses */
+  lenses?: number;
 }
 
 export const STORE: StoreItem[] = [
@@ -1557,7 +1559,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0257/6652/7012/products/8053672195736_side-02.jpg",
     url: "https://fyidoctors.com/products/ray-ban-rx5154",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 239.96,
   },
   {
     id: "glasses-rx6375",
@@ -1569,7 +1572,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0257/6652/7012/files/8056597080712_angle-01.png",
     url: "https://fyidoctors.com/products/rx6375",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 239.96,
   },
   {
     id: "glasses-ray-ban-rx7230",
@@ -1581,7 +1585,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0257/6652/7012/files/8056597938334_side-01_e6704706-2843-44fc-abc8-43c9135d5af4.png",
     url: "https://fyidoctors.com/products/ray-ban-0rx7230",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 239.96,
   },
   {
     id: "glasses-ray-ban-rx5418",
@@ -1593,7 +1598,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0257/6652/7012/files/8056597827034_side-03_9cfb8542-66ac-4b2e-a204-f7d55abea926.jpg",
     url: "https://fyidoctors.com/products/ray-ban-0rx5418",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 239.96,
   },
   {
     id: "glasses-oakley-ox8046",
@@ -1605,7 +1611,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0257/6652/7012/files/888392133205_front-01.jpg",
     url: "https://fyidoctors.com/products/oakley-0ox8046",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 239.96,
   },
   {
     id: "glasses-oakley-ox8191",
@@ -1617,7 +1624,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0257/6652/7012/files/888392662361_side-01.jpg",
     url: "https://fyidoctors.com/products/oakley-ox8191",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 239.96,
   },
   {
     id: "glasses-hstn-sq-rx",
@@ -1629,7 +1637,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0703/4044/4457/files/7000637970_2.jpg",
     url: "https://www.newlook.ca/products/hstn-sq-rx",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 214,
   },
   {
     id: "glasses-nike-7415",
@@ -1641,7 +1650,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0703/4044/4457/files/3070104410_2.jpg",
     url: "https://www.newlook.ca/products/nike-7415",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 214,
   },
   {
     id: "glasses-ca-8897",
@@ -1653,7 +1663,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0703/4044/4457/files/8910303320_3.jpg",
     url: "https://www.newlook.ca/products/ca-8897",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 214,
   },
   {
     id: "glasses-rx-5451f",
@@ -1665,7 +1676,8 @@ export const STORE: StoreItem[] = [
     from: true,
     image: "https://cdn.shopify.com/s/files/1/0703/4044/4457/files/3330124960_2.jpg",
     url: "https://www.newlook.ca/products/rx-5451f",
-    why: "Glasses or contacts; frame price, prescription lenses extra",
+    why: "Glasses or contacts; frame plus the store's single-vision lenses",
+    lenses: 214,
   },
   {
     id: "glasses-falcon",
@@ -2001,7 +2013,7 @@ export function claimAll(items: StoreItem[], lsaLeft: number, visionLeft: number
 
 /** What you can claim on one item, given what's left in each benefit. */
 export function claimFor(item: StoreItem, lsaLeft: number, visionLeft: number): Claim {
-  const total = r2(item.price * (1 + QC_SALES_TAX));
+  const total = r2((item.price + (item.lenses ?? 0)) * (1 + QC_SALES_TAX));
   const vision = item.benefit === "vision" ? Math.min(total, Math.max(0, visionLeft)) : 0;
   const lsa = item.visionOnly ? 0 : Math.min(total - vision, Math.max(0, lsaLeft));
   return { total, vision: r2(vision), lsa: r2(lsa), you: r2(total - vision - lsa) };
