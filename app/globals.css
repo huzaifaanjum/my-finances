@@ -2114,10 +2114,12 @@ select option{background:#18181b;color:var(--text)}
 .st-pots-g .keep header>b{color:var(--std)}
 .st-pots-g header>small{grid-column:1/-1;font-size:12px;color:var(--mute)}
 .st-pots-l{list-style:none;margin:0;padding:0}
-.st-pots-l li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #1d1d21;text-align:left}
+.st-pots-l li{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #1d1d21;text-align:left}
 .st-pots-l li:last-child{border-bottom:0}
 .st-pots-l li>span{flex:1;min-width:0;display:grid;gap:1px;font-size:13.5px}
 .st-pots-l li>span small{font-size:11.5px;color:#71717a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-pots-l li>span em.st-pots-get{display:block;margin-top:3px;padding:0;background:none;border-radius:0;font-style:normal;font-size:12px;font-weight:400;line-height:1.45;color:#a1a1aa;hyphens:manual}
+.st-pots-get b{font-weight:600;color:#d4d4d8}
 .st-pots-l li>b{flex:none;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
 .st-pots-l li>b small{font-size:11.5px;font-weight:400;color:var(--mute)}
 .st-pots-l li>b.zero{color:var(--none)}

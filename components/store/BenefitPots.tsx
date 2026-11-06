@@ -32,6 +32,9 @@ export default function BenefitPots({ limits, lsaUsed }: { limits: LimitMap; lsa
             <small>
               {r.per} · {r.note}
             </small>
+            <em className="st-pots-get">
+              <b>You can get:</b> {r.get}
+            </em>
           </span>
           {r.carry !== "expires" && <em className={r.carry}>{TAG[r.carry]}</em>}
           {r.left === undefined ? (
