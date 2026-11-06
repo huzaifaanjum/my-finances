@@ -10,16 +10,22 @@ export const dynamic = "force-dynamic";
 const DOC = "store";
 const ID = /^[a-z0-9-]{1,40}$/;
 
-/** First read copies the bundled catalog in; upserts with $setOnInsert so two first reads at once can't duplicate or overwrite. */
+/**
+ * Adds any product from the bundled catalog that isn't in the collection yet, so new products in lib/store.ts reach Mongo.
+ * $setOnInsert never overwrites a product already there, and two requests at once can't duplicate one.
+ */
 async function items(): Promise<StoreItem[]> {
   const col = await storeCollection();
-  if ((await col.estimatedDocumentCount()) === 0) {
+  let docs = await col.find({}).toArray();
+  const have = new Set(docs.map((d) => String(d._id)));
+  const missing = STORE.filter((i) => !have.has(i.id));
+  if (missing.length) {
     await col.bulkWrite(
-      STORE.map(({ id, ...rest }) => ({ updateOne: { filter: { _id: id as never }, update: { $setOnInsert: rest }, upsert: true } })),
+      missing.map(({ id, ...rest }) => ({ updateOne: { filter: { _id: id as never }, update: { $setOnInsert: rest }, upsert: true } })),
       { ordered: false },
     );
+    docs = await col.find({}).toArray();
   }
-  const docs = await col.find({}).toArray();
   return docs.map(({ _id, ...rest }) => ({ id: String(_id), ...rest }) as StoreItem);
 }
 

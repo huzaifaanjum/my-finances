@@ -4,7 +4,7 @@ import { useState } from "react";
 import InfoTip from "@/components/ui/InfoTip";
 import { money } from "@/lib/format";
 import { payMarginal } from "@/lib/pay";
-import { STORE_CATEGORIES, type Claim, type StoreItem } from "@/lib/store";
+import { SHOE_BUZZ, STORE_CATEGORIES, type Claim, type StoreItem } from "@/lib/store";
 
 const GST = 0.05;
 const QST = 0.09975;
@@ -78,6 +78,15 @@ function ClaimDetails({ item, c, lsaLeft, visionLeft }: { item: StoreItem; c: Cl
   );
 }
 
+function Source({ title, body }: { title: string; body: string }) {
+  return (
+    <>
+      <b>{title}</b>
+      <p className="st-src">{body}</p>
+    </>
+  );
+}
+
 interface Props {
   item: StoreItem;
   claim: Claim;
@@ -94,6 +103,7 @@ export default function ProductCard({ item, claim: c, lsaLeft, visionLeft, wishe
   const covered = c.vision + c.lsa;
   const full = c.you === 0;
   const off = item.was ? Math.round((1 - item.price / item.was) * 100) : 0;
+  const buzz = SHOE_BUZZ[item.id];
 
   return (
     <article className={`st-card${full ? " full" : ""}`}>
@@ -118,6 +128,26 @@ export default function ProductCard({ item, claim: c, lsaLeft, visionLeft, wishe
           <em>{catLabel(item.category)}</em>
         </div>
         <h3 title={item.name}>{item.name}</h3>
+        {buzz && (
+          <div className="st-buzz">
+            {buzz.popular && (
+              <InfoTip className="st-tag hot" label={`Why ${item.name} is popular`} text={<Source title="Popular" body={buzz.popular} />}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.5-5 .2 1.8 1 3 2 3.5C11 9 10.5 5 12 2z" />
+                </svg>
+                Popular
+              </InfoTip>
+            )}
+            {buzz.creators && (
+              <InfoTip className="st-tag pick" label={`Who recommends ${item.name}`} text={<Source title="Recommended by running creators" body={buzz.creators} />}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" />
+                </svg>
+                Creator pick
+              </InfoTip>
+            )}
+          </div>
+        )}
 
         <div className="st-price">
           <b>

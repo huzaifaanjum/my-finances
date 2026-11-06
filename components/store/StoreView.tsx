@@ -8,7 +8,7 @@ import { useBenefitLimits } from "@/hooks/useBenefitLimits";
 import { useStore } from "@/hooks/useStore";
 import { LSA_YEARLY } from "@/lib/benefits";
 import { money } from "@/lib/format";
-import { claimFor, QC_SALES_TAX, STORE_CATEGORIES, STORE_CHECKED, type StoreBenefit, type StoreCategory } from "@/lib/store";
+import { claimFor, QC_SALES_TAX, SHOE_BRANDS, STORE_CATEGORIES, STORE_CHECKED, type StoreBenefit, type StoreCategory } from "@/lib/store";
 import BenefitPots from "./BenefitPots";
 import ProductCard from "./ProductCard";
 
@@ -27,6 +27,7 @@ export default function StoreView() {
   const glasses = limits["eh-glasses"];
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<StoreCategory | "all">("all");
+  const [brand, setBrand] = useState("all");
   const [benefit, setBenefit] = useState<StoreBenefit | "all">("all");
   const [sort, setSort] = useState<Sort>("claim");
   const [fullOnly, setFullOnly] = useState(false);
@@ -58,6 +59,16 @@ export default function StoreView() {
     );
   }, [priced, query, benefit, fullOnly]);
 
+  const inCat = useMemo(() => matching.filter(({ item }) => cat === "all" || item.category === cat), [matching, cat]);
+
+  // brands in the chosen category, shoe brands first in their usual order, then the rest alphabetically
+  const brands = useMemo(() => {
+    const count = new Map<string, number>();
+    for (const { item } of inCat) count.set(item.brand, (count.get(item.brand) ?? 0) + 1);
+    const rank = (b: string) => (SHOE_BRANDS.includes(b) ? SHOE_BRANDS.indexOf(b) : SHOE_BRANDS.length);
+    return [...count].sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b));
+  }, [inCat]);
+
   const rows = useMemo(() => {
     const by: Record<Sort, (a: (typeof matching)[number], b: (typeof matching)[number]) => number> = {
       claim: (a, b) => b.c.vision + b.c.lsa - (a.c.vision + a.c.lsa) || a.c.you - b.c.you,
@@ -65,14 +76,15 @@ export default function StoreView() {
       low: (a, b) => a.item.price - b.item.price,
       high: (a, b) => b.item.price - a.item.price,
     };
-    return matching.filter(({ item }) => cat === "all" || item.category === cat).sort(by[sort]);
-  }, [matching, cat, sort]);
+    return inCat.filter(({ item }) => brand === "all" || item.brand === brand).sort(by[sort]);
+  }, [inCat, brand, sort]);
 
   const free = priced.filter(({ c }) => c.you === 0).length;
-  const filtered = query || cat !== "all" || benefit !== "all" || fullOnly;
+  const filtered = query || cat !== "all" || brand !== "all" || benefit !== "all" || fullOnly;
   const clear = () => {
     setQuery("");
     setCat("all");
+    setBrand("all");
     setBenefit("all");
     setFullOnly(false);
   };
@@ -178,13 +190,36 @@ export default function StoreView() {
           {[{ id: "all" as const, label: "All" }, ...STORE_CATEGORIES].map((c) => {
             const n = c.id === "all" ? matching.length : matching.filter(({ item }) => item.category === c.id).length;
             return (
-              <button key={c.id} type="button" aria-pressed={cat === c.id} disabled={n === 0 && cat !== c.id} onClick={() => setCat(c.id)}>
+              <button
+                key={c.id}
+                type="button"
+                aria-pressed={cat === c.id}
+                disabled={n === 0 && cat !== c.id}
+                onClick={() => {
+                  setCat(c.id);
+                  setBrand("all");
+                }}
+              >
                 {c.label}
                 <span>{n}</span>
               </button>
             );
           })}
         </div>
+        {cat === "shoes" && brands.length > 1 && (
+          <div className="st-chips st-brands" role="group" aria-label="Brand">
+            <button type="button" aria-pressed={brand === "all"} onClick={() => setBrand("all")}>
+              All brands
+              <span>{inCat.length}</span>
+            </button>
+            {brands.map(([b, n]) => (
+              <button key={b} type="button" aria-pressed={brand === b} onClick={() => setBrand(brand === b ? "all" : b)}>
+                {b}
+                <span>{n}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="st-count">

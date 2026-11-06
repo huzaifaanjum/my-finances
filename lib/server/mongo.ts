@@ -47,7 +47,7 @@ export async function payslipCollection(): Promise<Collection<Document>> {
   return (await client()).db("planner").collection("payslips");
 }
 
-/** One document per Store product: { _id: item id, ...StoreItem fields }, seeded from lib/store.ts the first time it's read. */
+/** One document per Store product: { _id: item id, ...StoreItem fields }, topped up from lib/store.ts with any product it doesn't have yet. */
 export async function storeCollection(): Promise<Collection<Document>> {
   return (await client()).db("planner").collection("store");
 }
