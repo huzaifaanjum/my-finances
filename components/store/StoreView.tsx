@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { G } from "@/components/glossary/GlossaryText";
 import SeeAlso from "@/components/ui/SeeAlso";
 import { Note } from "@/components/ui/text";
@@ -28,8 +29,22 @@ export default function StoreView() {
   const { items, lsaUsed, wishlist, loading, error, saveLsaUsed, toggleWish } = useStore();
   const glasses = limitValue("eh-glasses", limits);
   const [query, setQuery] = useState("");
-  const [cat, setCat] = useState<StoreCategory | "all">("all");
-  const [brand, setBrand] = useState("all");
+  // category and brand live in the URL (/store?cat=shoes&brand=Nike), so a refresh, a shared link or Back keeps them
+  const params = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const rawCat = params.get("cat");
+  const cat: StoreCategory | "all" = STORE_CATEGORIES.some((c) => c.id === rawCat) ? (rawCat as StoreCategory) : "all";
+  const brand = params.get("brand") ?? "all";
+  const filterTo = (nextCat: StoreCategory | "all", nextBrand: string) => {
+    const q = new URLSearchParams(params.toString());
+    if (nextCat === "all") q.delete("cat");
+    else q.set("cat", nextCat);
+    if (nextBrand === "all") q.delete("brand");
+    else q.set("brand", nextBrand);
+    const qs = q.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
   const [benefit, setBenefit] = useState<StoreBenefit | "all">("all");
   const [sort, setSort] = useState<Sort>("claim");
   const [fullOnly, setFullOnly] = useState(false);
@@ -85,8 +100,7 @@ export default function StoreView() {
   const filtered = query || cat !== "all" || brand !== "all" || benefit !== "all" || fullOnly;
   const clear = () => {
     setQuery("");
-    setCat("all");
-    setBrand("all");
+    filterTo("all", "all");
     setBenefit("all");
     setFullOnly(false);
   };
@@ -168,8 +182,7 @@ export default function StoreView() {
         limits={limits}
         lsaLeft={lsaLeft}
         onShop={(c) => {
-          setCat(c as StoreCategory);
-          setBrand("all");
+          filterTo(c as StoreCategory, "all");
           document.getElementById("st-tools")?.scrollIntoView({ behavior: "smooth", block: "start" });
         }}
       />
@@ -210,8 +223,7 @@ export default function StoreView() {
                 aria-pressed={cat === c.id}
                 disabled={n === 0 && cat !== c.id}
                 onClick={() => {
-                  setCat(c.id);
-                  setBrand("all");
+                  filterTo(c.id, "all");
                 }}
               >
                 {c.label}
@@ -222,12 +234,12 @@ export default function StoreView() {
         </div>
         {(cat === "shoes" || cat === "tech") && brands.length > 1 && (
           <div className="st-chips st-brands" role="group" aria-label="Brand">
-            <button type="button" aria-pressed={brand === "all"} onClick={() => setBrand("all")}>
+            <button type="button" aria-pressed={brand === "all"} onClick={() => filterTo(cat, "all")}>
               All brands
               <span>{inCat.length}</span>
             </button>
             {brands.map(([b, n]) => (
-              <button key={b} type="button" aria-pressed={brand === b} onClick={() => setBrand(brand === b ? "all" : b)}>
+              <button key={b} type="button" aria-pressed={brand === b} onClick={() => filterTo(cat, brand === b ? "all" : b)}>
                 {b}
                 <span>{n}</span>
               </button>
