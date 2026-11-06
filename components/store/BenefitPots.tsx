@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { G, GlossaryScope } from "@/components/glossary/GlossaryText";
 import type { LimitMap } from "@/hooks/useBenefitLimits";
 import { CLAIM_LIMITS, LSA_YEARLY } from "@/lib/benefits";
 import { money } from "@/lib/format";
@@ -26,16 +27,20 @@ export default function BenefitPots({ limits, lsaUsed }: { limits: LimitMap; lsa
   const List = ({ list }: { list: typeof rows }) => (
     <ul className="st-pots-l">
       {list.map((r) => (
-        <li key={r.id} title={r.note}>
-          <span>
-            {r.label}
-            <small>
-              {r.per} · {r.note}
-            </small>
-            <em className="st-pots-get">
-              <b>You can get:</b> {r.get}
-            </em>
-          </span>
+        <li key={r.id}>
+          <GlossaryScope>
+            <span>
+              <span className="st-pots-name">
+                <G>{r.label}</G>
+              </span>
+              <small>
+                <G>{`${r.per} · ${r.note}`}</G>
+              </small>
+              <em className="st-pots-get">
+                <b>You can get:</b> <G>{r.get}</G>
+              </em>
+            </span>
+          </GlossaryScope>
           {r.carry !== "expires" && <em className={r.carry}>{TAG[r.carry]}</em>}
           {r.left === undefined ? (
             <Link href="/insurance" className="st-pots-add">
@@ -68,9 +73,13 @@ export default function BenefitPots({ limits, lsaUsed }: { limits: LimitMap; lsa
       <div className="st-pots-g">
         <section className="lose">
           <header>
-            <h3>Use it or lose it</h3>
+            <h3>
+              <G>Use it or lose it</G>
+            </h3>
             <b>{money(sum(lose))}</b>
-            <small>resets April 1, the start of each plan year</small>
+            <small>
+              <G>resets April 1, the start of each plan year</G>
+            </small>
           </header>
           <List list={lose} />
         </section>
@@ -78,7 +87,9 @@ export default function BenefitPots({ limits, lsaUsed }: { limits: LimitMap; lsa
           <header>
             <h3>Doesn&apos;t reset yearly</h3>
             <b>{money(sum(keep))}</b>
-            <small>carries forward or renews every few years, plus lifetime travel and drug cover</small>
+            <small>
+              <G>carries forward or renews every few years, plus lifetime travel and drug cover</G>
+            </small>
           </header>
           <List list={keep} />
         </section>

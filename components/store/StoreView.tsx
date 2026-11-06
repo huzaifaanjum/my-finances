@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { G } from "@/components/glossary/GlossaryText";
 import SeeAlso from "@/components/ui/SeeAlso";
 import { Note } from "@/components/ui/text";
 import { useBenefitLimits } from "@/hooks/useBenefitLimits";
@@ -95,7 +96,9 @@ export default function StoreView() {
       <section className="ph2 st-hero">
         <div className="st-hero-main">
           <div className="ph2-lead">
-            <span>Spending account left this plan year</span>
+            <span>
+              <G>Spending account left this plan year</G>
+            </span>
             <b>{money(lsaLeft)}</b>
             <div className="st-lsa">
               <div className="st-meter big" role="img" aria-label={`${money(lsaUsed)} claimed of ${money(LSA_YEARLY)}`}>

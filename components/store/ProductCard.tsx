@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { G, GlossaryScope } from "@/components/glossary/GlossaryText";
 import InfoTip from "@/components/ui/InfoTip";
 import { money } from "@/lib/format";
 import { payMarginal } from "@/lib/pay";
@@ -127,7 +128,11 @@ export default function ProductCard({ item, claim: c, lsaLeft, visionLeft, wishe
           <span>{item.brand}</span>
           <em>{catLabel(item.category)}</em>
         </div>
-        <h3 title={item.name}>{item.name}</h3>
+        <h3 title={item.name}>
+          <GlossaryScope>
+            <G>{item.name}</G>
+          </GlossaryScope>
+        </h3>
         {buzz && (
           <div className="st-buzz">
             {buzz.popular && (
@@ -177,7 +182,11 @@ export default function ProductCard({ item, claim: c, lsaLeft, visionLeft, wishe
               <path d="M7 17 17 7M9 7h8v8" />
             </svg>
           </a>
-          <p className="st-why">Eligible as: {item.why}</p>
+          <p className="st-why">
+            <GlossaryScope>
+              <G>{`Eligible as: ${item.why}`}</G>
+            </GlossaryScope>
+          </p>
         </div>
       </div>
     </article>
