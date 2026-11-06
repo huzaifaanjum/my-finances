@@ -883,6 +883,54 @@ export const GOAL_TEMPLATES: GoalTemplate[] = [
     ],
   },
   {
+    kind: "invisalign",
+    name: "Invisalign",
+    blurb: "Clear aligners: what your dental plan won't pay, two years of spending account, and the tax credit.",
+    typical: "$4,000 to $8,000",
+    months: 8,
+    fields: [
+      { key: "cost", label: "Invisalign treatment", kind: "money", initial: 6500, step: 100, hint: "Montréal about $4,000 (Lite) to $8,000 (full); get 2 to 3 free consultations" },
+      { key: "retainers", label: "Retainers afterward", kind: "money", initial: 500, step: 50, hint: "Often $400 to $800; sometimes included in the quote" },
+      {
+        key: "lsa",
+        label: "Claimed from your Lifestyle Spending Account",
+        kind: "money",
+        initial: 2 * LSA_YEARLY,
+        step: 50,
+        hint: "Unused dollars carry forward one plan year, so 2026-27 plus 2027-28 can both go here; the first year is prorated from your start date",
+      },
+      { key: "tmj", label: "Part billed as jaw (TMJ) treatment", kind: "money", initial: 0, step: 100, hint: "Only if a jaw problem is diagnosed; your dental plan pays 50% of it, up to $1,000 for life" },
+    ],
+    cost: (v) => {
+      const total = v.cost + v.retainers;
+      const tmj = Math.min(v.tmj * 0.5, 1000);
+      const lsa = Math.min(v.lsa, total - tmj);
+      const yours = total - tmj - lsa;
+      return {
+        target: yours,
+        lines: [
+          { label: "Invisalign treatment", amount: v.cost },
+          ...(v.retainers ? [{ label: "Retainers", amount: v.retainers }] : []),
+          ...(tmj ? [{ label: "Dental plan, TMJ at 50%", amount: -tmj }] : []),
+          ...(lsa ? [{ label: "Lifestyle Spending Account", amount: -lsa, note: `taxable, about ${money0(lsa * (1 - payMarginal().rate))} after tax` }] : []),
+        ],
+        back: { label: "Back at tax time", amount: medicalBack(yours), note: "medical expense credits on what Manulife didn't pay, Quebec 20% and federal" },
+      };
+    },
+    tips: [
+      "Your dental plan pays $0: orthodontics are covered for children under 21 only (booklet, page 54).",
+      "Don't spend your spending account elsewhere: unused dollars carry forward one plan year (April 1 to March 31), so two years can go to Invisalign.",
+      "Spread instalments past April 1 to claim from one more plan year.",
+      "Ask the orthodontist for a written treatment plan with the dental reason (crowding, spacing, bite) so it counts for the medical expense credits; purely cosmetic doesn't.",
+      "Ask whether any part can be billed as TMJ (jaw) treatment, and send Manulife a predetermination first.",
+      "Keep every receipt for Manulife and your tax return; claim only what Manulife didn't pay.",
+    ],
+    sources: [
+      { label: "Medical expenses (Revenu Québec)", url: "https://www.revenuquebec.ca/en/citizens/tax-credits/medical-expenses/" },
+      { label: "Medical expense credit (RCGT)", url: "https://www.rcgt.com/en/tax-planning-guide/sections/section-04-health-seniors-and-caregivers/medical-expense-credit/" },
+    ],
+  },
+  {
     kind: "glasses",
     name: "Glasses or contacts",
     blurb: "Frames, lenses or a year of contacts, minus what your vision coverage pays.",
