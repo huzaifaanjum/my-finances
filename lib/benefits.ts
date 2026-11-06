@@ -1,5 +1,5 @@
 // Group insurance and benefits, from the Manulife coverage summary (statement as of Oct 13, 2026)
-// and Manulife's list of Lifestyle Spending Account eligible expenses.
+// and Manulife's list of Lifestyle Spending Account eligible expenses (LSA_Eligible_Expenses.pdf).
 
 export const STATEMENT_DATE = "Oct 13, 2026";
 /** Quebec's tax on insurance premiums; it is why each payslip deduction is 9% above the Manulife price. */
@@ -161,46 +161,94 @@ export const LSA_CATEGORIES: LsaCategory[] = [
   {
     title: "Fitness and recreation",
     items: [
-      "Gym, health club and fitness classes (yoga, Pilates)",
+      "Health club, gym memberships and classes (yoga, Pilates, aerobics)",
       "Personal trainer",
-      "Fitness equipment, trackers and apps",
-      "Running shoes, race and club fees",
-      "Ski and snowboard passes and equipment",
-      "Racket sports, golf, dance and self-defence lessons",
-      "Sports registration, team fees and equipment",
-      "Camping, fishing, hiking and water-sports gear",
-      "Recreational club memberships",
+      "Fitness equipment (treadmill, exercise bike, gym equipment)",
+      "Fitness trackers and apps (activity, heart rate and sleep monitors)",
+      "Fitness videos and books",
+      "Hiking, jogging and running: club fees, race entry, shoes",
+      "Skiing and snowboarding: lift tickets, passes, equipment, memberships",
+      "Camping: campground fees and equipment (tent, sleeping bag, stove, pots)",
+      "Water sports: paddle board, canoe, kayak, surfboard, life jacket",
+      "Racket sports: court fees, lessons, equipment",
+      "Golf: green fees and lessons",
+      "Sports (baseball, curling, hockey): registration, equipment, team fees, lessons",
+      "Equipment to take part in a sporting event",
+      "Dance lessons and self-defence courses",
+      "Fishing and hunting: licences and equipment",
+      "Horseback riding: lessons and equipment",
+      "Recreational club membership (sailing, skiing)",
     ],
   },
   {
     title: "Education",
-    items: ["Professional course fees and tuition", "Books and school supplies", "Computer and software", "Foreign language training", "CPR and first aid courses", "Tutor", "Parking to attend school"],
+    items: [
+      "Professional course fees and tuition",
+      "Books, school supplies and calculators",
+      "Computer and software",
+      "Foreign language training",
+      "CPR and first aid courses",
+      "Tutor",
+      "Summer camp fees",
+      "Lodging, meals and travel to attend school",
+      "Parking to attend school",
+      "School insurance",
+    ],
   },
   {
     title: "Healthcare",
     items: [
-      "Health costs not covered by the core plan",
+      "Health costs not covered by the core plan or Health Spending Account",
       "Vitamins and supplements",
-      "Mattress, adjustable bed, massage units",
+      "Bed mattresses and adjustable beds",
+      "Massage units",
       "Heating pad, electric blanket, thermometer",
+      "Medical alert devices and monitoring subscriptions",
       "Virtual or executive health clinic fees",
+      "Treatment centres and spas (hair removal, waxing)",
+      "PPE for personal use (masks, gloves)",
       "Vet fees",
       "Maternity expenses (prenatal classes, midwife)",
+      "Traditional medicines and Indigenous ceremony fees and supplies",
     ],
   },
   {
     title: "Dental extras",
-    items: ["Cosmetic dentistry and whitening", "Toothbrushes, floss, toothpaste, water flosser", "Prefabricated mouth guards", "Dental costs the plan didn't pay"],
+    items: [
+      "Dental costs not covered by the core plan or Health Spending Account",
+      "Cosmetic dentistry, bleaching, home whitening kits and strips",
+      "Toothbrushes, floss, toothpaste and home fluoride",
+      "Water flosser",
+      "Prefabricated mouth guards",
+      "Denture cleaners and adhesive",
+    ],
   },
   {
     title: "Counselling",
-    items: ["Nutritional counselling", "Stress management programs", "Weight loss and smoking cessation programs", "Grief and addiction counselling"],
+    items: [
+      "Nutritional counselling",
+      "Stress management programs, counselling and books",
+      "Weight loss programs, counselling and books",
+      "Smoking cessation programs, counselling and books",
+      "Grief and addiction counselling",
+      "Lactation consulting and parishioner fees",
+    ],
   },
   {
     title: "Family and home",
-    items: ["Childcare, nanny, daycare", "Car seats and baby monitors", "Elder care", "Cleaning service or homemaker"],
+    items: [
+      "Childcare, daycare, nanny and emergency childcare",
+      "Travel to take a child to daycare (gas, mileage, taxi)",
+      "Field trips and diaper service",
+      "Car seats, booster seats and baby monitors",
+      "Adult or elder care",
+      "Maid, cleaning service or homemaker",
+    ],
   },
-  { title: "Long-term care", items: ["Retirement and nursing home fees (not room)", "Meals on Wheels", "Hospital phone and TV rental"] },
+  {
+    title: "Long-term care",
+    items: ["Retirement home fees", "Nursing home expenses, excluding room", "Meals on Wheels and homemaker", "Laundry, hairdressing and similar charges", "Phone and TV rental while in hospital"],
+  },
 ];
 
 /** The eligible expenses most likely to fit you right now. */

@@ -354,3 +354,27 @@ export function claimFor(item: StoreItem, lsaLeft: number, visionLeft: number): 
   const lsa = Math.min(total - vision, Math.max(0, lsaLeft));
   return { total, vision: r2(vision), lsa: r2(lsa), you: r2(total - vision - lsa) };
 }
+
+/* ---------- what you can claim, and whether it lasts ---------- */
+
+export type Carry = "expires" | "carries" | "rolling" | "lifetime";
+
+/**
+ * Every money limit you can claim against, and what happens to the unused part. Typical Manulife group rules;
+ * the HSA one-year carry-forward is a CRA requirement. Ids match CLAIM_LIMITS so amounts come from your statement or booklet.
+ */
+export const BENEFIT_POTS: { id: string; label: string; per: string; carry: Carry; note: string }[] = [
+  { id: "lsa-year", label: "Lifestyle Spending Account", per: "a plan year", carry: "expires", note: "Unused dollars expire at plan year end" },
+  { id: "eh-massage", label: "Massage therapy", per: "a plan year", carry: "expires", note: "Resets each plan year" },
+  { id: "eh-physio", label: "Physiotherapy", per: "a plan year", carry: "expires", note: "Resets each plan year" },
+  { id: "eh-chiro", label: "Chiropractor", per: "a plan year", carry: "expires", note: "Resets each plan year" },
+  { id: "eh-psych", label: "Psychologist or social worker", per: "a plan year", carry: "expires", note: "Resets each plan year" },
+  { id: "dent-max", label: "Dental", per: "a plan year", carry: "expires", note: "Yearly maximum resets" },
+  { id: "drug-max", label: "Prescription drugs", per: "a plan year", carry: "expires", note: "Many plans have no maximum" },
+  { id: "hsa-year", label: "Health Spending Account", per: "a plan year", carry: "carries", note: "Unused credits carry forward one year, then expire" },
+  { id: "eh-glasses", label: "Glasses or contacts", per: "every 24 months", carry: "rolling", note: "Rolling period; nothing carries over" },
+  { id: "eh-eye-exam", label: "Eye exam", per: "every 24 months", carry: "rolling", note: "Rolling period; nothing carries over" },
+  { id: "eh-hearing", label: "Hearing aids", per: "every 5 years", carry: "rolling", note: "Rolling period; nothing carries over" },
+  { id: "dent-ortho", label: "Orthodontics", per: "lifetime", carry: "lifetime", note: "Never resets; whatever you don't use stays available" },
+  { id: "eh-travel", label: "Emergency medical abroad", per: "lifetime", carry: "lifetime", note: "Never resets" },
+];

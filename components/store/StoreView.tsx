@@ -9,6 +9,7 @@ import { useStore } from "@/hooks/useStore";
 import { LSA_YEARLY } from "@/lib/benefits";
 import { money } from "@/lib/format";
 import { claimFor, QC_SALES_TAX, STORE_CATEGORIES, STORE_CHECKED, type StoreBenefit, type StoreCategory } from "@/lib/store";
+import BenefitPots from "./BenefitPots";
 import ProductCard from "./ProductCard";
 
 type Sort = "claim" | "low" | "high" | "you";
@@ -90,23 +91,22 @@ export default function StoreView() {
                 {lsaLeft > 0 && <i className="l" style={{ width: `${100 - usedPct}%` }} />}
               </div>
               <div className="st-lsa-f">
-                <span>
-                  {money(lsaUsed)} claimed of {money(LSA_YEARLY)}
-                </span>
-                <label className="st-used">
-                  Already claimed
+                <span>Already claimed</span>
+                <label className="st-used" title="Tap the amount to change it">
                   <span>
                     <i>$</i>
                     <input
                       inputMode="decimal"
                       placeholder="0"
                       value={usedText}
+                      style={{ width: `${Math.max(1, usedText.length) + 0.4}ch` }}
                       onChange={(e) => setUsedText(e.target.value)}
                       onBlur={commitUsed}
                       onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
-                      aria-label="Spending account already claimed this year"
+                      aria-label={`Spending account already claimed this year, out of ${money(LSA_YEARLY)}`}
                     />
                   </span>
+                  <em>/ {money(LSA_YEARLY)}</em>
                 </label>
               </div>
             </div>
@@ -145,6 +145,7 @@ export default function StoreView() {
             </div>
           </dl>
         </div>
+        <BenefitPots limits={limits} lsaUsed={lsaUsed} />
       </section>
 
       <div className="st-tools">
