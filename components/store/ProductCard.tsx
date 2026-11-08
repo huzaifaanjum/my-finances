@@ -63,25 +63,38 @@ function ClaimDetails({ item, c, lsaLeft, visionLeft }: { item: StoreItem; c: Cl
 
       <span className="st-ts">
         <span className="st-th">Claim</span>
+        {item.benefit === "ortho" && <Row label="Orthopaedic shoes, extended health" value={`−${money(c.vision, 2)}`} tone="pos" />}
         {item.benefit === "vision" && (
           <Row label={visionLeft === undefined ? "Vision cover (limit not added)" : "Vision cover"} value={`−${money(c.vision, 2)}`} tone="pos" />
         )}
-        <Row label="Spending account" value={`−${money(c.lsa, 2)}`} tone="pos" />
+        {item.benefit !== "ortho" && <Row label="Spending account" value={`−${money(c.lsa, 2)}`} tone="pos" />}
         <Row label={`You pay · ${c.total ? Math.round((covered / c.total) * 100) : 0}% covered`} value={money(c.you, 2)} tone="tt" />
       </span>
 
       <span className="st-ts">
         <span className="st-th">After buying</span>
-        <Row label="Spending account left" value={`${money(lsaLeft, 2)} → ${money(lsaLeft - c.lsa, 2)}`} />
-        {item.benefit === "vision" && visionLeft !== undefined && <Row label="Vision left, 24 months" value={`${money(visionLeft, 2)} → ${money(visionLeft - c.vision, 2)}`} />}
-        {c.lsa > 0 && <Row label="Extra income tax on the claim" value={`≈ ${money(c.lsa * TAX_RATE, 2)}`} tone="neg" />}
+        {item.benefit === "ortho" ? (
+          <>
+            <Row label="Orthopaedic shoe claim, this plan year" value="1 pair → used until April 1" />
+            <Row label="Spending account" value={`${money(lsaLeft, 2)}, untouched`} />
+            <Row label="Income tax on the claim" value="none" tone="pos" />
+          </>
+        ) : (
+          <>
+            <Row label="Spending account left" value={`${money(lsaLeft, 2)} → ${money(lsaLeft - c.lsa, 2)}`} />
+            {item.benefit === "vision" && visionLeft !== undefined && <Row label="Vision left, 24 months" value={`${money(visionLeft, 2)} → ${money(visionLeft - c.vision, 2)}`} />}
+            {c.lsa > 0 && <Row label="Extra income tax on the claim" value={`≈ ${money(c.lsa * TAX_RATE, 2)}`} tone="neg" />}
+          </>
+        )}
       </span>
 
       <span className="st-tn">
         {item.benefit === "vision" ? "Needs a valid prescription. " : ""}
+        {item.benefit === "ortho" ? "Needs a doctor's or podiatrist's recommendation; one pair a plan year, up to $250. The podiatrist visit is covered too. " : ""}
         {item.visionOnly ? "Smart glasses: the price includes clear or sun lenses, not your prescription; ask the store what prescription lenses add. Only the prescription eyewear part is a sure claim, so the spending account isn't counted. " : ""}
         {item.per ? "Claim each renewal separately. " : ""}
-        Pay, keep the receipt, then claim it in the Manulife app. Spending account claims are a taxable benefit on your T4 and RL-1.
+        Pay, keep the receipt, then claim it in the Manulife app.
+        {item.benefit === "ortho" ? " Extended health claims aren't taxed." : " Spending account claims are a taxable benefit on your T4 and RL-1."}
       </span>
     </span>
   );

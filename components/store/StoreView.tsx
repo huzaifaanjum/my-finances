@@ -200,6 +200,7 @@ export default function StoreView() {
             <option value="all">Every benefit</option>
             <option value="lsa">Spending account</option>
             <option value="vision">Vision</option>
+            <option value="ortho">Orthopaedic shoes</option>
           </select>
           <select className="st-select" value={sort} onChange={(e) => setSort(e.target.value as Sort)} aria-label="Sort">
             {SORTS.map((s) => (

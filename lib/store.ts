@@ -9,7 +9,10 @@ export const QC_SALES_TAX = 0.14975;
  * Which benefit pays. "lsa" is the $500 Lifestyle Spending Account; "vision" is extended health's
  * glasses-or-contacts limit, with the spending account covering what's left (it accepts health costs the core plan doesn't pay).
  */
-export type StoreBenefit = "lsa" | "vision";
+export type StoreBenefit = "lsa" | "vision" | "ortho";
+
+/** Extended health pays up to this for one pair of stock orthopaedic shoes a plan year, with a doctor's or podiatrist's note (booklet, Premium). */
+export const ORTHO_SHOE_LIMIT = 250;
 
 export type StoreCategory = "fitness" | "shoes" | "tech" | "recovery" | "sleep" | "vision" | "dental" | "supplements" | "learning";
 
@@ -986,6 +989,84 @@ export const STORE: StoreItem[] = [
     image: "https://cdn.shopify.com/s/files/1/0961/5752/files/ON-CLOUDBOOM-STRIKE-2-UNISEXE-3UG30052929.webp",
     url: "https://www.lecoureur.com/products/on-cloudboom-strike-2",
     why: "Running shoes",
+  },
+  {
+    id: "shoe-on-cloudboom-strike-2-ls",
+    name: "Cloudboom Strike 2 LS (LightSpray), White & Lime",
+    brand: "On",
+    category: "shoes",
+    benefit: "lsa",
+    price: 400,
+    image: "https://images.ctfassets.net/hnk2vsx53n6l/1oyLtdkcjiMsj5bzb0ZErI/659736d262034afec150f91ffecfd994/e22be1ea737965128e7b957bb7ee72d6eb1756a3.png?w=1200&h=630&fit=pad&bg=rgb:ffffff&q=85&fm=webp",
+    url: "https://www.on.com/en-ca/products/cloudboom-strike-2-ls-u-3ug3002/unisex/white-lime-shoes-3UG30022929",
+    why: "Running shoes",
+  },
+  {
+    id: "shoe-on-cloudboom-strike-2-ls-verdite",
+    name: "Cloudboom Strike 2 LS (LightSpray), White & Verdite",
+    brand: "On",
+    category: "shoes",
+    benefit: "lsa",
+    price: 400,
+    image: "https://images.ctfassets.net/hnk2vsx53n6l/Bw1ZVLnb57AZvQ43o8kgC/2095abe54d37d0e88497e70bc7538ae8/e58ff68cb8503ad505ddf81101e9909092189081.png?w=1200&h=630&fit=pad&bg=rgb:ffffff&q=85&fm=webp",
+    url: "https://www.on.com/en-ca/products/cloudboom-strike-2-ls-u-3ug3002/unisex/white-verdite-shoes-3UG30025363",
+    why: "Running shoes",
+  },
+  {
+    id: "shoe-on-cloudboom-strike-ls",
+    name: "Cloudboom Strike LS (LightSpray), White & Raspberry",
+    brand: "On",
+    category: "shoes",
+    benefit: "lsa",
+    price: 420,
+    image: "https://images.ctfassets.net/hnk2vsx53n6l/6E1sutFke51ZT4FHChskbg/f4f164cd2e93c2ede0fcdc63c1a8e3ae/b7239446429c89660db68cd0244cd0880838f1d9.png?w=1200&h=630&fit=pad&bg=rgb:ffffff&q=85&fm=webp",
+    url: "https://www.on.com/en-ca/products/cloudboom-strike-ls-u-3ue3001/unisex/white-raspberry-shoes-3UE30012926",
+    why: "Running shoes",
+  },
+  {
+    id: "shoe-on-cloudsurfer-max-dust",
+    name: "Men's Cloudsurfer Max, Dust & Ivory",
+    brand: "On",
+    category: "shoes",
+    benefit: "lsa",
+    price: 135,
+    was: 220,
+    image: "https://images.ctfassets.net/hnk2vsx53n6l/LMLCohNbts0agaEZyi251/cc2917af90162827f58d301606e1e77f/0440c81bdfdcfa0031ff8c224cfb9ea95561a517.png?w=1200&h=630&fit=pad&bg=rgb:ffffff&q=85&fm=webp",
+    url: "https://www.on.com/en-ca/products/cloudsurfer-max-m-3mf3043/mens/dust-ivory-shoes-3MF30434287",
+    why: "Running shoes",
+  },
+  {
+    id: "shoe-orthofeet-tilos-hands-free",
+    name: "Tilos Hands-Free orthopaedic sneaker, Blue",
+    brand: "Orthofeet",
+    category: "shoes",
+    benefit: "ortho",
+    price: 199,
+    image: "https://cdn.shopify.com/s/files/1/0867/3656/8567/files/OTF_WebAsset_Tilos_20019_Blue_PDP5_00_0126_1500x1060_9d094834-b6c0-414f-a66e-8eebd2baa018.jpg",
+    url: "https://ca.orthofeet.com/products/tilos-hands-free-blue",
+    why: "Orthopaedic shoes; needs a doctor's or podiatrist's note",
+  },
+  {
+    id: "shoe-orthofeet-advantage-pickleball",
+    name: "Advantage Pickleball Hands-Free court shoe, White",
+    brand: "Orthofeet",
+    category: "shoes",
+    benefit: "ortho",
+    price: 199,
+    image: "https://cdn.shopify.com/s/files/1/0867/3656/8567/files/OTF_WebAssets_Advantage_88100_White_PDP5_00_0126_1500x1060_a86f9b09-b5ac-4972-8b8e-7305f19e6371.jpg",
+    url: "https://ca.orthofeet.com/products/advantage-pickleball-hands-free-white",
+    why: "Orthopaedic shoes with a note; or racket sports gear on the spending account",
+  },
+  {
+    id: "shoe-orthofeet-tilos-trail",
+    name: "Tilos Trail Hands-Free trail shoe, Gray & Teal",
+    brand: "Orthofeet",
+    category: "shoes",
+    benefit: "lsa",
+    price: 199,
+    image: "https://cdn.shopify.com/s/files/1/0867/3656/8567/files/OTF_WebAsset_TilosTrail_50002_GrayTeal_PDP5_00_0126_1500x1060_d008eff4-4ebd-4782-ba7d-7d07cdb64ef5.jpg",
+    url: "https://ca.orthofeet.com/products/tilos-trail-hands-free-gray-teal",
+    why: "Hiking shoes; or orthopaedic shoes with a note",
   },
   {
     id: "shoe-saucony-endorphin-speed-5",
@@ -2296,7 +2377,7 @@ export const STORE: StoreItem[] = [
 export interface Claim {
   /** price with Quebec sales tax, what the receipt shows */
   total: number;
-  /** from extended health's glasses-or-contacts limit */
+  /** from extended health: the glasses-or-contacts limit, or the orthopaedic shoe limit for orthopaedic shoes */
   vision: number;
   /** from the Lifestyle Spending Account */
   lsa: number;
@@ -2316,7 +2397,7 @@ export function claimAll(items: StoreItem[], lsaLeft: number, visionLeft: number
   const claims = items.map((item) => {
     const c = claimFor(item, lsa, vision);
     lsa -= c.lsa;
-    vision -= c.vision;
+    if (item.benefit === "vision") vision -= c.vision;
     return c;
   });
   const sum = (k: keyof Claim) => r2(claims.reduce((t, c) => t + c[k], 0));
@@ -2326,8 +2407,9 @@ export function claimAll(items: StoreItem[], lsaLeft: number, visionLeft: number
 /** What you can claim on one item, given what's left in each benefit. */
 export function claimFor(item: StoreItem, lsaLeft: number, visionLeft: number): Claim {
   const total = r2((item.price + (item.lenses ?? 0)) * (1 + QC_SALES_TAX));
-  const vision = item.benefit === "vision" ? Math.min(total, Math.max(0, visionLeft)) : 0;
-  const lsa = item.visionOnly ? 0 : Math.min(total - vision, Math.max(0, lsaLeft));
+  const plan = item.benefit === "vision" ? visionLeft : item.benefit === "ortho" ? ORTHO_SHOE_LIMIT : 0;
+  const vision = Math.min(total, Math.max(0, plan));
+  const lsa = item.visionOnly || item.benefit === "ortho" ? 0 : Math.min(total - vision, Math.max(0, lsaLeft));
   return { total, vision: r2(vision), lsa: r2(lsa), you: r2(total - vision - lsa) };
 }
 
