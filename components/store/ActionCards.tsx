@@ -23,8 +23,19 @@ interface Action {
 }
 
 /** Claims to make to get the most out of your benefits, biggest dollar value first, as a collapsible row of cards you scroll sideways. */
-export default function ActionCards({ limits, lsaLeft, onShop }: { limits: LimitMap; lsaLeft: number; onShop: (category: string) => void }) {
-  const v = (id: string) => limitValue(id, limits) ?? 0;
+export default function ActionCards({
+  limits,
+  lsaLeft,
+  used = {},
+  onShop,
+}: {
+  limits: LimitMap;
+  lsaLeft: number;
+  /** already claimed against each health limit, so each card shows what's left */
+  used?: Record<string, number>;
+  onShop: (category: string) => void;
+}) {
+  const v = (id: string) => Math.max(0, (limitValue(id, limits) ?? 0) - (used[id] ?? 0));
   const lsaTax = payMarginal(new Date().getFullYear()).rate;
 
   const actions: Action[] = [

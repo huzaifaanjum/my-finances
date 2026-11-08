@@ -14,6 +14,9 @@ export type StoreBenefit = "lsa" | "vision" | "ortho";
 /** Extended health pays up to this for one pair of stock orthopaedic shoes a plan year, with a doctor's or podiatrist's note (booklet, Premium). */
 export const ORTHO_SHOE_LIMIT = 250;
 
+/** Health limits whose "already claimed" amount you track in the Store header; ids match CLAIM_LIMITS. */
+export const CLAIMED_IDS = ["eh-glasses", "eh-ortho-shoes", "eh-massage", "eh-physio", "eh-acu"];
+
 export type StoreCategory = "fitness" | "shoes" | "tech" | "recovery" | "sleep" | "vision" | "dental" | "supplements" | "learning";
 
 export const STORE_CATEGORIES: { id: StoreCategory; label: string }[] = [
@@ -1067,6 +1070,17 @@ export const STORE: StoreItem[] = [
     image: "https://cdn.shopify.com/s/files/1/0867/3656/8567/files/OTF_WebAsset_TilosTrail_50002_GrayTeal_PDP5_00_0126_1500x1060_d008eff4-4ebd-4782-ba7d-7d07cdb64ef5.jpg",
     url: "https://ca.orthofeet.com/products/tilos-trail-hands-free-gray-teal",
     why: "Hiking shoes; or orthopaedic shoes with a note",
+  },
+  {
+    id: "shoe-hoka-bondi-sr",
+    name: "Men's Bondi SR slip-resistant walking shoe",
+    brand: "Hoka",
+    category: "shoes",
+    benefit: "ortho",
+    price: 199.99,
+    image: "https://img.thelasthunt.com/https%3A%2F%2Fs3.amazonaws.com%2Fsyncpigeon%2Falti_prod%2Fimages%2Fhoo-1110520_black-black.jpg?w=828&q=75",
+    url: "https://altitude-sports.com/products/hoka-bondi-sr-running-shoes-mens-llll-hoo-1110520",
+    why: "Possibly orthopaedic shoes with a doctor's or podiatrist's note; ask Manulife first",
   },
   {
     id: "shoe-saucony-endorphin-speed-5",
@@ -2391,13 +2405,15 @@ const r2 = (v: number) => Math.round(v * 100) / 100;
  * Buying several items one after another: each draws down the same spending account and vision limit,
  * so later items may get less than they would on their own.
  */
-export function claimAll(items: StoreItem[], lsaLeft: number, visionLeft: number): { claims: Claim[]; total: Claim } {
+export function claimAll(items: StoreItem[], lsaLeft: number, visionLeft: number, orthoLeft = ORTHO_SHOE_LIMIT): { claims: Claim[]; total: Claim } {
   let lsa = lsaLeft;
   let vision = visionLeft;
+  let ortho = orthoLeft;
   const claims = items.map((item) => {
-    const c = claimFor(item, lsa, vision);
+    const c = claimFor(item, lsa, vision, ortho);
     lsa -= c.lsa;
     if (item.benefit === "vision") vision -= c.vision;
+    if (item.benefit === "ortho") ortho -= c.vision;
     return c;
   });
   const sum = (k: keyof Claim) => r2(claims.reduce((t, c) => t + c[k], 0));
@@ -2405,9 +2421,9 @@ export function claimAll(items: StoreItem[], lsaLeft: number, visionLeft: number
 }
 
 /** What you can claim on one item, given what's left in each benefit. */
-export function claimFor(item: StoreItem, lsaLeft: number, visionLeft: number): Claim {
+export function claimFor(item: StoreItem, lsaLeft: number, visionLeft: number, orthoLeft = ORTHO_SHOE_LIMIT): Claim {
   const total = r2((item.price + (item.lenses ?? 0)) * (1 + QC_SALES_TAX));
-  const plan = item.benefit === "vision" ? visionLeft : item.benefit === "ortho" ? ORTHO_SHOE_LIMIT : 0;
+  const plan = item.benefit === "vision" ? visionLeft : item.benefit === "ortho" ? orthoLeft : 0;
   const vision = Math.min(total, Math.max(0, plan));
   const lsa = item.visionOnly || item.benefit === "ortho" ? 0 : Math.min(total - vision, Math.max(0, lsaLeft));
   return { total, vision: r2(vision), lsa: r2(lsa), you: r2(total - vision - lsa) };

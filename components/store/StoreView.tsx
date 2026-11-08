@@ -11,6 +11,7 @@ import { useStore } from "@/hooks/useStore";
 import { limitValue, LSA_YEARLY } from "@/lib/benefits";
 import { money } from "@/lib/format";
 import { claimFor, QC_SALES_TAX, SHOE_BRANDS, STORE_CATEGORIES, STORE_CHECKED, type StoreBenefit, type StoreCategory } from "@/lib/store";
+import BenefitBars from "./BenefitBars";
 import BenefitPots from "./BenefitPots";
 import ActionCards from "./ActionCards";
 import ProductCard from "./ProductCard";
@@ -26,8 +27,11 @@ const SORTS: { id: Sort; label: string }[] = [
 /** Products from popular brands that your spending account and vision cover pay for, with what you can claim on each. */
 export default function StoreView() {
   const { limits } = useBenefitLimits();
-  const { items, lsaUsed, wishlist, loading, error, saveLsaUsed, toggleWish } = useStore();
+  const { items, lsaUsed, used, wishlist, loading, error, saveLsaUsed, saveUsed, toggleWish } = useStore();
   const glasses = limitValue("eh-glasses", limits);
+  // what's left after what you've already claimed, so the cards don't count a limit twice
+  const glassesLeft = glasses === undefined ? undefined : Math.max(0, glasses - (used["eh-glasses"] ?? 0));
+  const orthoLeft = Math.max(0, (limitValue("eh-ortho-shoes", limits) ?? 0) - (used["eh-ortho-shoes"] ?? 0));
   const [query, setQuery] = useState("");
   // category and brand live in the URL (/store?cat=shoes&brand=Nike), so a refresh, a shared link or Back keeps them
   const params = useSearchParams();
@@ -49,21 +53,9 @@ export default function StoreView() {
   const [sort, setSort] = useState<Sort>("claim");
   const [fullOnly, setFullOnly] = useState(false);
 
-  // the field shows what you type and saves to your account when you leave it
-  const [usedText, setUsedText] = useState("");
-  const [synced, setSynced] = useState(lsaUsed);
-  if (lsaUsed !== synced) {
-    setSynced(lsaUsed);
-    setUsedText(lsaUsed ? String(lsaUsed) : "");
-  }
-  const commitUsed = () => {
-    const n = Math.min(LSA_YEARLY, Math.max(0, Number(usedText.replace(/[$,\s]/g, "")) || 0));
-    setUsedText(n ? String(n) : "");
-    if (n !== lsaUsed) saveLsaUsed(n);
-  };
   const lsaLeft = LSA_YEARLY - lsaUsed;
 
-  const priced = useMemo(() => items.map((item) => ({ item, c: claimFor(item, lsaLeft, glasses ?? 0) })), [items, lsaLeft, glasses]);
+  const priced = useMemo(() => items.map((item) => ({ item, c: claimFor(item, lsaLeft, glassesLeft ?? 0, orthoLeft) })), [items, lsaLeft, glassesLeft, orthoLeft]);
 
   // everything but the category, so each chip can say how many it would show
   const matching = useMemo(() => {
@@ -104,83 +96,27 @@ export default function StoreView() {
     setBenefit("all");
     setFullOnly(false);
   };
-  const usedPct = (lsaUsed / LSA_YEARLY) * 100;
 
   return (
     <div className="st">
       <section className="ph2 st-hero">
-        <div className="st-hero-main">
-          <div className="ph2-lead">
-            <span>
-              <G>Spending account left this plan year</G>
-            </span>
-            <b>{money(lsaLeft)}</b>
-            <div className="st-lsa">
-              <div className="st-meter big" role="img" aria-label={`${money(lsaUsed)} claimed of ${money(LSA_YEARLY)}`}>
-                {lsaUsed > 0 && <i className="y" style={{ width: `${usedPct}%` }} />}
-                {lsaLeft > 0 && <i className="l" style={{ width: `${100 - usedPct}%` }} />}
-              </div>
-              <div className="st-lsa-f">
-                <span>Already claimed</span>
-                <label className="st-used" title="Tap the amount to change it">
-                  <span>
-                    <i>$</i>
-                    <input
-                      inputMode="decimal"
-                      placeholder="0"
-                      value={usedText}
-                      style={{ width: `${Math.max(1, usedText.length) + 0.4}ch` }}
-                      onChange={(e) => setUsedText(e.target.value)}
-                      onBlur={commitUsed}
-                      onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
-                      aria-label={`Spending account already claimed this year, out of ${money(LSA_YEARLY)}`}
-                    />
-                  </span>
-                  <em>/ {money(LSA_YEARLY)}</em>
-                </label>
-              </div>
-            </div>
-          </div>
-          <dl className="ph2-facts">
-            <div>
-              <dt>Glasses or contacts</dt>
-              {glasses !== undefined ? (
-                <>
-                  <dd>{money(glasses)}</dd>
-                  <small>per 24 months, before the spending account</small>
-                </>
-              ) : (
-                <>
-                  <dd className="st-todo">Not added</dd>
-                  <small>
-                    Add it in <Link href="/insurance">Claim limits</Link>
-                  </small>
-                </>
-              )}
-            </div>
-            <div>
-              <dt>Fully covered now</dt>
-              <dd>
-                {free}
-                <small> of {items.length}</small>
-              </dd>
-              <small>cost you nothing after claiming</small>
-            </div>
-            <div>
-              <dt>Wishlist</dt>
-              <dd>{wishlist.length}</dd>
-              <small>
-                <Link href="/store/wishlist">See the total →</Link>
-              </small>
-            </div>
-          </dl>
-        </div>
+        <BenefitBars
+          limits={limits}
+          lsaUsed={lsaUsed}
+          used={used}
+          saveLsaUsed={saveLsaUsed}
+          saveUsed={saveUsed}
+          free={free}
+          products={items.length}
+          wishlist={wishlist.length}
+        />
         <BenefitPots limits={limits} lsaUsed={lsaUsed} />
       </section>
 
       <ActionCards
         limits={limits}
         lsaLeft={lsaLeft}
+        used={used}
         onShop={(c) => {
           filterTo(c as StoreCategory, "all");
           document.getElementById("st-tools")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -285,7 +221,7 @@ export default function StoreView() {
       ) : (
         <div className="st-grid">
           {rows.map(({ item, c }) => (
-            <ProductCard key={item.id} item={item} claim={c} lsaLeft={lsaLeft} visionLeft={glasses} wished={wishlist.includes(item.id)} onWish={() => toggleWish(item.id)} />
+            <ProductCard key={item.id} item={item} claim={c} lsaLeft={lsaLeft} visionLeft={glassesLeft} wished={wishlist.includes(item.id)} onWish={() => toggleWish(item.id)} />
           ))}
         </div>
       )}

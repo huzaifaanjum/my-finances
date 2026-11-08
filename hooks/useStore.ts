@@ -8,21 +8,24 @@ const API = "/api/store";
 /** where "already claimed" lived before it moved to your account */
 const OLD_KEY = "store_lsa_used";
 
-/** Store products, the spending account you've already claimed and your wishlist, from your account. Falls back to the bundled list if loading fails. */
+/** Store products, what you've already claimed (spending account and health limits) and your wishlist, from your account. Falls back to the bundled list if loading fails. */
 export function useStore() {
   const [items, setItems] = useState<StoreItem[]>([]);
   const [lsaUsed, setLsaUsed] = useState(0);
   const [wishlist, setWishlist] = useState<string[]>([]);
+  /** already claimed against each tracked health limit, by CLAIM_LIMITS id */
+  const [used, setUsed] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-    api<{ items?: StoreItem[]; lsaUsed?: number; wishlist?: string[] }>(API)
+    api<{ items?: StoreItem[]; lsaUsed?: number; used?: Record<string, number>; wishlist?: string[] }>(API)
       .then((d) => {
         if (cancelled) return;
         setItems(d.items ?? []);
         setWishlist(d.wishlist ?? []);
+        setUsed(d.used ?? {});
         let used = d.lsaUsed ?? 0;
         // carry over a value saved in this browser before it synced
         try {
@@ -75,5 +78,21 @@ export function useStore() {
     [wishlist],
   );
 
-  return { items, lsaUsed, wishlist, loading, error, saveLsaUsed, toggleWish };
+  const saveUsed = useCallback(
+    async (id: string, value: number) => {
+      setError("");
+      const before = used[id];
+      setUsed((prev) => ({ ...prev, [id]: value }));
+      try {
+        await api(API, { method: "PUT", body: { used: { id, value } } });
+      } catch (e) {
+        if (e instanceof AuthError) return signOut(true);
+        setError("Could not save that amount. Check your connection and try again.");
+        setUsed((prev) => ({ ...prev, [id]: before ?? 0 }));
+      }
+    },
+    [used],
+  );
+
+  return { items, lsaUsed, used, wishlist, loading, error, saveLsaUsed, saveUsed, toggleWish };
 }

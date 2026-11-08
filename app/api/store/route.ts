@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { guard, json } from "@/lib/server/auth";
 import { stateCollection, storeCollection } from "@/lib/server/mongo";
-import { LSA_YEARLY } from "@/lib/benefits";
-import { STORE, type StoreItem } from "@/lib/store";
+import { limitValue, LSA_YEARLY } from "@/lib/benefits";
+import { CLAIMED_IDS, STORE, type StoreItem } from "@/lib/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,7 +29,7 @@ async function items(): Promise<StoreItem[]> {
   return docs.map(({ _id, ...rest }) => ({ id: String(_id), ...rest }) as StoreItem);
 }
 
-/** GET -> { items, lsaUsed, wishlist }: the product catalog, what you've already claimed from the spending account this year, and wished item ids, oldest first. */
+/** GET -> { items, lsaUsed, used, wishlist }: the product catalog, what you've already claimed from the spending account and each health limit, and wished item ids, oldest first. */
 export async function GET(req: NextRequest) {
   const denied = await guard(req);
   if (denied) return denied;
@@ -38,7 +38,8 @@ export async function GET(req: NextRequest) {
     const lsaUsed = doc && typeof doc.lsaUsed === "number" ? doc.lsaUsed : 0;
     const wished = doc && typeof doc.wish === "object" && doc.wish !== null ? (doc.wish as Record<string, number>) : {};
     const wishlist = Object.keys(wished).sort((a, b) => wished[a] - wished[b]);
-    return json({ items: list, lsaUsed, wishlist });
+    const used = doc && typeof doc.used === "object" && doc.used !== null ? (doc.used as Record<string, number>) : {};
+    return json({ items: list, lsaUsed, used, wishlist });
   } catch {
     return json({ error: "server" }, 500);
   }
@@ -47,13 +48,22 @@ export async function GET(req: NextRequest) {
 /**
  * PUT { lsaUsed } -> saves what you've already claimed from the spending account this year.
  * PUT { wish: { id, on } } -> adds or removes one wishlist item (each is its own field, so devices never overwrite each other).
+ * PUT { used: { id, value } } -> saves what you've already claimed against one health limit (glasses, massage, ...).
  */
 export async function PUT(req: NextRequest) {
   const denied = await guard(req);
   if (denied) return denied;
   try {
-    const body = (await req.json().catch(() => null)) as { lsaUsed?: unknown; wish?: { id?: unknown; on?: unknown } } | null;
+    const body = (await req.json().catch(() => null)) as { lsaUsed?: unknown; wish?: { id?: unknown; on?: unknown }; used?: { id?: unknown; value?: unknown } } | null;
     const col = await stateCollection();
+    if (body?.used) {
+      const { id, value } = body.used;
+      if (typeof id !== "string" || !CLAIMED_IDS.includes(id)) return json({ error: "bad body" }, 400);
+      const max = limitValue(id) ?? 0;
+      if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > max) return json({ error: "bad value" }, 400);
+      await col.updateOne({ _id: DOC as never }, { $set: { [`used.${id}`]: value } }, { upsert: true });
+      return json({ ok: true });
+    }
     if (body?.wish) {
       const { id, on } = body.wish;
       if (typeof id !== "string" || !ID.test(id) || typeof on !== "boolean") return json({ error: "bad body" }, 400);
